@@ -29,6 +29,9 @@ class TemperatureController(object):
         self._latest_temp = ((data[0] << 8) + data[1]) / 5.00
         return self._latest_temp
 
+    def run_program(self, program):
+        pass
+
 
 class TemperatureSetting(object):
     def __init__(self, temperature, duration_in_seconds):
