@@ -22,11 +22,12 @@ class Relay(object):
 class TemperatureController(object):
     def __init__(self):
         self._bus = smbus.SMBus(1)
-        self._current_temp = None
+        self._latest_temp = None
 
-    def _update_temp(self):
+    def read_temperature(self):
         data = self._bus.read_i2c_block_data(0x4d, 1, 2)
-        self._current_temp = ((data[0] << 8) + data[1]) / 5.00
+        self._latest_temp = ((data[0] << 8) + data[1]) / 5.00
+        return self._latest_temp
 
 
 class TemperatureSetting(object):
