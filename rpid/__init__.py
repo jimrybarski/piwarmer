@@ -92,10 +92,3 @@ class TemperatureProgram(object):
                 return setting.temperature
         # The program program is over or holding at a specified temperature.
         return self._hold_temp if self._hold_temp else False
-
-
-# def install(self, relay):
-#     with open("/sys/class/gpio/export", "w") as f:
-#         f.write(relay.number + "\n")
-#     with open(relay.path("direction"), "w") as f:
-#         f.write("out")
