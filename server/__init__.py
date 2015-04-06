@@ -57,7 +57,7 @@ def current():
         current_temp = r.get("current_temp") or "n/a"
         current_setting = r.get("current_setting") or "off"
         minutes_left = r.get("minutes_left")
-        minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s) left"
+        minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
         print("ML %s" % minutes_left)
         data = {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
@@ -73,7 +73,6 @@ def history():
     else:
         keys = StrictRedis().hkeys("history")
         res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in keys}
-        print(res)
         return res
 
 
