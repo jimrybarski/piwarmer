@@ -3,26 +3,11 @@ import smbus
 import time
 import numpy as np
 import logging
+import redis
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.DEBUG)
-
-
-class Relay(object):
-    def __init__(self, name):
-        assert name in ("hot", "cold")
-        numbers = {"hot": "22",
-                   "cold": "27"}
-        self._number = numbers[name]
-
-    @property
-    def number(self):
-        return self._number
-
-    def path(self, item):
-        assert item in ("value", "direction")
-        return "/sys/class/gpio/gpio%s/%s" % (self.number, item)
 
 
 class TemperatureController(object):
@@ -33,6 +18,7 @@ class TemperatureController(object):
     def read_temperature(self):
         data = self._bus.read_i2c_block_data(0x4d, 1, 2)
         self._latest_temp = ((data[0] << 8) + data[1]) / 5.00
+        redis.StrictRedis().set("current_temp", self._latest_temp)
         return self._latest_temp
 
     def run_program(self, program):

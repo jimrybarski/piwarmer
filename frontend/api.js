@@ -51,17 +51,32 @@ $(document).ready(function(){
 
   // submit form data to the API
   $(document.body).on('click', '#run_program' ,function() {
-    var config = {};
+    var program = {};
     var row_id = 0;
     $("#settings").serializeArray().map(function(item) {
       if (item.name == "mode") {
         row_id++;
-        config[row_id] = {"mode": item.value};
+        program[row_id] = {"mode": item.value};
       } else {
-        config[row_id][item.name] = item.value;
+        program[row_id][item.name] = item.value;
       };
     });
-    console.log(JSON.stringify(config));
+
+    $.ajax({
+      type: "POST",
+      crossDomain: true,
+      url: "http://127.0.0.1:8089/program",
+      data: JSON.stringify(program),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: function(data) {
+        window.location.replace("http://localhost:8000/monitor.html");
+      },
+      failure: function(data) { 
+          console.log(data);
+          alert("Something went wrong! Is the web server not really running?");
+      },
+    });
   });
 
 
