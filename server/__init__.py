@@ -9,8 +9,8 @@ app = Bottle()
 @app.hook('after_request')
 def enable_cors():
     """
-    You need to add some headers to each request.
-    Don't use the wildcard '*' for Access-Control-Allow-Origin in production.
+    Deals with some security issues caused by running two sites both on localhost.
+
     """
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
@@ -26,7 +26,7 @@ def status():
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        StrictRedis().set("program", str(request.data))
+        StrictRedis().set("active", 1)
     return {}
 
 
@@ -34,7 +34,7 @@ def act():
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        StrictRedis().delete("program")
+        StrictRedis().set("active", 0)
     return {}
 
 
@@ -44,7 +44,16 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        return json.loads(StrictRedis().get("program")) or {"1": "No program set."}
+        return json.loads(StrictRedis().get("program")) or {}
+
+
+@app.route('/program', method=['POST'])
+def act():
+    response.headers['Content-Type'] = 'application/json'
+    if request.method == 'OPTIONS':
+        return {}
+    else:
+        StrictRedis().set("program", json.dumps(request.data))
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])
