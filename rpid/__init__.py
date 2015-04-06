@@ -34,17 +34,28 @@ class TemperatureController(object):
 
 
 class TemperatureSetting(object):
-    def __init__(self, temperature, duration_in_seconds):
-        self._temperature = temperature
-        self._duration = duration_in_seconds
+    def __init__(self, duration, function="set", **kwargs):
+        funcs = {"_set": self._set,
+                 "_linear": self._linear,
+                 "_exponential": self._exponential}
+        self._function = funcs[function]
+        self._kwargs = kwargs
 
-    @property
-    def temperature(self):
-        return self._temperature
+    def _set(self):
+        return 0
+
+    def _linear(self):
+        return 0
+
+    def _exponential(self):
+        return 0
+
+    def temperature(self, elapsed):
+        return self._function(elapsed)
 
     @property
     def duration(self):
-        return self._duration
+        return self._kwargs['duration']
 
 
 class TemperatureProgram(object):
@@ -89,6 +100,7 @@ class TemperatureProgram(object):
         for setting in settings:
             elapsed -= setting.duration
             if elapsed < 0:
-                return setting.temperature
+                # elapsed is now the negative of the time spent in the current setting
+                return setting.temperature(-elapsed)
         # The program program is over or holding at a specified temperature.
         return self._hold_temp if self._hold_temp else False
