@@ -1,28 +1,124 @@
+from datetime import datetime
 from itertools import cycle
 import smbus
 import time
 import numpy as np
 import logging
 import redis
+import json
+import RPIO
+from RPIO import PWM
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.DEBUG)
 
 
-class TemperatureController(object):
+class Data(object):
+    def __init__(self):
+        self._conn = None
+
+    @property
+    def conn(self):
+        return redis.StrictRedis()
+
+    def update_temperature(self, temp):
+        self.conn.set("current_temp", temp)
+
+    def deactivate(self):
+        self.conn.set("active", 0)
+
+    def activate(self):
+        self.conn.set("active", 1)
+
+    @property
+    def program(self):
+        return self.conn.get("program")
+
+    @property
+    def active(self):
+        return self.conn.get("active") == "1"
+
+
+class Output(object):
+    ENABLE_PIN = 27
+    PWM_PIN = 28
+
+    def __init__(self):
+        RPIO.setup(RPIO.BOARD)
+        RPIO.setup(Output.ENABLE_PIN, RPIO.OUT)
+        RPIO.setup(Output.PWM_PIN, RPIO.OUT)
+        # Sets up a PWM pin with 1 second cycles
+        self._pwm = PWM.Servo(subcycle_time_us=1000000)
+
+    def enable(self):
+        RPIO.output(Output.ENABLE_PIN, True)
+
+    def disable(self):
+        RPIO.output(Output.ENABLE_PIN, False)
+
+    def set_pwm(self, duty_cycle):
+        assert 0.0 <= duty_cycle <= 1.0
+        self._pwm.set_servo(Output.PWM_PIN, 1000000 * duty_cycle)
+
+
+class TemperatureProbe(object):
+    GPIO_ADDRESS = 0x4d
+
     def __init__(self):
         self._bus = smbus.SMBus(1)
-        self._latest_temp = None
+        log.debug("Connected to SMBus")
 
-    def read_temperature(self):
-        data = self._bus.read_i2c_block_data(0x4d, 1, 2)
-        self._latest_temp = ((data[0] << 8) + data[1]) / 5.00
-        redis.StrictRedis().set("current_temp", self._latest_temp)
-        return self._latest_temp
+    @property
+    def current_temperature(self):
+        data = self._bus.read_i2c_block_data(TemperatureProbe.GPIO_ADDRESS, 1, 2)
+        return ((data[0] * 256) + data[1]) / 5.0
 
-    def run_program(self, program):
-        pass
+
+class TemperatureController(object):
+    def __init__(self):
+        self._probe = TemperatureProbe()
+        self._data = Data()
+        # Disable the temperature controller on boot to ensure we're not running an old program
+        self._data.deactivate()
+        self._program = None
+        self._history_key = None
+
+    def _update_temperature(self):
+        temperature = self._probe.current_temperature
+        log.debug("current_temp: %s" % temperature)
+        self._data.update_temperature(temperature)
+
+    def _run_program(self):
+        while True:
+            if not self._data.active:
+
+
+    def _activate(self):
+        self._program = TemperatureProgram()
+        self._program.load_json(self._data.program)
+        self._history_key = self._get_history_key()
+
+    def _get_history_key(self):
+        return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+    def run(self):
+        while True:
+            self._listen()
+            self._run_program()
+
+    def _listen(self):
+        """
+        Do nothing until someone instructs the temperature controller to start running.
+
+        :return:
+        """
+        while True:
+            if self._data.active:
+                break
+            else:
+                log.debug("Temperature controller inactive.")
+                time.sleep(1)
 
 
 class TemperatureSetting(object):
@@ -45,6 +141,10 @@ class TemperatureProgram(object):
         self._looping = False
         self._start = None
         self._hold_temp = None
+
+    def load_json(self, json_program):
+        raw_program = json.loads(json_program)
+        # TODO: Build up the temperature settings here
 
     def set_temperature(self, temperature, duration_in_seconds):
         if not self._looping:
