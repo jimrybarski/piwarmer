@@ -55,6 +55,7 @@ $(document).ready(function(){
     var row_id = 0;
     $("#settings").serializeArray().map(function(item) {
       if (item.name == "mode") {
+        // we're on a new row (i.e. a new instruction)
         row_id++;
         program[row_id] = {"mode": item.value};
       } else {
@@ -70,6 +71,7 @@ $(document).ready(function(){
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data) {
+        // the program has been received, so we move to the monitoring page
         window.location.replace("http://localhost:8000/monitor.html");
       },
       failure: function(data) { 

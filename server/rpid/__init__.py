@@ -22,11 +22,13 @@ class Data(object):
     def conn(self):
         return redis.StrictRedis()
 
-    def update_temperature(self, temp):
+    def update_temperature(self, temp, history_key, timestamp):
         self.conn.set("current_temp", temp)
+        self.conn.hset(history_key, timestamp, temp)
 
     def deactivate(self):
         self.conn.set("active", 0)
+        self.conn.delete("program")
 
     def activate(self):
         self.conn.set("active", 1)
@@ -78,26 +80,40 @@ class TemperatureProbe(object):
 class TemperatureController(object):
     def __init__(self):
         self._probe = TemperatureProbe()
+        self._output = Output()
         self._data = Data()
+        self._pid = PID()
         # Disable the temperature controller on boot to ensure we're not running an old program
         self._data.deactivate()
         self._program = None
         self._history_key = None
+        self._start_time = None
 
     def _update_temperature(self):
         temperature = self._probe.current_temperature
         log.debug("current_temp: %s" % temperature)
-        self._data.update_temperature(temperature)
+        timestamp = self._start_time - datetime.utcnow()
+        self._data.update_temperature(temperature, self._history_key, timestamp)
+        return temperature
 
     def _run_program(self):
         while True:
             if not self._data.active:
-
+                # Turn off the heater and return to listening mode
+                self._output.disable()
+                break
+            else:
+                temperature = self._update_temperature()
+                self._pid.set_point = self._program.get_desired_temperature()
+                new_duty_cycle = self._pid.update(temperature)
+                self._output.set_pwm(new_duty_cycle)
+            time.sleep(1.0)
 
     def _activate(self):
         self._program = TemperatureProgram()
         self._program.load_json(self._data.program)
         self._history_key = self._get_history_key()
+        self._start_time = datetime.utcnow()
 
     def _get_history_key(self):
         return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
@@ -141,6 +157,12 @@ class TemperatureProgram(object):
         self._looping = False
         self._start = None
         self._hold_temp = None
+        self._total_duration = 0.0
+
+    @property
+    def minutes_left(self):
+        seconds_left = max(time.time() - self._start - self._total_duration, 0)
+        return int(seconds_left / 60.0)
 
     def load_json(self, json_program):
         raw_program = json.loads(json_program)
@@ -149,6 +171,7 @@ class TemperatureProgram(object):
     def set_temperature(self, temperature, duration_in_seconds):
         if not self._looping:
             setting = TemperatureSetting(temperature, duration_in_seconds)
+            self._total_duration += duration_in_seconds
             self._settings.append(setting)
         return self
 
@@ -158,6 +181,7 @@ class TemperatureProgram(object):
             for i in range(times):
                 for action in self._settings:
                     new_settings.append(action)
+                    self._total_duration += action.duration
             self._settings = new_settings
         return self
 
@@ -172,7 +196,7 @@ class TemperatureProgram(object):
     def start(self):
         self._start = time.time()
 
-    def get_current_temperature(self):
+    def get_desired_temperature(self):
         if self._looping:
             settings = cycle(self._settings)
         else:
@@ -198,11 +222,11 @@ class PID:
         self._accumulated_error_min = accumulated_error_min
         self._set_point = 25.0
 
-    def update(self, current_value):
+    def update(self, current_temperature):
         log.debug("\n\n")
-        error = self._set_point - current_value
+        error = self._set_point - current_temperature
         log.debug("Error: %s" % error)
-        self._update_previous_errors(current_value, error)
+        self._update_previous_errors(current_temperature, error)
         self._update_accumulated_error(error)
         p = self._kp * error
         log.debug("Proportional: %s" % p)
