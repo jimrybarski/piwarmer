@@ -166,7 +166,7 @@ class TemperatureProgram(object):
 
     def load_json(self, json_program):
         raw_program = json.loads(json_program)
-        # TODO: Build up the temperature settings here
+        # TODO: Build up the temperature settings heresha
 
     def set_temperature(self, temperature, duration_in_seconds):
         if not self._looping:
