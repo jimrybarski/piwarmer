@@ -47,8 +47,8 @@ class Data(object):
 
 
 class Output(object):
-    ENABLE_PIN = 27
-    PWM_PIN = 28
+    PWM_PIN = 27
+    ENABLE_PIN = 28
 
     def __init__(self):
         RPIO.setup(RPIO.BOARD)
