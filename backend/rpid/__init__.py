@@ -51,7 +51,7 @@ class Output(object):
     ENABLE_PIN = 28
 
     def __init__(self):
-        RPIO.setup(RPIO.BOARD)
+        RPIO.setmode(RPIO.BOARD)
         RPIO.setup(Output.ENABLE_PIN, RPIO.OUT)
         RPIO.setup(Output.PWM_PIN, RPIO.OUT)
         # Sets up a PWM pin with 1 second cycles
