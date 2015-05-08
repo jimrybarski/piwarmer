@@ -11,9 +11,47 @@ log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.DEBUG)
 
+"""
+sudo python
+Python 2.7.3 (default, Mar 18 2014, 05:13:23)
+[GCC 4.6.3] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import RPi.GPIO as GPIO
+>>> GPIO.setmode(GPIO.BOARD)
+>>> GPIO.setup(38, GPIO.OUT)
+__main__:1: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
+>>> GPIO.output(38, GPIO.HIGH)
+>>> p = GPIO.PWM(36, 1)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+RuntimeError: You must setup() the GPIO channel as an output first
+>>> GPIO.setup(36, GPIO.OUT)
+>>> p = GPIO.PWM(36, 1)
+>>> GPIO.LOW
+0
+>>> GPIO.HIGH
+1
+>>> p
+<RPi.GPIO.PWM object at 0xb6c7f560>
+>>> dir(p)
+['ChangeDutyCycle', 'ChangeFrequency', '__class__', '__delattr__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'start', 'stop']
+>>> p.start(1)
+>>> p.ChangeDutyCycle(1.0)
+>>> p.ChangeDutyCycle(5.0)
+>>> p.ChangeDutyCycle(10.0)
+>>> p.ChangeDutyCycle(20.0)
+>>> p.ChangeDutyCycle(30.0)
+>>> p.ChangeDutyCycle(40.0)
+>>> p.ChangeDutyCycle(100.0)
+>>> p.ChangeDutyCycle(40.0)
+>>> p.ChangeDutyCycle(50.0)
+>>> p.ChangeDutyCycle(60.0)
+>>> p.ChangeDutyCycle(70.0)
+>>> p.stop()
+
+"""
 try:
-    import RPIO
-    from RPIO import PWM
+    import RPi.GPIO as GPIO
 except SystemError:
     log.warn("Not running on Raspberry Pi, RPIO cannot be imported.")
 
@@ -47,25 +85,25 @@ class Data(object):
 
 
 class Output(object):
-    PWM_PIN = 27
-    ENABLE_PIN = 28
+    PWM_PIN = 36
+    ENABLE_PIN = 38
 
     def __init__(self):
-        RPIO.setmode(RPIO.BOARD)
-        RPIO.setup(Output.ENABLE_PIN, RPIO.OUT)
-        RPIO.setup(Output.PWM_PIN, RPIO.OUT)
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(Output.ENABLE_PIN, GPIO.OUT)
+        GPIO.setup(Output.PWM_PIN, GPIO.OUT)
         # Sets up a PWM pin with 1 second cycles
-        self._pwm = PWM.Servo(subcycle_time_us=1000000)
+        self._pwm = GPIO.PWM(Output.PWM_PIN, 1.0)
 
     def enable(self):
-        RPIO.output(Output.ENABLE_PIN, True)
+        GPIO.output(Output.ENABLE_PIN, GPIO.HIGH)
 
     def disable(self):
-        RPIO.output(Output.ENABLE_PIN, False)
+        GPIO.output(Output.ENABLE_PIN, GPIO.LOW)
 
-    def set_pwm(self, duty_cycle):
-        assert 0.0 <= duty_cycle <= 1.0
-        self._pwm.set_servo(Output.PWM_PIN, 1000000 * duty_cycle)
+    def set_pwm(self, new_duty_cycle):
+        assert 0.0 <= duty_cycle <= 100.0
+        self._pwm.ChangeDutyCycle(new_duty_cycle)
 
 
 class TemperatureProbe(object):
