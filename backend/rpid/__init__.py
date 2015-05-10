@@ -71,6 +71,7 @@ class Output(object):
         GPIO.setup(Output.PWM_PIN, GPIO.OUT)
         # Sets up a PWM pin with 1 second cycles
         self._pwm = GPIO.PWM(Output.PWM_PIN, Output.HERTZ)
+        self._pwm.start(0)
 
     def enable(self):
         GPIO.output(Output.ENABLE_PIN, GPIO.HIGH)
