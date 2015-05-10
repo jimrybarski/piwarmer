@@ -140,6 +140,7 @@ class TemperatureController(object):
         self._program.load_json(self._data_provider.program)
         # save the current timestamp so we can label data for the current run
         self._history_key = self._get_history_key()
+        self._program.start()
 
     def _run_program(self):
         # Activate the motor driver chip, but ensure the heater won't get hot until we want it to
@@ -207,12 +208,7 @@ class TemperatureProgram(object):
     def load_json(self, json_program):
         """
         json_program will be a dict like:
-        {
-         "1": {"mode": "set", "temperature": 60.0, "duration": 3600},
-         "2": {"mode": "set", "temperature": 37.0, "duration": 600},
-         "3": {"mode": "repeat", "num_repeats": 20},
-         "4": {"mode": "hold", "temperature": 25.0}
-        }
+        {"1": {"mode": "set", "temperature": 60.0, "duration": 3600},"2": {"mode": "set", "temperature": 37.0, "duration": 600},"3": {"mode": "repeat", "num_repeats": 20},"4": {"mode": "hold", "temperature": 25.0}}
         Modes and attributes supported:
 
         set: temperature, duration
@@ -262,6 +258,7 @@ class TemperatureProgram(object):
         return self
 
     def start(self):
+        assert self._start is None
         self._start = time.time()
 
     def get_desired_temperature(self):
@@ -269,7 +266,7 @@ class TemperatureProgram(object):
             settings = cycle(self._settings)
         else:
             settings = self._settings
-        elapsed = time.time() - self._start
+        elapsed = time.time() - self.start
         for setting in settings:
             elapsed -= setting.duration
             if elapsed < 0:
