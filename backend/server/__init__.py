@@ -92,4 +92,4 @@ def history_csv(item):
         history = ["%s\t%s" % (timestamp, temperature) for timestamp, temperature in sorted(values.items())]
         return "timestamp\ttemperature\n" + "\n".join(history)
 
-app.run(host="0.0.0.0", port=PORT)
+app.run(host="10.42.0.86", port=PORT)

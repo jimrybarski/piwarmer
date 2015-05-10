@@ -66,13 +66,13 @@ $(document).ready(function(){
     $.ajax({
       type: "POST",
       crossDomain: true,
-      url: "http://127.0.0.1:8089/program",
+      url: "http://10.42.0.86:8089/program",
       data: JSON.stringify(program),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data) {
         // the program has been received, so we move to the monitoring page
-        window.location.replace("http://localhost:8000/monitor.html");
+        window.location.replace("http://10.42.0.86/monitor.html");
       },
       failure: function(data) { 
           console.log(data);
