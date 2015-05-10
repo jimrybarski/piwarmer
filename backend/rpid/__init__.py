@@ -32,9 +32,32 @@ class Data(redis.StrictRedis):
     def program(self):
         return self.get("program")
 
+    def set_program(self, program):
+        self.set("program", json.dumps(program))
+
     @property
     def active(self):
         return self.get("active") == "1"
+
+    @property
+    def current_temp(self):
+        return self.get("current_temp")
+
+    @property
+    def current_setting(self):
+        return self.get("current_setting")
+
+    @property
+    def minutes_left(self):
+        return self.get("minutes_left")
+
+    @property
+    def run_times(self):
+        # a list of timestamps when experiments were started
+        return self.hkeys("history")
+
+    def get_history(self, timestamp):
+        return self.hget("history", timestamp)
 
 
 class Output(object):
@@ -95,7 +118,51 @@ class TemperatureController(object):
     def run(self):
         while True:
             self._listen()
+            self._activate()
             self._run_program()
+
+    def _listen(self):
+        """
+        Do nothing until someone instructs the temperature controller to start running.
+
+        """
+        while True:
+            if self._data_provider.active:
+                break
+            else:
+                log.debug("Temperature controller inactive.")
+                time.sleep(1)
+
+    def _activate(self):
+        self._program = TemperatureProgram()
+        # get the program currently in Redis
+        self._program.load_json(self._data_provider.program)
+        # save the current timestamp so we can label data for the current run
+        self._history_key = self._get_history_key()
+
+    def _run_program(self):
+        # Activate the motor driver chip, but ensure the heater won't get hot until we want it to
+        self._output.set_pwm(0.0)
+        self._output.enable()
+
+        while True:
+            if not self._data_provider.active:
+                # Turn off the heater and return to listening mode
+                log.debug("The program is inactive, according to the data provider.")
+                self._output.disable()
+                break
+            else:
+                # We're still running the program. Update the PID and adjust the duty cycle accordingly
+                temperature = self._update_temperature()
+                desired_temperature = self._program.get_desired_temperature()
+                if desired_temperature is False:
+                    # the program is over
+                    break
+                log.debug("Desired temp: %s" % desired_temperature)
+                self._pid.update_set_point(desired_temperature)
+                new_duty_cycle = self._pid.update(temperature)
+                self._output.set_pwm(new_duty_cycle)
+            time.sleep(1.0)
 
     def _update_temperature(self):
         temperature = self._probe.current_temperature
@@ -104,42 +171,8 @@ class TemperatureController(object):
         self._data_provider.update_temperature(temperature, self._history_key, timestamp)
         return temperature
 
-    def _run_program(self):
-        while True:
-            if not self._data_provider.active:
-                # Turn off the heater and return to listening mode
-                log.debug("The program is inactive, according to the data provider.")
-                self._output.disable()
-                break
-            else:
-                temperature = self._update_temperature()
-                desired_temperature = self._program.get_desired_temperature()
-                log.debug("Desired temp: %s" % desired_temperature)
-                self._pid.update_set_point(desired_temperature)
-                new_duty_cycle = self._pid.update(temperature)
-                self._output.set_pwm(new_duty_cycle)
-            time.sleep(1.0)
-
-    def _activate(self):
-        self._program = TemperatureProgram()
-        self._program.load_json(self._data_provider.program)
-        self._history_key = self._get_history_key()
-
     def _get_history_key(self):
         return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-
-    def _listen(self):
-        """
-        Do nothing until someone instructs the temperature controller to start running.
-
-        :return:
-        """
-        while True:
-            if self._data_provider.active:
-                break
-            else:
-                log.debug("Temperature controller inactive.")
-                time.sleep(1)
 
 
 class TemperatureSetting(object):
@@ -273,6 +306,7 @@ class PID:
         log.debug("PI total: %s" % total)
         duty_cycle = max(0, min(100, total))
         log.info("Duty cycle: %s" % duty_cycle)
+        return duty_cycle
 
     def _update_accumulated_error(self, error):
         # Add the current error to the accumulated error

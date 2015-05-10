@@ -1,9 +1,10 @@
 from bottle import Bottle, request, response
 import json
-from redis import StrictRedis
+from rpid import Data
 
 PORT = 8089
 app = Bottle()
+data = Data()
 
 
 @app.hook('after_request')
@@ -26,7 +27,7 @@ def status():
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        StrictRedis().set("active", 1)
+        data.activate()
     return {}
 
 
@@ -34,7 +35,7 @@ def act():
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        StrictRedis().set("active", 0)
+        data.deactivate()
     return {}
 
 
@@ -44,7 +45,7 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        return json.loads(StrictRedis().get("program")) or {}
+        return json.loads(data.program) or {}
 
 
 @app.route('/program', method=['POST'])
@@ -53,7 +54,7 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        StrictRedis().set("program", json.dumps(request.data))
+        data.set_program(request.data)
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])
@@ -62,16 +63,13 @@ def current():
     if request.method == 'OPTIONS':
         return {}
     else:
-        r = StrictRedis()
-        current_temp = r.get("current_temp") or "n/a"
-        current_setting = r.get("current_setting") or "off"
-        minutes_left = r.get("minutes_left")
+        current_temp = data.current_temp or "n/a"
+        current_setting = data.current_setting or "off"
+        minutes_left = data.minutes_left
         minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
-        print("ML %s" % minutes_left)
-        data = {"setting": current_setting,
+        return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
                 "minutes_left": minutes_left}
-        return data
 
 
 @app.route('/history', method=['OPTIONS', 'GET'])
@@ -80,8 +78,7 @@ def history():
     if request.method == 'OPTIONS':
         return {}
     else:
-        keys = StrictRedis().hkeys("history")
-        res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in keys}
+        res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in data.run_times}
         return res
 
 
@@ -91,7 +88,7 @@ def history_csv(item):
     if request.method == 'OPTIONS':
         return {}
     else:
-        values = json.loads(StrictRedis().hget("history", item))
+        values = json.loads(data.get_history(item))
         history = ["%s\t%s" % (timestamp, temperature) for timestamp, temperature in sorted(values.items())]
         return "timestamp\ttemperature\n" + "\n".join(history)
 
