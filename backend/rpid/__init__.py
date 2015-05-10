@@ -256,10 +256,6 @@ class TemperatureProgram(object):
             self._settings = new_settings
         return self
 
-    def loop_forever(self):
-        self._looping = True
-        return self
-
     def hold(self, temperature=25.0):
         self._hold_temp = temperature
         return self
