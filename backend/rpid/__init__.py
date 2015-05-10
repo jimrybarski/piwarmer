@@ -1,99 +1,53 @@
 from datetime import datetime
 from itertools import cycle
-import smbus
-import time
-import numpy as np
+import json
 import logging
 import redis
-import json
+import smbus
+import time
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.DEBUG)
 
-"""
-sudo python
-Python 2.7.3 (default, Mar 18 2014, 05:13:23)
-[GCC 4.6.3] on linux2
-Type "help", "copyright", "credits" or "license" for more information.
->>> import RPi.GPIO as GPIO
->>> GPIO.setmode(GPIO.BOARD)
->>> GPIO.setup(38, GPIO.OUT)
-__main__:1: RuntimeWarning: This channel is already in use, continuing anyway.  Use GPIO.setwarnings(False) to disable warnings.
->>> GPIO.output(38, GPIO.HIGH)
->>> p = GPIO.PWM(36, 1)
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-RuntimeError: You must setup() the GPIO channel as an output first
->>> GPIO.setup(36, GPIO.OUT)
->>> p = GPIO.PWM(36, 1)
->>> GPIO.LOW
-0
->>> GPIO.HIGH
-1
->>> p
-<RPi.GPIO.PWM object at 0xb6c7f560>
->>> dir(p)
-['ChangeDutyCycle', 'ChangeFrequency', '__class__', '__delattr__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'start', 'stop']
->>> p.start(1)
->>> p.ChangeDutyCycle(1.0)
->>> p.ChangeDutyCycle(5.0)
->>> p.ChangeDutyCycle(10.0)
->>> p.ChangeDutyCycle(20.0)
->>> p.ChangeDutyCycle(30.0)
->>> p.ChangeDutyCycle(40.0)
->>> p.ChangeDutyCycle(100.0)
->>> p.ChangeDutyCycle(40.0)
->>> p.ChangeDutyCycle(50.0)
->>> p.ChangeDutyCycle(60.0)
->>> p.ChangeDutyCycle(70.0)
->>> p.stop()
-
-"""
 try:
     import RPi.GPIO as GPIO
-except SystemError:
-    log.warn("Not running on Raspberry Pi, RPIO cannot be imported.")
+except (SystemError, ImportError):
+    log.warn("Not running on Raspberry Pi, GPIO cannot be imported.")
 
 
-class Data(object):
-    def __init__(self):
-        self._conn = None
-
-    @property
-    def conn(self):
-        return redis.StrictRedis()
-
+class Data(redis.StrictRedis):
     def update_temperature(self, temp, history_key, timestamp):
-        self.conn.set("current_temp", temp)
-        self.conn.hset(history_key, timestamp, temp)
+        self.set("current_temp", temp)
+        self.hset(history_key, timestamp, temp)
 
     def deactivate(self):
-        self.conn.set("active", 0)
-        self.conn.delete("program")
+        self.set("active", 0)
+        self.delete("program")
 
     def activate(self):
-        self.conn.set("active", 1)
+        self.set("active", 1)
 
     @property
     def program(self):
-        return self.conn.get("program")
+        return self.get("program")
 
     @property
     def active(self):
-        return self.conn.get("active") == "1"
+        return self.get("active") == "1"
 
 
 class Output(object):
     PWM_PIN = 36
     ENABLE_PIN = 38
+    HERTZ = 1.0  # the response is super slow so 1 Hz is fine
 
     def __init__(self):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(Output.ENABLE_PIN, GPIO.OUT)
         GPIO.setup(Output.PWM_PIN, GPIO.OUT)
         # Sets up a PWM pin with 1 second cycles
-        self._pwm = GPIO.PWM(Output.PWM_PIN, 1.0)
+        self._pwm = GPIO.PWM(Output.PWM_PIN, Output.HERTZ)
 
     def enable(self):
         GPIO.output(Output.ENABLE_PIN, GPIO.HIGH)
@@ -102,7 +56,7 @@ class Output(object):
         GPIO.output(Output.ENABLE_PIN, GPIO.LOW)
 
     def set_pwm(self, new_duty_cycle):
-        assert 0.0 <= duty_cycle <= 100.0
+        assert 0.0 <= new_duty_cycle <= 100.0
         self._pwm.ChangeDutyCycle(new_duty_cycle)
 
 
@@ -138,9 +92,14 @@ class TemperatureController(object):
             self._start_time = datetime.utcnow()
         return self._start_time
 
+    def run(self):
+        while True:
+            self._listen()
+            self._run_program()
+
     def _update_temperature(self):
         temperature = self._probe.current_temperature
-        log.debug("current_temp: %s" % temperature)
+        log.debug("Current temp: %s" % temperature)
         timestamp = self.start_time - datetime.utcnow()
         self._data_provider.update_temperature(temperature, self._history_key, timestamp)
         return temperature
@@ -149,11 +108,14 @@ class TemperatureController(object):
         while True:
             if not self._data_provider.active:
                 # Turn off the heater and return to listening mode
+                log.debug("The program is inactive, according to the data provider.")
                 self._output.disable()
                 break
             else:
                 temperature = self._update_temperature()
-                self._pid.set_point = self._program.get_desired_temperature()
+                desired_temperature = self._program.get_desired_temperature()
+                log.debug("Desired temp: %s" % desired_temperature)
+                self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
                 self._output.set_pwm(new_duty_cycle)
             time.sleep(1.0)
@@ -165,11 +127,6 @@ class TemperatureController(object):
 
     def _get_history_key(self):
         return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-
-    def run(self):
-        while True:
-            self._listen()
-            self._run_program()
 
     def _listen(self):
         """
@@ -292,45 +249,30 @@ class TemperatureProgram(object):
 
 
 class PID:
-    def __init__(self, kp=1.0, ki=1.0, kd=1.0, accumulated_error_min=-20, accumulated_error_max=20):
-        assert accumulated_error_min < 0 < accumulated_error_max
+    ROOM_TEMP = 20
+
+    def __init__(self, kp=5.0, ki=1.0):
         self._kp = kp
         self._ki = ki
-        self._kd = kd
         self._previous_errors = []
         self._accumulated_error = 0.0
-        self._accumulated_error_max = accumulated_error_max
-        self._accumulated_error_min = accumulated_error_min
+        self._accumulated_error_max = 20
+        self._accumulated_error_min = -20
         self._set_point = 25.0
 
     def update(self, current_temperature):
-        log.debug("\n\n")
-        error = self._set_point - current_temperature
+        error = self.set_point - current_temperature
         log.debug("Error: %s" % error)
-        self._update_previous_errors(current_temperature, error)
+        # self._update_previous_errors(current_temperature, error)
         self._update_accumulated_error(error)
         p = self._kp * error
         log.debug("Proportional: %s" % p)
         i = self._accumulated_error * self._ki
         log.debug("Integral: %s" % i)
-        d = self._calculate_error_derivative() * self._kd
-        log.debug("Derivative: %s" % d)
-        total = p + i + d
-        log.debug("PID total: %s" % total)
-        return total
-
-    def _calculate_error_derivative(self):
-        # finds the slope of the least squares regression for the last five error measurements
-        a = np.vstack([np.array(self._previous_errors), np.ones(len(self._previous_errors))]).T
-        b = np.arange(float(len(self._previous_errors)))
-        slope = np.linalg.lstsq(a, b)[0][0]
-        return slope
-
-    def _update_previous_errors(self, current_value, error):
-        if not self._previous_errors:
-            self._previous_errors = [float(current_value) for i in range(5)]
-        self._previous_errors.pop(0)
-        self._previous_errors.append(error)
+        total = 100 * int(p + i) / (self.set_point - PID.ROOM_TEMP + 5.0)
+        log.debug("PI total: %s" % total)
+        duty_cycle = max(0, min(100, total))
+        log.info("Duty cycle: %s" % duty_cycle)
 
     def _update_accumulated_error(self, error):
         # Add the current error to the accumulated error
@@ -344,6 +286,9 @@ class PID:
     def set_point(self):
         return self._set_point
 
-    @set_point.setter
-    def set_point(self, temperature):
+    def update_set_point(self, temperature):
+        log.debug("Setting set point to %s" % temperature)
+        room_temp_diff = temperature - PID.ROOM_TEMP + 5.0
+        self._accumulated_error_max = room_temp_diff / 2.0
+        self._accumulated_error_min = -room_temp_diff / 2.0
         self._set_point = float(temperature)
