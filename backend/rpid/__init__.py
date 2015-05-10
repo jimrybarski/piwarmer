@@ -266,7 +266,7 @@ class TemperatureProgram(object):
             settings = cycle(self._settings)
         else:
             settings = self._settings
-        elapsed = time.time() - self.start
+        elapsed = time.time() - self._start
         for setting in settings:
             elapsed -= setting.duration
             if elapsed < 0:
