@@ -2,7 +2,7 @@ function get(func){
     $.ajax({
       type: "GET",
       crossDomain: true,
-      url: "http://10.42.0.86:8089/history",
+      url: "http://10.42.0.86/api/history",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data){

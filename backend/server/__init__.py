@@ -5,6 +5,7 @@ from rpid import Data
 PORT = 8089
 app = Bottle()
 data = Data()
+app.mount('/api/', app)
 
 
 @app.hook('after_request')
@@ -92,4 +93,4 @@ def history_csv(item):
         history = ["%s\t%s" % (timestamp, temperature) for timestamp, temperature in sorted(values.items())]
         return "timestamp\ttemperature\n" + "\n".join(history)
 
-app.run(host="10.42.0.86", port=PORT)
+app.run(host="127.0.0.1", port=PORT)
