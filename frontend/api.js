@@ -72,7 +72,7 @@ $(document).ready(function(){
       dataType: "json",
       success: function(data) {
         // the program has been received, so we move to the monitoring page
-        window.location.replace("http://10.42.0.86/monitor.html");
+        window.location.replace("http://10.42.0.86/monitor");
       },
       failure: function(data) { 
           console.log(data);
