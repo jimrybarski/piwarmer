@@ -1,6 +1,6 @@
 from bottle import Bottle, request, response
 import json
-from rpid import Data
+from backend.rpid import Data
 
 PORT = 8089
 app = Bottle()
@@ -22,14 +22,6 @@ def enable_cors():
 @app.route('/', method=['OPTIONS', 'GET'])
 def status():
     return "The API is running."
-
-
-@app.route('/start', method=['OPTIONS', 'POST'])
-def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method != 'OPTIONS':
-        data.activate()
-    return {}
 
 
 @app.route('/stop', method=['OPTIONS', 'POST'])
@@ -56,6 +48,7 @@ def act():
         return {}
     else:
         data.set_program(request.json)
+        data.activate()
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])
