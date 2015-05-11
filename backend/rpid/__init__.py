@@ -166,7 +166,7 @@ class TemperatureController(object):
                 if desired_temperature is False:
                     # the program is over
                     break
-                log.debug("\n\nDesired temp: %s" % desired_temperature)
+                log.debug("Desired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
                 self._output.set_pwm(new_duty_cycle)
@@ -174,7 +174,7 @@ class TemperatureController(object):
 
     def _update_temperature(self):
         temperature = self._probe.current_temperature
-        log.debug("Current temp: %s" % temperature)
+        log.debug("\n\nCurrent temp: %s" % temperature)
         timestamp = self.start_time - datetime.utcnow()
         self._data_provider.update_temperature(temperature, self._history_key, timestamp)
         return temperature
