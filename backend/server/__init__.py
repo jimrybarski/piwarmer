@@ -5,7 +5,7 @@ from rpid import Data
 PORT = 8089
 app = Bottle()
 data = Data()
-app.mount('/api/', app)
+app.mount('/backend/', app)
 
 
 @app.hook('after_request')
@@ -55,7 +55,7 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        data.set_program(request.data)
+        data.set_program(request.json)
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])

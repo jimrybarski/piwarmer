@@ -66,7 +66,7 @@ $(document).ready(function(){
     $.ajax({
       type: "POST",
       crossDomain: true,
-      url: "http://10.42.0.86/api/program",
+      url: "http://10.42.0.86/backend/program",
       data: JSON.stringify(program),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
