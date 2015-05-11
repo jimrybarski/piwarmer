@@ -45,7 +45,7 @@ class Data(redis.StrictRedis):
 
     @property
     def current_temp(self):
-        return self.get("current_temp")
+        return float(self.get("current_temp"))
 
     @property
     def current_setting(self):
@@ -53,7 +53,7 @@ class Data(redis.StrictRedis):
 
     @property
     def minutes_left(self):
-        return self.get("minutes_left")
+        return int(self.get("minutes_left"))
 
     @property
     def run_times(self):
@@ -256,8 +256,8 @@ class TemperatureProgram(object):
 
     def set_temperature(self, temperature=25.0, duration=60):
         if not self._looping:
-            setting = TemperatureSetting(temperature, duration)
-            self._total_duration += duration
+            setting = TemperatureSetting(float(temperature), int(duration))
+            self._total_duration += int(duration)
             self._settings.append(setting)
         return self
 
