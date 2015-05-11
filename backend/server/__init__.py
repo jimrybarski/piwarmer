@@ -1,6 +1,6 @@
 from bottle import Bottle, request, response
 import json
-from backend.rpid import Data
+from rpid import Data
 
 PORT = 8089
 app = Bottle()
