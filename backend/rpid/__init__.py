@@ -8,7 +8,7 @@ import time
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 
 try:
     import RPi.GPIO as GPIO
@@ -174,7 +174,7 @@ class TemperatureController(object):
 
     def _update_temperature(self):
         temperature = self._probe.current_temperature
-        log.debug("\n\nCurrent temp: %s" % temperature)
+        log.debug("Current temp: %s" % temperature)
         timestamp = self.start_time - datetime.utcnow()
         self._data_provider.update_temperature(temperature, self._history_key, timestamp)
         return temperature
@@ -297,17 +297,18 @@ class PID:
 
     def update(self, current_temperature):
         error = self.set_point - current_temperature
-        # log.debug("Error: %s" % error)
+        log.debug("Error: %s" % error)
         # self._update_previous_errors(current_temperature, error)
         self._update_accumulated_error(error)
         p = self._kp * error
-        # log.debug("Proportional: %s" % p)
+        log.debug("Proportional: %s" % p)
         i = self._accumulated_error * self._ki
-        # log.debug("Integral: %s" % i)
+        log.debug("Integral: %s" % i)
         total = 100 * int(p + i) / (self.set_point - PID.ROOM_TEMP + 5.0)
-        # log.debug("PI total: %s" % total)
+        log.debug("PI total: %s" % total)
         duty_cycle = max(0, min(100, total))
-        log.info("Duty cycle: %s" % duty_cycle)
+        log.debug("Duty cycle: %s" % duty_cycle)
+        log.info("Temp: %s (error: %s)" % (current_temperature, error))
         return duty_cycle
 
     def _update_accumulated_error(self, error):
