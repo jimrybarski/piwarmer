@@ -4,5 +4,5 @@ probe = TemperatureProbe()
 output = Output()
 data_provider = Data()
 
-tc = TemperatureController(probe=probe, output=output, data_provider=data_provider)
-tc.run()
+with TemperatureController(probe=probe, output=output, data_provider=data_provider) as tc:
+    tc.run()

@@ -103,12 +103,19 @@ class TemperatureController(object):
         self._output = output
         self._data_provider = data_provider
         self._pid = PID()
-        if self._data_provider:
-            # Disable the temperature controller on boot to ensure we're not running an old program
-            self._data_provider.deactivate()
-        self._program = None
+        self._program = TemperatureProgram()
         self._history_key = None
         self._start_time = None
+
+    def __enter__(self):
+        # Disable the temperature controller on boot to ensure we're not running an old program
+        self._data_provider.deactivate()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Ensure that we've turned off the heater once the program finishes for any reason
+        log.info("Ending run. Shutting off heater.")
+        self._data_provider.deactivate()
 
     @property
     def start_time(self):
@@ -135,7 +142,6 @@ class TemperatureController(object):
                 time.sleep(1)
 
     def _activate(self):
-        self._program = TemperatureProgram()
         # get the program currently in Redis
         self._program.load_json(self._data_provider.program)
         # save the current timestamp so we can label data for the current run
@@ -150,7 +156,7 @@ class TemperatureController(object):
         while True:
             if not self._data_provider.active:
                 # Turn off the heater and return to listening mode
-                log.debug("The program is inactive, according to the data provider.")
+                log.debug("The program has been disabled.")
                 self._output.disable()
                 break
             else:
@@ -160,7 +166,7 @@ class TemperatureController(object):
                 if desired_temperature is False:
                     # the program is over
                     break
-                log.debug("Desired temp: %s" % desired_temperature)
+                log.debug("\n\nDesired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
                 self._output.set_pwm(new_duty_cycle)
@@ -174,7 +180,9 @@ class TemperatureController(object):
         return temperature
 
     def _get_history_key(self):
-        return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        history_key = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        log.debug("History key: %s" % history_key)
+        return history_key
 
 
 class TemperatureSetting(object):
@@ -289,15 +297,15 @@ class PID:
 
     def update(self, current_temperature):
         error = self.set_point - current_temperature
-        log.debug("Error: %s" % error)
+        # log.debug("Error: %s" % error)
         # self._update_previous_errors(current_temperature, error)
         self._update_accumulated_error(error)
         p = self._kp * error
-        log.debug("Proportional: %s" % p)
+        # log.debug("Proportional: %s" % p)
         i = self._accumulated_error * self._ki
-        log.debug("Integral: %s" % i)
+        # log.debug("Integral: %s" % i)
         total = 100 * int(p + i) / (self.set_point - PID.ROOM_TEMP + 5.0)
-        log.debug("PI total: %s" % total)
+        # log.debug("PI total: %s" % total)
         duty_cycle = max(0, min(100, total))
         log.info("Duty cycle: %s" % duty_cycle)
         return duty_cycle
@@ -308,7 +316,7 @@ class PID:
         # Ensure the value is within the allowed limits
         self._accumulated_error = min(self._accumulated_error, self._accumulated_error_max)
         self._accumulated_error = max(self._accumulated_error, self._accumulated_error_min)
-        log.debug("Accumulated error: %s" % self._accumulated_error)
+        # log.debug("Accumulated error: %s" % self._accumulated_error)
 
     @property
     def set_point(self):
