@@ -27,6 +27,7 @@ class Data(redis.StrictRedis):
 
     def activate(self):
         self.set("active", 1)
+        self.set("current_setting", "on")
 
     def save_data(self):
         """ Persists all data to disk asynchronously. """
@@ -54,6 +55,10 @@ class Data(redis.StrictRedis):
     @property
     def minutes_left(self):
         return self.get("minutes_left")
+
+    @minutes_left.setter
+    def minutes_left(self, value):
+        self.set("minutes_left", value)
 
     @property
     def run_times(self):
@@ -113,8 +118,6 @@ class TemperatureController(object):
         self._start_time = None
 
     def __enter__(self):
-        # Disable the temperature controller on boot to ensure we're not running an old program
-        self._data_provider.deactivate()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -187,6 +190,7 @@ class TemperatureController(object):
         log.debug("Current temp: %s" % temperature)
         timestamp = self.start_time - datetime.utcnow()
         self._data_provider.update_temperature(temperature, self._history_key, timestamp)
+        self._data_provider.minutes_left = self._program.minutes_left
         return temperature
 
     def _get_history_key(self):
