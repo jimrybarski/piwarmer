@@ -91,6 +91,7 @@ class Output(object):
 
     def set_pwm(self, new_duty_cycle):
         assert 0.0 <= new_duty_cycle <= 100.0
+        log.info("duty cycle: %s" % new_duty_cycle)
         self._pwm.ChangeDutyCycle(new_duty_cycle)
 
 
@@ -163,8 +164,8 @@ class TemperatureController(object):
 
     def _run_program(self):
         # Activate the motor driver chip, but ensure the heater won't get hot until we want it to
-        self._output.set_pwm(0.0)
         self._output.enable()
+        self._output.set_pwm(0.0)
         while True:
             if not self._data_provider.active:
                 # Turn off the heater and return to listening mode
