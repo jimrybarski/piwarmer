@@ -45,7 +45,7 @@ class Data(redis.StrictRedis):
 
     @property
     def current_temp(self):
-        return float(self.get("current_temp"))
+        return self.get("current_temp")
 
     @property
     def current_setting(self):
@@ -53,7 +53,7 @@ class Data(redis.StrictRedis):
 
     @property
     def minutes_left(self):
-        return int(self.get("minutes_left"))
+        return self.get("minutes_left")
 
     @property
     def run_times(self):
