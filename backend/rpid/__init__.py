@@ -218,7 +218,7 @@ class TemperatureProgram(object):
     def load_json(self, json_program):
         """
         json_program will be a dict like:
-        {"1": {"mode": "set", "temperature": 60.0, "duration": 3600},"2": {"mode": "set", "temperature": 37.0, "duration": 600},"3": {"mode": "repeat", "num_repeats": 20},"4": {"mode": "hold", "temperature": 25.0}}
+        {"1": {"mode": "set", "temperature": 60.0, "duration": 300},"2": {"mode": "set", "temperature": 37.0, "duration": 1200},"3": {"mode": "repeat", "num_repeats": 2},"4": {"mode": "hold", "temperature": 25.0}}
         Modes and attributes supported:
 
         set: temperature, duration
@@ -310,7 +310,7 @@ class PID:
         log.debug("PI total: %s" % total)
         duty_cycle = max(0, min(100, total))
         log.debug("Duty cycle: %s" % duty_cycle)
-        log.info("Temp: %s (error: %s)" % (current_temperature, error))
+        log.info("Temp: %s (error: %s)" % (current_temperature, -error))
         return duty_cycle
 
     def _update_accumulated_error(self, error):
