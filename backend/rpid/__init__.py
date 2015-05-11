@@ -31,7 +31,7 @@ class Data(redis.StrictRedis):
 
     def save_data(self):
         """ Persists all data to disk asynchronously. """
-        self.bgsave()
+        self.save()
 
     @property
     def program(self):
@@ -125,6 +125,10 @@ class TemperatureController(object):
         log.info("Ending run. Shutting off heater.")
         self._data_provider.deactivate()
         self._output.disable()
+        # save data to disk once a minute
+        log.info("Saving data to disk")
+        self._data_provider.save_data()
+        log.info("Save complete.")
 
     @property
     def start_time(self):
@@ -161,7 +165,6 @@ class TemperatureController(object):
         # Activate the motor driver chip, but ensure the heater won't get hot until we want it to
         self._output.set_pwm(0.0)
         self._output.enable()
-        iteration = 0
         while True:
             if not self._data_provider.active:
                 # Turn off the heater and return to listening mode
@@ -179,10 +182,6 @@ class TemperatureController(object):
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
                 self._output.set_pwm(new_duty_cycle)
-                iteration += 1
-                if iteration % 60:
-                    # save data to disk once a minute
-                    self._data_provider.save_data()
             time.sleep(1.0)
 
     def _update_temperature(self):
