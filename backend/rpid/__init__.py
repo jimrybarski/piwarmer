@@ -216,7 +216,6 @@ class TemperatureSetting(object):
 class TemperatureProgram(object):
     def __init__(self):
         self._settings = []
-        self._looping = False
         self._start = None
         self._hold_temp = None
         self._total_duration = 0.0
@@ -230,7 +229,12 @@ class TemperatureProgram(object):
     def load_json(self, json_program):
         """
         json_program will be a dict like:
-        {"1": {"mode": "set", "temperature": 60.0, "duration": 300},"2": {"mode": "set", "temperature": 37.0, "duration": 1200},"3": {"mode": "repeat", "num_repeats": 2},"4": {"mode": "hold", "temperature": 25.0}}
+        {
+          "1": {"mode": "set", "temperature": 80.0, "duration": 300},
+          "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": 3600},
+          "3": {"mode": "hold", "temperature": 37.0}
+        }
+
         Modes and attributes supported:
 
         set: temperature, duration
@@ -246,6 +250,7 @@ class TemperatureProgram(object):
 
         """
         action = {"set": self.set_temperature,
+                  "linear": self.linear,
                   "repeat": self.repeat,
                   "hold": self.hold
                   }
@@ -259,20 +264,35 @@ class TemperatureProgram(object):
             action[mode](**parameters)
 
     def set_temperature(self, temperature=25.0, duration=60):
-        if not self._looping:
-            setting = TemperatureSetting(float(temperature), int(duration))
-            self._total_duration += int(duration)
-            self._settings.append(setting)
+        setting = TemperatureSetting(float(temperature), int(duration))
+        self._total_duration += int(duration)
+        self._settings.append(setting)
         return self
 
+    def linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
+        # at least one minute long, must be multiple of 15
+        assert duration >= 60
+        assert duration % 15 == 0
+        total_diff = abs(float(start_temperature) - float(end_temperature))
+        setting_count = int(max(1, duration / 15))
+        step_diff = total_diff / setting_count
+        temperature = start_temperature
+        for _ in xrange(setting_count):
+            if start_temperature > end_temperature:
+                temperature -= step_diff
+            else:
+                temperature += step_diff
+            setting = TemperatureSetting(float(temperature), 15)
+            self._total_duration += 15
+            self._settings.append(setting)
+
     def repeat(self, num_repeats=3):
-        if not self._looping:
-            new_settings = []
-            for i in range(num_repeats):
-                for action in self._settings:
-                    new_settings.append(action)
-                    self._total_duration += action.duration
-            self._settings = new_settings
+        new_settings = []
+        for i in range(num_repeats):
+            for action in self._settings:
+                new_settings.append(action)
+                self._total_duration += action.duration
+        self._settings = new_settings
         return self
 
     def hold(self, temperature=25.0):
@@ -284,12 +304,8 @@ class TemperatureProgram(object):
         self._start = time.time()
 
     def get_desired_temperature(self):
-        if self._looping:
-            settings = cycle(self._settings)
-        else:
-            settings = self._settings
         elapsed = time.time() - self._start
-        for setting in settings:
+        for setting in self._settings:
             elapsed -= setting.duration
             if elapsed < 0:
                 return float(setting.temperature)
