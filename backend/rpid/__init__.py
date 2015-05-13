@@ -9,8 +9,6 @@ log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
 
-HEATER_DUTY_CYCLE_CUTOFF_PERCENTAGE = 50
-
 try:
     import RPi.GPIO as GPIO
 except (SystemError, ImportError):
@@ -183,8 +181,10 @@ class TemperatureController(object):
                 log.debug("Desired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
-                thresholded_duty_cycle = min(HEATER_DUTY_CYCLE_CUTOFF_PERCENTAGE, new_duty_cycle)
-                self._output.set_pwm(thresholded_duty_cycle)
+                # We add a slowdown factor here just as a hack to prevent the thing from heating too fast
+                # In reality we should add back the derivative action
+                SLOWDOWN_FACTOR = 0.2
+                self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
             time.sleep(1.0)
 
     def _update_temperature(self):
