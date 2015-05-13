@@ -1,5 +1,4 @@
 from datetime import datetime
-from itertools import cycle
 import json
 import logging
 import redis
@@ -9,6 +8,8 @@ import time
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
+
+HEATER_DUTY_CYCLE_CUTOFF_PERCENTAGE = 50
 
 try:
     import RPi.GPIO as GPIO
@@ -182,7 +183,8 @@ class TemperatureController(object):
                 log.debug("Desired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
-                self._output.set_pwm(new_duty_cycle)
+                thresholded_duty_cycle = min(HEATER_DUTY_CYCLE_CUTOFF_PERCENTAGE, new_duty_cycle)
+                self._output.set_pwm(thresholded_duty_cycle)
             time.sleep(1.0)
 
     def _update_temperature(self):
