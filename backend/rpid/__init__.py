@@ -271,17 +271,17 @@ class TemperatureProgram(object):
 
     def linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         # at least one minute long, must be multiple of 15
+        duration = int(duration)
+        start_temperature = float(start_temperature)
+        end_temperature = float(end_temperature)
         assert duration >= 60
         assert duration % 15 == 0
-        total_diff = abs(float(start_temperature) - float(end_temperature))
+        total_diff = start_temperature - end_temperature
         setting_count = int(max(1, duration / 15))
         step_diff = total_diff / setting_count
         temperature = start_temperature
         for _ in xrange(setting_count):
-            if start_temperature > end_temperature:
-                temperature -= step_diff
-            else:
-                temperature += step_diff
+            temperature -= step_diff
             setting = TemperatureSetting(float(temperature), 15)
             self._total_duration += 15
             self._settings.append(setting)
