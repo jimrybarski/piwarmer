@@ -292,13 +292,13 @@ class TemperatureProgram(object):
         for setting in settings:
             elapsed -= setting.duration
             if elapsed < 0:
-                return setting.temperature
+                return float(setting.temperature)
         # The program program is over or holding at a specified temperature.
-        return self._hold_temp if self._hold_temp else False
+        return float(self._hold_temp) if self._hold_temp else False
 
 
 class PID:
-    ROOM_TEMP = 20
+    ROOM_TEMP = 20.0
 
     def __init__(self, kp=5.0, ki=1.0):
         self._kp = kp
@@ -338,8 +338,9 @@ class PID:
         return self._set_point
 
     def update_set_point(self, temperature):
+        assert isinstance(temperature, float)
         log.debug("Setting set point to %s" % temperature)
         room_temp_diff = temperature - PID.ROOM_TEMP + 5.0
         self._accumulated_error_max = room_temp_diff / 2.0
         self._accumulated_error_min = -room_temp_diff / 2.0
-        self._set_point = float(temperature)
+        self._set_point = temperature
