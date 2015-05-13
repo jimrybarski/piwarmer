@@ -20,13 +20,15 @@ class Data(redis.StrictRedis):
         self.set("current_temp", temp)
         self.hset(history_key, timestamp, temp)
 
+    def update_setting(self, desired_temp):
+        self.set("current_setting", desired_temp)
+
     def deactivate(self):
         self.set("active", 0)
         self.delete("program")
 
     def activate(self):
         self.set("active", 1)
-        self.set("current_setting", "on")
 
     def save_data(self):
         """ Persists all data to disk asynchronously. """
@@ -176,8 +178,11 @@ class TemperatureController(object):
                 temperature = self._update_temperature()
                 desired_temperature = self._program.get_desired_temperature()
                 if desired_temperature is False:
+                    self._data_provider.update_setting("Off!")
                     # the program is over
                     break
+                else:
+                    self._data_provider.update_setting("%s&deg;C" % desired_temperature)
                 log.debug("Desired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
