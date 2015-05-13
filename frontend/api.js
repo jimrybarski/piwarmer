@@ -1,9 +1,13 @@
 function get_new_row(id, mode) {
   var front = get_id_td(id) + get_mode_td(id, mode);
 
-  if (mode == "set" || mode == "linear" || mode == "exponential") {
+  if (mode == "set") {
     var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>';
   };
+
+  if (mode == "linear") {
+    var back = '<td><input type="text" name="start_temperature" placeholder="Start Temperature (&deg;C)"></td><td><input type="text" name="end_temperature" placeholder="End Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>;'
+  }
 
   if (mode == "hold") {
     var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td>';
@@ -21,7 +25,7 @@ function get_id_td(id) {
 };
 
 function get_mode_td(id, mode) {
-  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">set</option><option value="hold">hold</option><option value="linear">linear gradient</option><option value="exponential">exponential gradient</option><option value="repeat">repeat</option></select></td>';
+  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">set</option><option value="hold">hold</option><option value="linear">linear gradient</option><option value="repeat">repeat</option></select></td>';
 };
 
 $(document).ready(function(){
@@ -39,7 +43,7 @@ $(document).ready(function(){
   });
 
 
-  // different modes need different inputs, so we change the elements available in the row to accomodate that
+  // different modes need different inputs, so we change the elements available in the row to accommodate that
   $(document.body).on('change', '.mode' ,function() {
      var new_row = get_new_row(this.id, this.value);
      var id = this.id;
