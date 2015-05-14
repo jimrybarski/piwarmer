@@ -323,7 +323,7 @@ class TemperatureProgram(object):
 class PID:
     ROOM_TEMP = 20.0
 
-    def __init__(self, kp=5.0, ki=1.0):
+    def __init__(self, kp=5.0, ki=2.0):
         self._kp = kp
         self._ki = ki
         self._previous_errors = []
