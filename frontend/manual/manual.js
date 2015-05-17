@@ -17,23 +17,30 @@ function get(endpoint, func){
 function change_temp(amount) {
         var new_temp = parseInt($("#desired_temp").html()) + amount;
         $("#desired_temp").html(new_temp);
+        $.ajax({
+          type: "POST",
+          crossDomain: true,
+          url: "http://10.42.0.86/backend/manual"
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          data: JSON.stringify({"temp": new_temp}),
+        });
     };
 
 function toggle_mode(mode) {
-    if (mode == "start") {
+    if (mode == "stop") {
         var new_toggle_button = '<button id="start" type="button">Activate Temperature Control</button>';
     }
-    if (mode == "stop") {
+    if (mode == "start") {
         var new_toggle_button = '<button id="stop" type="button">Deactivate Temperature Control</button>';
     }
     $("#toggle").html(new_toggle_button);
 
-//    $.ajax({
-//      type: "POST",
-//      crossDomain: true,
-//      url: "http://10.42.0.86/backend/" + mode
-//    });
-
+    $.ajax({
+      type: "POST",
+      crossDomain: true,
+      url: "http://10.42.0.86/backend/" + mode
+    });
 }
 
 function update() {
@@ -56,10 +63,10 @@ $(document).ready(function() {
         change_temp(-10);
     });
     $(document.body).on('click', '#start' ,function() {
-        toggle_mode("stop");
+        toggle_mode("start");
     });
     $(document.body).on('click', '#stop' ,function() {
-        toggle_mode("start");
+        toggle_mode("stop");
     });
 
     var intervalID = window.setInterval(update, 1000);

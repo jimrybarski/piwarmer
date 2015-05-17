@@ -31,6 +31,20 @@ def act():
         data.deactivate()
     return {}
 
+@app.route('/start', method=['OPTIONS', 'POST'])
+def act():
+    response.headers['Content-Type'] = 'application/json'
+    if request.method != 'OPTIONS':
+        data.activate()
+    return {}
+
+@app.route('/manual', method=['OPTIONS', 'POST'])
+def act():
+    response.headers['Content-Type'] = 'application/json'
+    if request.method == 'OPTIONS':
+        return {}
+    else:
+        data.update_setting(request.json['temp'])
 
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():
