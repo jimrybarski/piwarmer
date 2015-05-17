@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import logging
+from logging import handlers
 import redis
 import smbus
 import time
@@ -9,6 +10,9 @@ log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
 
+TEN_MINUTES = 600
+
+
 try:
     import RPi.GPIO as GPIO
 except (SystemError, ImportError):
@@ -16,9 +20,11 @@ except (SystemError, ImportError):
 
 
 class Data(redis.StrictRedis):
-    def update_temperature(self, temp, history_key, timestamp):
+    def update_temperature(self, temp):
         self.set("current_temp", temp)
-        self.hset(history_key, timestamp, temp)
+        if self.llen("history") > TEN_MINUTES:
+            self.lpop("history")
+        self.rpush("history", temp)
 
     def update_setting(self, desired_temp):
         self.set("current_setting", desired_temp)
@@ -62,12 +68,9 @@ class Data(redis.StrictRedis):
         self.set("minutes_left", value)
 
     @property
-    def run_times(self):
-        # a list of timestamps when experiments were started
-        return self.hkeys("history")
-
-    def get_history(self, timestamp):
-        return self.hget("history", timestamp)
+    def history(self):
+        # gets the last ten minutes of temperature records
+        return self.lrange("history", 0, -1)
 
 
 class Output(object):
@@ -161,6 +164,11 @@ class TemperatureController(object):
         self._program.load_json(self._data_provider.program)
         # save the current timestamp so we can label data for the current run
         self._history_key = self._get_history_key()
+        self._temp_log = logging.getLogger()
+        handler = handlers.RotatingFileHandler("/var/log/temperatures/%s" % self._history_key)
+        handler.setFormatter(logging.Formatter('%(asctime)s\t%(message)s'))
+        self._temp_log.addHandler(handler)
+        self._temp_log.setLevel(logging.INFO)
         self._program.start()
 
     def _run_program(self):
@@ -176,6 +184,7 @@ class TemperatureController(object):
             else:
                 # We're still running the program. Update the PID and adjust the duty cycle accordingly
                 temperature = self._update_temperature()
+                self._temp_log.info(temperature)
                 desired_temperature = self._program.get_desired_temperature()
                 if desired_temperature is False:
                     self._data_provider.update_setting("Off!")
@@ -187,7 +196,7 @@ class TemperatureController(object):
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
                 # We add a slowdown factor here just as a hack to prevent the thing from heating too fast
-                # In reality we should add back the derivative action
+                # Long term we should add back the derivative action
                 SLOWDOWN_FACTOR = 0.2
                 self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
             time.sleep(1.0)
@@ -195,13 +204,12 @@ class TemperatureController(object):
     def _update_temperature(self):
         temperature = self._probe.current_temperature
         log.debug("Current temp: %s" % temperature)
-        timestamp = self.start_time - datetime.utcnow()
-        self._data_provider.update_temperature(temperature, self._history_key, timestamp)
+        self._data_provider.update_temperature(temperature)
         self._data_provider.minutes_left = self._program.minutes_left
         return temperature
 
     def _get_history_key(self):
-        history_key = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        history_key = datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S")
         log.debug("History key: %s" % history_key)
         return history_key
 
