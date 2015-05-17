@@ -59,6 +59,13 @@ class Data(redis.StrictRedis):
     def current_setting(self):
         return self.get("current_setting")
 
+    def set_mode(self, mode):
+        self.set("mode", mode)
+
+    @property
+    def manual(self):
+        return self.get("mode") == "manual"
+
     @property
     def minutes_left(self):
         return self.get("minutes_left")
@@ -127,13 +134,10 @@ class TemperatureController(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Ensure that we've turned off the heater once the program finishes for any reason
-        log.info("Ending run. Shutting off heater.")
+        log.info("\n\nEnding run. Shutting off heater.")
         self._data_provider.deactivate()
         self._output.disable()
-        # save data to disk once a minute
-        log.info("Saving data to disk")
-        self._data_provider.save_data()
-        log.info("Save complete.")
+        log.info("Shutdown complete.\n\n")
 
     @property
     def start_time(self):
@@ -161,7 +165,8 @@ class TemperatureController(object):
 
     def _activate(self):
         # get the program currently in Redis
-        self._program.load_json(self._data_provider.program)
+        if not self._data_provider.manual:
+            self._program.load_json(self._data_provider.program)
         # save the current timestamp so we can label data for the current run
         self._history_key = self._get_history_key()
         self._temp_log = logging.getLogger()
@@ -169,7 +174,8 @@ class TemperatureController(object):
         handler.setFormatter(logging.Formatter('%(asctime)s\t%(message)s'))
         self._temp_log.addHandler(handler)
         self._temp_log.setLevel(logging.INFO)
-        self._program.start()
+        if not self._data_provider.manual:
+            self._program.start()
 
     def _run_program(self):
         # Activate the motor driver chip, but ensure the heater won't get hot until we want it to
@@ -185,7 +191,10 @@ class TemperatureController(object):
                 # We're still running the program. Update the PID and adjust the duty cycle accordingly
                 temperature = self._update_temperature()
                 self._temp_log.info(temperature)
-                desired_temperature = self._program.get_desired_temperature()
+                if self._data_provider.manual:
+                    desired_temperature = self._data_provider.current_setting
+                else:
+                    desired_temperature = self._program.get_desired_temperature()
                 if desired_temperature is False:
                     self._data_provider.update_setting("Off!")
                     # the program is over
