@@ -76,14 +76,4 @@ def history():
         return res
 
 
-@app.route('/history/<item>', method=['OPTIONS', 'GET'])
-def history_csv(item):
-    response.headers['Content-Type'] = 'application/text'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        values = json.loads(data.get_history(item))
-        history = ["%s\t%s" % (timestamp, temperature) for timestamp, temperature in sorted(values.items())]
-        return "timestamp\ttemperature\n" + "\n".join(history)
-
 app.run(host="127.0.0.1", port=PORT)
