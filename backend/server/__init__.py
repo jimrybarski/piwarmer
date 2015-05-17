@@ -44,7 +44,8 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        data.update_setting(request.json['temp'])
+        data.set_mode('manual')
+        data.update_setting(int(request.json['temp']))
 
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():

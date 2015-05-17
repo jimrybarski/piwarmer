@@ -33,14 +33,14 @@ function toggle_mode(mode) {
     }
     if (mode == "start") {
         var new_toggle_button = '<button id="stop" type="button">Deactivate Temperature Control</button>';
+        change_temp(0);
+        $.ajax({
+          type: "POST",
+          crossDomain: true,
+          url: "http://10.42.0.86/backend/start",
+        });
     }
     $("#toggle").html(new_toggle_button);
-
-    $.ajax({
-      type: "POST",
-      crossDomain: true,
-      url: "http://10.42.0.86/backend/" + mode
-    });
 }
 
 function update() {
