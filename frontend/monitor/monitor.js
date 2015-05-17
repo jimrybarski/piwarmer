@@ -1,4 +1,4 @@
-function get(endpoint, func){
+function get(endpoint, func) {
     $.ajax({
       type: "GET",
       crossDomain: true,
@@ -14,6 +14,14 @@ function get(endpoint, func){
     });
 }
 
+function post(endpoint, func) {
+    $.ajax({
+      type: "POST",
+      crossDomain: true,
+      url: "http://10.42.0.86/backend/stop"
+    });
+}
+
 function update() {
   get("current", function(data){
     $("#current_temp").html("Temp: " + data.temp)
@@ -23,5 +31,10 @@ function update() {
 }
 
 $(document).ready(function(){
+    $("#stop").click( function()
+        {
+            alert('I should stop the program now...');
+        }
+    );
     var intervalID = window.setInterval(update, 1000);
 });
