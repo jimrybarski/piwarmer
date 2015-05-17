@@ -1,87 +1,67 @@
-function get_new_row(id, mode) {
-  var front = get_id_td(id) + get_mode_td(id, mode);
-
-  if (mode == "set") {
-    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>';
-  };
-
-  if (mode == "linear") {
-    var back = '<td><input type="text" name="start_temperature" placeholder="Start Temperature (&deg;C)"></td><td><input type="text" name="end_temperature" placeholder="End Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>;'
-  }
-
-  if (mode == "hold") {
-    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td>';
-  };
-
-  if (mode == "repeat") {
-    var back = '<td><input type="text" name="num_repeats" placeholder="Number of repeats"></td>';
-  };
-
-  return front + back;
-};
-
-function get_id_td(id) {
-  return '<td>' + id + '</td>';
-};
-
-function get_mode_td(id, mode) {
-  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">set</option><option value="hold">hold</option><option value="linear">linear gradient</option><option value="repeat">repeat</option></select></td>';
-};
-
-$(document).ready(function(){
-
-  // generate the first row instead of hard coding it in the HTML so we can guarantee consistency
-  var first_row = get_new_row(1, "set");
-  $("#temperature_settings tr:first").html(first_row);
-
-
-  // adds additional rows so any number of instructions can be given to the temperature controller
-  $(document.body).on('click', '#add_button' ,function() {
-    var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
-    var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
-    $("#temperature_settings tr:last").after(new_row);
-  });
-
-
-  // different modes need different inputs, so we change the elements available in the row to accommodate that
-  $(document.body).on('change', '.mode' ,function() {
-     var new_row = get_new_row(this.id, this.value);
-     var id = this.id;
-     var mode = this.value;
-     // we're currently in the dropdown element. two levels up gives us the entire row
-     $(this).parent().parent().html(new_row);
-     $("#" + id).val(mode);
-  });
-
-  // submit form data to the API
-  $(document.body).on('click', '#run_program' ,function() {
-    var program = {};
-    var row_id = 0;
-    $("#settings").serializeArray().map(function(item) {
-      if (item.name == "mode") {
-        // we're on a new row (i.e. a new instruction)
-        row_id++;
-        program[row_id] = {"mode": item.value};
-      } else {
-        program[row_id][item.name] = item.value;
-      };
-    });
-
+function get(endpoint, func){
     $.ajax({
-      type: "POST",
+      type: "GET",
       crossDomain: true,
-      url: "http://10.42.0.86/backend/program",
-      data: JSON.stringify(program),
+      url: "http://10.42.0.86/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
-      success: function(data) {
-        // the program has been received, so we move to the monitoring page
-        window.location.replace("http://10.42.0.86/monitor");
+      success: function(data){
+        func(data)
       },
       failure: function(data) {
-          console.log(data);
-          alert("Something went wrong! Is the web server not really running?");
+        alert("The API could not be reached.")
       },
     });
+}
+
+function change_temp(amount) {
+        var new_temp = parseInt($("#desired_temp").html()) + amount;
+        $("#desired_temp").html(new_temp);
+    };
+
+function toggle_mode(mode) {
+    if (mode == "start") {
+        var new_toggle_button = '<button id="start" type="button">Activate Temperature Control</button>';
+    }
+    if (mode == "stop") {
+        var new_toggle_button = '<button id="stop" type="button">Deactivate Temperature Control</button>';
+    }
+    $("#toggle").html(new_toggle_button);
+
+//    $.ajax({
+//      type: "POST",
+//      crossDomain: true,
+//      url: "http://10.42.0.86/backend/" + mode
+//    });
+
+}
+
+function update() {
+  get("current", function(data){
+    $("#actual_temp").html(data.temp)
   });
+}
+
+$(document).ready(function() {
+    $(document.body).on('click', '#plus_ten', function() {
+        change_temp(10);
+    });
+    $(document.body).on('click', '#plus_one', function() {
+        change_temp(1);
+    });
+    $(document.body).on('click', '#minus_one', function() {
+        change_temp(-1);
+    });
+    $(document.body).on('click', '#minus_ten', function() {
+        change_temp(-10);
+    });
+    $(document.body).on('click', '#start' ,function() {
+        toggle_mode("stop");
+    });
+    $(document.body).on('click', '#stop' ,function() {
+        toggle_mode("start");
+    });
+
+    var intervalID = window.setInterval(update, 1000);
+
 });

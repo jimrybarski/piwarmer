@@ -3,14 +3,23 @@
     <title>Raspberry PID</title>
     <script type="text/javascript" src="../jquery.min.js"></script>
     <script type="text/javascript" src="manual.js"></script>
+    <style>
+        button {
+           font-size: 20px;
+           padding: 20px;
+        }
+    </style>
   </head>
   <body>
     <a href="http://10.42.0.86/">Enter New Program</a><br><br><br><br>
-    <h2><span>Actual: <span id="actual_temp">39.4&deg;C</span></span></h2><br>
-    <h2><span>Set: <span id="desired_temp">60&deg;C</span></span></h2><br>
+    <h2><span>Actual: <span id="actual_temp">---</span></span></h2>
+    <h2><span>Set: <span id="desired_temp">60</span>&deg;C</span></h2>
     <button id="minus_ten" type="button"> -10&deg;C </button>
     <button id="minus_one" type="button"> -1&deg;C </button>
     <button id="plus_one" type="button"> +1&deg;C </button>
-    <button id="plus_ten" type="button"> +10&deg;C </button>
+    <button id="plus_ten" type="button"> +10&deg;C </button><br><br><br>
+    <div id="toggle">
+      <button id="start" type="button">Activate Temperature Control</button>
+    </div>
   </body>
 </html>

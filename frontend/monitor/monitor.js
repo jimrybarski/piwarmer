@@ -1,4 +1,4 @@
-function get(endpoint, func) {
+function get(endpoint, func){
     $.ajax({
       type: "GET",
       crossDomain: true,
@@ -14,11 +14,19 @@ function get(endpoint, func) {
     });
 }
 
-function post(endpoint, func) {
+function get(endpoint, func){
     $.ajax({
-      type: "POST",
+      type: "GET",
       crossDomain: true,
-      url: "http://10.42.0.86/backend/stop"
+      url: "http://10.42.0.86/backend/" + endpoint,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: function(data){
+        func(data)
+      },
+      failure: function(data) {
+        alert("The API could not be reached.")
+      },
     });
 }
 
