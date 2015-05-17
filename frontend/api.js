@@ -21,11 +21,11 @@ function get_new_row(id, mode) {
 };
 
 function get_id_td(id) {
-  return '<td>' + id + '</td>';
+  return '<td class="step_id">' + id + '</td>';
 };
 
 function get_mode_td(id, mode) {
-  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">set</option><option value="hold">hold</option><option value="linear">linear gradient</option><option value="repeat">repeat</option></select></td>';
+  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">Set</option><option value="hold">Hold</option><option value="linear">Linear Gradient</option><option value="repeat">Repeat</option></select></td>';
 };
 
 $(document).ready(function(){
