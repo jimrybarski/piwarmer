@@ -247,10 +247,7 @@ class TemperatureProgram(object):
         set: temperature, duration
         repeat: num_repeats
         hold: temperature
-
-        Modes and attributes planned:
         linear: temperature, duration
-        exponential: temperature, duration
 
         :param json_program:    temperature settings for an experiment
         :type json_program:     str
