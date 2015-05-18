@@ -69,6 +69,6 @@ $(document).ready(function() {
         toggle_mode("stop");
     });
 
-    var intervalID = window.setInterval(update, 1000);
+    var intervalID = window.setInterval(update, 2500);
 
 });

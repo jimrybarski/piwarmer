@@ -44,5 +44,5 @@ $(document).ready(function(){
             alert('I should stop the program now...');
         }
     );
-    var intervalID = window.setInterval(update, 1000);
+    var intervalID = window.setInterval(update, 2500);
 });
