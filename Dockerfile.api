@@ -4,8 +4,8 @@ MAINTAINER Jim Rybarski <jim@rybarski.com>
 RUN apt-get update && apt-get install -y \
     python-pip \
     python-dev \
+    libffi-dev \
     python-numpy
-
 
 RUN pip install \
     RPIO==0.10.0 \
