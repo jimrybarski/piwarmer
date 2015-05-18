@@ -1,0 +1,7 @@
+FROM ubuntu:trusty
+MAINTAINER Jim Rybarski <jim@rybarski.com>
+
+RUN apt-get update && apt-get install -y \
+    python-pip
+
+RUN pip install bottle

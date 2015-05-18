@@ -2,7 +2,6 @@ from bottle import Bottle, request, response
 import json
 from rpid import Data
 
-PORT = 8089
 app = Bottle()
 data = Data()
 app.mount('/backend/', app)
@@ -89,6 +88,3 @@ def history():
     else:
         res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in data.run_times}
         return res
-
-
-app.run(host="127.0.0.1", port=PORT)

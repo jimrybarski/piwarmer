@@ -1,9 +1,0 @@
-RPIO==0.10.0
-argparse==1.2.1
-bottle==0.12.8
-cffi==0.8.6
-numpy==1.9.2
-pycparser==2.10
-redis==2.10.3
-smbus-cffi==0.4.1
-wsgiref==0.1.2
