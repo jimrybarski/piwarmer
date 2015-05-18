@@ -2,7 +2,7 @@ function get(endpoint, func){
     $.ajax({
       type: "GET",
       crossDomain: true,
-      url: "http://10.42.0.86/backend/" + endpoint,
+      url: "http://temperature.controller/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data){
@@ -20,7 +20,7 @@ function change_temp(amount) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://10.42.0.86/backend/manual"
+          url: "http://temperature.controller/backend/manual"
           contentType: "application/json; charset=utf-8",
           dataType: "json",
           data: JSON.stringify({"temp": new_temp}),
@@ -37,7 +37,7 @@ function toggle_mode(mode) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://10.42.0.86/backend/start",
+          url: "http://temperature.controller/backend/start",
         });
     }
     $("#toggle").html(new_toggle_button);

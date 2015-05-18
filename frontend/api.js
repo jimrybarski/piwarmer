@@ -70,13 +70,13 @@ $(document).ready(function(){
     $.ajax({
       type: "POST",
       crossDomain: true,
-      url: "http://10.42.0.86/backend/program",
+      url: "http://temperature.controller/backend/program",
       data: JSON.stringify(program),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data) {
         // the program has been received, so we move to the monitoring page
-        window.location.replace("http://10.42.0.86/monitor");
+        window.location.replace("http://temperature.controller/monitor");
       },
       failure: function(data) { 
           console.log(data);
