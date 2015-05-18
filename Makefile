@@ -13,7 +13,7 @@ front:
 	docker run -p 80:80 --net="host" --rm -it jimrybarski/raspberrypid-site
 
 back:
-	docker run --net="host" --rm -it jimrybarski/raspberrypid-backend python2.7 backendmain.py
+	docker run --net="host" --rm -v /var/log/temperatures -it jimrybarski/raspberrypid-backend python2.7 backendmain.py
 
 api:
-	docker run -p 8089:8089 --net="host" --rm -it jimrybarski/raspberrypid-backend python2.7 apimain.py
+	docker run -p 8089:8089 --net="host" --rm -v /var/log/temperatures -it jimrybarski/raspberrypid-backend python2.7 apimain.py
