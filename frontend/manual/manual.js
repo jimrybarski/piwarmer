@@ -20,7 +20,7 @@ function change_temp(amount) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://temperature.controller/backend/manual"
+          url: "http://temperature.controller/backend/manual",
           contentType: "application/json; charset=utf-8",
           dataType: "json",
           data: JSON.stringify({"temp": new_temp}),

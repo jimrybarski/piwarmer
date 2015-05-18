@@ -8,3 +8,6 @@ shellback:	build
 
 shellfront:
 	docker run -it jimrybarski/raspberrypid-site bash
+
+front:
+	docker run -p 80:80 --net="host" -it jimrybarski/raspberrypid-site
