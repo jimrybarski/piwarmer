@@ -29,6 +29,11 @@ function change_temp(amount) {
 
 function toggle_mode(mode) {
     if (mode == "stop") {
+        $.ajax({
+          type: "POST",
+          crossDomain: true,
+          url: "http://temperature.controller/backend/stop",
+        });
         var new_toggle_button = '<button id="start" type="button">Activate Temperature Control</button>';
     }
     if (mode == "start") {
