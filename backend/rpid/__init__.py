@@ -192,7 +192,7 @@ class TemperatureController(object):
                 temperature = self._update_temperature()
                 self._temp_log.info(temperature)
                 if self._data_provider.manual:
-                    desired_temperature = self._data_provider.current_setting
+                    desired_temperature = float(self._data_provider.current_setting)
                 else:
                     desired_temperature = self._program.get_desired_temperature()
                 if desired_temperature is False:
@@ -200,7 +200,7 @@ class TemperatureController(object):
                     # the program is over
                     break
                 else:
-                    self._data_provider.update_setting("%s&deg;C" % desired_temperature)
+                    self._data_provider.update_setting("%.2f&deg;C" % desired_temperature)
                 log.debug("Desired temp: %s" % desired_temperature)
                 self._pid.update_set_point(desired_temperature)
                 new_duty_cycle = self._pid.update(temperature)
