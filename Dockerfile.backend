@@ -2,6 +2,21 @@ FROM ubuntu:trusty
 MAINTAINER Jim Rybarski <jim@rybarski.com>
 
 RUN apt-get update && apt-get install -y \
-    python-pip
+    python-pip \
+    python-dev \
+    libffi-dev \
+    python-numpy
 
-RUN pip install bottle
+RUN pip install \
+    RPIO==0.10.0 \
+    argparse==1.2.1 \
+    bottle==0.12.8 \
+    cffi==0.8.6 \
+    pycparser==2.10 \
+    redis==2.10.3 \
+    smbus-cffi==0.4.1 \
+    wsgiref==0.1.2
+
+COPY ./backend /opt/
+
+WORKDIR /opt/

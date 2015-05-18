@@ -1,0 +1,9 @@
+FROM ubuntu:trusty
+MAINTAINER Jim Rybarski <jim@rybarski.com>
+
+RUN apt-get update && apt-get install -y \
+    nginx
+
+RUN mkdir -p /srv/www/
+
+COPY ./frontend /srv/www/
