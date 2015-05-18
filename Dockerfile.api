@@ -20,4 +20,4 @@ RUN pip install \
 COPY ./backend /opt/
 
 WORKDIR /opt/
-CMD /usr/bin/python2.7 server/main.py
+CMD /usr/bin/python2.7 apimain.py
