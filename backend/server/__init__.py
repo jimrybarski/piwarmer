@@ -73,7 +73,10 @@ def current():
     else:
         current_temp = data.current_temp or "n/a"
         current_setting = data.current_setting or "off"
-        minutes_left = data.minutes_left
+        try:
+            minutes_left = data.minutes_left
+        except TypeError:
+            minutes_left = None
         minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
