@@ -214,7 +214,10 @@ class TemperatureController(object):
         temperature = self._probe.current_temperature
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
-        self._data_provider.minutes_left = self._program.minutes_left
+        try:
+            self._data_provider.minutes_left = self._program.minutes_left
+        except TypeError:
+            self._data_provider.minutes_left = "n/a"
         return temperature
 
     def _get_history_key(self):
