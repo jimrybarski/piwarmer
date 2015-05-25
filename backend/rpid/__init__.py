@@ -89,21 +89,28 @@ class Output(object):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(Output.ENABLE_PIN, GPIO.OUT)
         GPIO.setup(Output.PWM_PIN, GPIO.OUT)
-        # Sets up a PWM pin with 1 second cycles
-        self._pwm = GPIO.PWM(Output.PWM_PIN, Output.HERTZ)
 
     def enable(self):
         GPIO.output(Output.ENABLE_PIN, GPIO.HIGH)
-        self._pwm.start(0)
 
     def disable(self):
-        GPIO.output(Output.ENABLE_PIN, GPIO.LOW)
-        self._pwm.stop()
+        try:
+            GPIO.output(Output.ENABLE_PIN, GPIO.LOW)
+            GPIO.output(Output.PWM_PIN, GPIO.LOW)
+        except:
+            log.critical("DANGER! COULD NOT DEACTIVATE HEATER! UNPLUG IT IMMEDIATELY!")
 
     def set_pwm(self, new_duty_cycle):
         assert 0.0 <= new_duty_cycle <= 100.0
         log.info("duty cycle: %s" % new_duty_cycle)
-        self._pwm.ChangeDutyCycle(new_duty_cycle)
+        on_time = Output.HERTZ * new_duty_cycle / 100.0
+        off_time = Output.HERTZ - on_time
+        GPIO.output(Output.PWM_PIN, GPIO.HIGH)
+        log.debug("PWM ON +++")
+        time.sleep(on_time)
+        GPIO.output(Output.PWM_PIN, GPIO.LOW)
+        log.debug("PWM OFF ---")
+        time.sleep(off_time)
 
 
 class TemperatureProbe(object):
@@ -161,7 +168,7 @@ class TemperatureController(object):
                 break
             else:
                 log.debug("Temperature controller inactive.")
-                time.sleep(1)
+                time.sleep(2)
 
     def _activate(self):
         # get the program currently in Redis
@@ -208,7 +215,6 @@ class TemperatureController(object):
                 # Long term we should add back the derivative action
                 SLOWDOWN_FACTOR = 0.2
                 self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
-            time.sleep(1.0)
 
     def _update_temperature(self):
         temperature = self._probe.current_temperature
