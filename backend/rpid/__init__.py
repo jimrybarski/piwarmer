@@ -8,7 +8,7 @@ import time
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 TEN_MINUTES = 600
 
