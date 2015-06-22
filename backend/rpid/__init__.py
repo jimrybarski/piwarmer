@@ -88,7 +88,7 @@ class Output(object):
     HERTZ = 1.0  # the response is super slow so 1 Hz is fine
 
     def __init__(self):
-        GPIO.setmode(GPIO.BOARD)
+        # GPIO.setmode(GPIO.BOARD)
         GPIO.setup(Output.ENABLE_PIN, GPIO.OUT)
         GPIO.setup(Output.PWM_PIN, GPIO.OUT)
 
