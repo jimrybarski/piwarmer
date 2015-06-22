@@ -218,9 +218,12 @@ class TemperatureController(object):
                 self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
 
     def _update_temperature(self):
-        temperature = float(self._probe.current_temperature)
-        if temperature == :
-            temperature = 65.0  # lol! this is extremely bad, fix this jim or everything will fail
+        current_temp = self._probe.current_temperature
+        if current_temp == "NaN":
+            temperature = 61.1  # lol! this is extremely bad, fix this jim or everything will fail
+        else:
+            temperature = float(current_temp)
+
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
         try:
