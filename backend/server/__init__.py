@@ -83,11 +83,11 @@ def current():
                 "minutes_left": minutes_left}
 
 
-@app.route('/history', method=['OPTIONS', 'GET'])
-def history():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in data.run_times}
-        return res
+# @app.route('/history', method=['OPTIONS', 'GET'])
+# def history():
+#     response.headers['Content-Type'] = 'application/json'
+#     if request.method == 'OPTIONS':
+#         return {}
+#     else:
+#         res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in data.run_times}
+#         return res
