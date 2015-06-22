@@ -2,7 +2,7 @@ function get(endpoint, func){
     $.ajax({
       type: "GET",
       crossDomain: true,
-      url: "http://temperature.controller/backend/" + endpoint,
+      url: "http://192.168.10.1/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data){
@@ -18,7 +18,7 @@ function get(endpoint, func){
     $.ajax({
       type: "GET",
       crossDomain: true,
-      url: "http://temperature.controller/backend/" + endpoint,
+      url: "http://192.168.10.1/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data){

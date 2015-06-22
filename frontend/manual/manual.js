@@ -2,7 +2,7 @@ function get(endpoint, func){
     $.ajax({
       type: "GET",
       crossDomain: true,
-      url: "http://temperature.controller/backend/" + endpoint,
+      url: "http://192.168.10.1/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: function(data){
@@ -20,7 +20,7 @@ function change_temp(amount) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://temperature.controller/backend/manual",
+          url: "http://192.168.10.1/backend/manual",
           contentType: "application/json; charset=utf-8",
           dataType: "json",
           data: JSON.stringify({"temp": new_temp}),
@@ -32,7 +32,7 @@ function toggle_mode(mode) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://temperature.controller/backend/stop",
+          url: "http://192.168.10.1/backend/stop",
         });
         var new_toggle_button = '<button id="start" type="button">Activate Temperature Control</button>';
     }
@@ -42,7 +42,7 @@ function toggle_mode(mode) {
         $.ajax({
           type: "POST",
           crossDomain: true,
-          url: "http://temperature.controller/backend/start",
+          url: "http://192.168.10.1/backend/start",
         });
     }
     $("#toggle").html(new_toggle_button);
