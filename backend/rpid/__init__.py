@@ -5,6 +5,8 @@ from logging import handlers
 import redis
 import smbus
 import time
+import Adafruit_MAX31855.MAX31855 as MAX31855
+
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
@@ -114,16 +116,15 @@ class Output(object):
 
 
 class TemperatureProbe(object):
-    GPIO_ADDRESS = 0x4d
 
     def __init__(self):
-        self._bus = smbus.SMBus(1)
-        log.debug("Connected to SMBus")
+        # Tell the temperature probe which ports its connected to (24, 23, and 18)
+        self._sensor = MAX31855.MAX31855(24, 23, 18)
+        log.debug("Connected to temperature probe.")
 
     @property
     def current_temperature(self):
-        data = self._bus.read_i2c_block_data(TemperatureProbe.GPIO_ADDRESS, 1, 2)
-        return ((data[0] * 256) + data[1]) / 5.0
+        return self._sensor.readTempC()
 
 
 class TemperatureController(object):
@@ -217,7 +218,10 @@ class TemperatureController(object):
                 self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
 
     def _update_temperature(self):
-        temperature = self._probe.current_temperature
+        try:
+            temperature = float(self._probe.current_temperature)
+        except ValueError:
+            return 100.0  # lol! this is extremely bad, fix this jim or everything will fail
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
         try:
