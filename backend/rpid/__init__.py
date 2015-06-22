@@ -181,7 +181,7 @@ class TemperatureController(object):
         handler = handlers.RotatingFileHandler("/var/log/temperatures/%s" % self._history_key)
         handler.setFormatter(logging.Formatter('%(asctime)s\t%(message)s'))
         self._temp_log.addHandler(handler)
-        self._temp_log.setLevel(logging.INFO)
+        self._temp_log.setLevel(logging.DEBUG)
         if not self._data_provider.manual:
             self._program.start()
 
@@ -218,9 +218,8 @@ class TemperatureController(object):
                 self._output.set_pwm(new_duty_cycle * SLOWDOWN_FACTOR)
 
     def _update_temperature(self):
-        try:
-            temperature = float(self._probe.current_temperature)
-        except ValueError:
+        temperature = float(self._probe.current_temperature)
+        if temperature == :
             temperature = 65.0  # lol! this is extremely bad, fix this jim or everything will fail
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
