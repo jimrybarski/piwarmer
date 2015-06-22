@@ -81,13 +81,3 @@ def current():
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
                 "minutes_left": minutes_left}
-
-
-# @app.route('/history', method=['OPTIONS', 'GET'])
-# def history():
-#     response.headers['Content-Type'] = 'application/json'
-#     if request.method == 'OPTIONS':
-#         return {}
-#     else:
-#         res = {key: "http://localhost:%s/history/%s" % (PORT, key) for key in data.run_times}
-#         return res
