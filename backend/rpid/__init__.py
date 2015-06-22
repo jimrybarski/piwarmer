@@ -221,7 +221,7 @@ class TemperatureController(object):
         try:
             temperature = float(self._probe.current_temperature)
         except ValueError:
-            return 100.0  # lol! this is extremely bad, fix this jim or everything will fail
+            temperature = 65.0  # lol! this is extremely bad, fix this jim or everything will fail
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
         try:
