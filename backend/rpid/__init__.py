@@ -83,8 +83,8 @@ class Data(redis.StrictRedis):
 
 
 class Output(object):
-    PWM_PIN = 36
-    ENABLE_PIN = 38
+    PWM_PIN = 16
+    ENABLE_PIN = 20
     HERTZ = 1.0  # the response is super slow so 1 Hz is fine
 
     def __init__(self):
