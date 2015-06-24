@@ -1,12 +1,11 @@
+import Adafruit_MAX31855.MAX31855 as MAX31855
 from datetime import datetime
 import json
 import logging
 from logging import handlers
-import redis
 import math
+import redis
 import time
-import Adafruit_MAX31855.MAX31855 as MAX31855
-
 
 log = logging.getLogger()
 log.addHandler(logging.StreamHandler())
