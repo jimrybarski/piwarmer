@@ -3,7 +3,7 @@ import json
 import logging
 from logging import handlers
 import redis
-import smbus
+import math
 import time
 import Adafruit_MAX31855.MAX31855 as MAX31855
 
@@ -219,10 +219,9 @@ class TemperatureController(object):
 
     def _update_temperature(self):
         current_temp = self._probe.current_temperature
-        if current_temp == "NaN":
-            temperature = 61.1  # lol! this is extremely bad, fix this jim or everything will fail
-        else:
-            temperature = float(current_temp)
+        if math.isnan(current_temp):
+            current_temp = self._data_provider.current_temp or 20.0
+        temperature = float(current_temp)
 
         log.debug("Current temp: %s" % temperature)
         self._data_provider.update_temperature(temperature)
