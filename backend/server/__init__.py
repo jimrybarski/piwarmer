@@ -1,6 +1,6 @@
 from bottle import Bottle, request, response
 import json
-from rpid import APIData
+from rpid.api import APIData
 
 app = Bottle()
 api_data = APIData()
@@ -74,10 +74,10 @@ def current():
         current_temp = api_data.current_temp or "n/a"
         current_setting = api_data.current_setting or "off"
         try:
-            minutes_left = api_data.minutes_left
+            seconds_left = api_data.seconds_left
         except TypeError:
-            minutes_left = None
-        minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
+            seconds_left = None
+        seconds_left = "n/a" if seconds_left is None else seconds_left + " seconds(s)"
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
-                "minutes_left": minutes_left}
+                "seconds_left": seconds_left}

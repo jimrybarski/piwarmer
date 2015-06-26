@@ -45,9 +45,9 @@ class APIData(redis.StrictRedis):
         return self.get("mode") == "manual"
 
     @property
-    def minutes_left(self):
-        return self.get("minutes_left")
+    def seconds_left(self):
+        return self.get("seconds_left")
 
-    @minutes_left.setter
-    def minutes_left(self, value):
-        self.set("minutes_left", value)
+    @seconds_left.setter
+    def seconds_left(self, value):
+        self.set("seconds_left", value)
