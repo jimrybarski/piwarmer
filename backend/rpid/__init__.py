@@ -1,4 +1,8 @@
-import Adafruit_MAX31855.MAX31855 as MAX31855
+try:
+    import Adafruit_MAX31855.MAX31855 as MAX31855
+except ImportError:
+    pass
+
 from datetime import datetime
 import json
 import logging
@@ -14,13 +18,7 @@ log.setLevel(logging.DEBUG)
 TEN_MINUTES = 600
 
 
-try:
-    import RPi.GPIO as GPIO
-except (SystemError, ImportError):
-    log.warn("Not running on Raspberry Pi, GPIO cannot be imported.")
-
-
-class Data(redis.StrictRedis):
+class APIData(redis.StrictRedis):
     def update_temperature(self, temp):
         self.set("current_temp", temp)
         if self.llen("history") > TEN_MINUTES:
@@ -74,44 +72,6 @@ class Data(redis.StrictRedis):
     @minutes_left.setter
     def minutes_left(self, value):
         self.set("minutes_left", value)
-
-    @property
-    def history(self):
-        # gets the last ten minutes of temperature records
-        return self.lrange("history", 0, -1)
-
-
-class Output(object):
-    PWM_PIN = 16
-    ENABLE_PIN = 20
-    HERTZ = 1.0  # the response is super slow so 1 Hz is fine
-
-    def __init__(self):
-        # GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(Output.ENABLE_PIN, GPIO.OUT)
-        GPIO.setup(Output.PWM_PIN, GPIO.OUT)
-
-    def enable(self):
-        GPIO.output(Output.ENABLE_PIN, GPIO.HIGH)
-
-    def disable(self):
-        try:
-            GPIO.output(Output.ENABLE_PIN, GPIO.LOW)
-            GPIO.output(Output.PWM_PIN, GPIO.LOW)
-        except:
-            log.critical("DANGER! COULD NOT DEACTIVATE HEATER! UNPLUG IT IMMEDIATELY!")
-
-    def set_pwm(self, new_duty_cycle):
-        assert 0.0 <= new_duty_cycle <= 100.0
-        log.info("duty cycle: %s" % new_duty_cycle)
-        on_time = Output.HERTZ * new_duty_cycle / 100.0
-        off_time = Output.HERTZ - on_time
-        GPIO.output(Output.PWM_PIN, GPIO.HIGH)
-        log.debug("PWM ON +++")
-        time.sleep(on_time)
-        GPIO.output(Output.PWM_PIN, GPIO.LOW)
-        log.debug("PWM OFF ---")
-        time.sleep(off_time)
 
 
 class TemperatureProbe(object):
