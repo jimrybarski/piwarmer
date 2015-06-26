@@ -5,7 +5,6 @@ Also where errors occur and how you'll handle partial compliance.
 """
 from datetime import datetime
 import logging
-import math
 from rpid.api import APIData
 from rpid.pid import PID, Driver
 from rpid.thermometer import Thermometer
@@ -15,21 +14,47 @@ import time
 
 log = logging.getLogger(__name__)
 
-# def listen():
-#     api_data = APIData()
-#     while True:
-#         if api_data.active:
-#             break
-#         else:
-#             log.debug("Temperature controller inactive.")
-#             time.sleep(2)
-#
-#
-# def activate():
-#     driver = Driver("small aluminum block", 5.0, 1.0, 0.0, 10.0, -10.0)
-#     thermometer = Thermometer()
-#     pid = PID(driver)
-#     start_time = datetime.utcnow()
+
+class BaseRunner(object):
+    def run(self):
+        while True:
+            self._boot()
+            self._listen()
+            self._activate()
+            self._run()
+
+    def _boot(self):
+        while True:
+            try:
+                api_data = APIData()
+                api_data.clear()
+            except:
+                log.exception("Could not get data from Redis about active state.")
+
+            else:
+                return True
+
+    def _listen(self):
+        while True:
+            active = False
+            try:
+                api_data = APIData()
+                active = api_data.active
+            except:
+                log.exception("Could not get data from Redis about active state.")
+            else:
+                if active:
+                    break
+                else:
+                    log.debug("Temperature controller inactive.")
+                    time.sleep(2)
+
+    def _activate(self):
+        data =
+        driver = Driver("small aluminum block", 5.0, 1.0, 0.0, 10.0, -10.0)
+        thermometer = Thermometer()
+        pid = PID(driver)
+        start_time = datetime.utcnow()
 #
 #
 # def run_program():

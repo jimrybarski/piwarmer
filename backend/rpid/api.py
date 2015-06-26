@@ -5,6 +5,15 @@ TEN_MINUTES = 600  # seconds
 
 
 class APIData(redis.StrictRedis):
+    def clear(self):
+        """
+        Resets everything.
+
+        """
+        labels = ["current_temp", "current_setting", "active", "program", "mode", "seconds_left"]
+        for label in labels:
+            self.delete(label)
+
     def update_temperature(self, temp):
         self.set("current_temp", temp)
 
@@ -37,12 +46,14 @@ class APIData(redis.StrictRedis):
     def current_setting(self):
         return self.get("current_setting")
 
-    def set_mode(self, mode):
-        self.set("mode", mode)
-
     @property
-    def manual(self):
-        return self.get("mode") == "manual"
+    def mode(self):
+        return self.get("mode")
+
+    @mode.setter
+    def mode(self, value):
+        assert value in ('manual', 'programmed')
+        self.set("mode", value)
 
     @property
     def seconds_left(self):

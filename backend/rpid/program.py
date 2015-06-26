@@ -4,6 +4,21 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def calculate_seconds_left(data):
+    seconds_left = int(max(data.program.total_duration - data.current_time + data.start, 0))
+    return seconds_left
+
+
+def get_desired_temperature(data):
+    elapsed = data.current_time - data.start
+    for setting in data.program.settings:
+        elapsed -= setting.duration
+        if elapsed < 0:
+            return float(setting.temperature)
+    # The program program is over or holding at a specified temperature.
+    return float(data.program.hold_temp) if data.program.hold_temp else False
+
+
 class TemperatureSetting(object):
     def __init__(self, temperature, duration_in_seconds):
         self._temperature = temperature
@@ -19,18 +34,21 @@ class TemperatureSetting(object):
 
 
 class TemperatureProgram(object):
-    def __init__(self):
+    def __init__(self, json_program):
         self._settings = []
-        self._start = None
         self._hold_temp = None
         self._total_duration = 0.0
+        self._load_json(json_program)
 
-    def minutes_left(self, current_time):
-        seconds_left = max(self._total_duration - current_time + self._start, 0)
-        log.debug("seconds left: %s" % seconds_left)
-        return int(seconds_left / 60.0)
+    @property
+    def settings(self):
+        return self._settings
 
-    def load_json(self, json_program):
+    @property
+    def hold_temp(self):
+        return self._hold_temp
+
+    def _load_json(self, json_program):
         """
         json_program will be a dict like:
         {
@@ -50,10 +68,10 @@ class TemperatureProgram(object):
         :type json_program:     str
 
         """
-        action = {"set": self.set_temperature,
-                  "linear": self.linear,
-                  "repeat": self.repeat,
-                  "hold": self.hold
+        action = {"set": self._set_temperature,
+                  "linear": self._linear,
+                  "repeat": self._repeat,
+                  "hold": self._hold
                   }
         raw_program = json.loads(json_program)
         for index, parameters in sorted(raw_program.items(), key=lambda x: int(x[0])):
@@ -64,13 +82,13 @@ class TemperatureProgram(object):
             log.debug("Adding instruction: %s with parameters: %s" % (mode, parameters))
             action[mode](**parameters)
 
-    def set_temperature(self, temperature=25.0, duration=60):
+    def _set_temperature(self, temperature=25.0, duration=60):
         setting = TemperatureSetting(float(temperature), int(duration))
         self._total_duration += int(duration)
         self._settings.append(setting)
         return self
 
-    def linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
+    def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         # at least one minute long, must be multiple of 15
         duration = int(duration)
         start_temperature = float(start_temperature)
@@ -86,7 +104,7 @@ class TemperatureProgram(object):
             self._total_duration += duration
             self._settings.append(setting)
 
-    def repeat(self, num_repeats=3):
+    def _repeat(self, num_repeats=3):
         new_settings = []
         for i in range(num_repeats):
             for action in self._settings:
@@ -95,19 +113,7 @@ class TemperatureProgram(object):
         self._settings = new_settings
         return self
 
-    def hold(self, temperature=25.0):
+    def _hold(self, temperature=25.0):
         self._hold_temp = temperature
         return self
 
-    def start(self, current_time):
-        assert self._start is None
-        self._start = current_time
-
-    def get_desired_temperature(self, current_time):
-        elapsed = current_time - self._start
-        for setting in self._settings:
-            elapsed -= setting.duration
-            if elapsed < 0:
-                return float(setting.temperature)
-        # The program program is over or holding at a specified temperature.
-        return float(self._hold_temp) if self._hold_temp else False
