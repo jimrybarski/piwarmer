@@ -4,10 +4,7 @@ log = logging.getLogger(__name__)
 
 
 class FakeGPIO(object):
-    """
-    This exists solely so we can test things outside of the Raspberry Pi.
-
-    """
+    """ Allows testing of heater functionality outside of Raspberry Pi. """
     OUT = 'OUT'
     IN = 'IN'
     HIGH = 1
@@ -20,3 +17,12 @@ class FakeGPIO(object):
     @staticmethod
     def setup(pin, state):
         log.debug("Fake GPIO setup pin %s to %s" % (pin, state))
+
+
+class FakeMAX31855(object):
+    """ Allows testing of thermometer functionality outside of Raspberry Pi. """
+    def __init__(self, *args):
+        self.temperature = 20.0
+
+    def readTempC(self):
+        return self.temperature
