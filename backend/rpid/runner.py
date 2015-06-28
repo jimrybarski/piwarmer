@@ -24,15 +24,8 @@ class BaseRunner(object):
             self._run()
 
     def _boot(self):
-        while True:
-            try:
-                api_data = APIData()
-                api_data.clear()
-            except:
-                log.exception("Could not get data from Redis about active state.")
-
-            else:
-                return True
+        api_data = APIData()
+        api_data.clear()
 
     def _listen(self):
         while True:
