@@ -37,15 +37,6 @@ def act():
         data.activate()
     return {}
 
-@app.route('/manual', method=['OPTIONS', 'POST'])
-def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        data.set_mode('manual')
-        data.update_setting(int(request.json['temp']))
-
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():
     response.headers['Content-Type'] = 'application/json'
@@ -74,10 +65,10 @@ def current():
         current_temp = data.current_temp or "n/a"
         current_setting = data.current_setting or "off"
         try:
-            seconds_left = data.seconds_left
+            time_left = data.time_left
         except TypeError:
-            seconds_left = None
-        seconds_left = "n/a" if seconds_left is None else seconds_left + " seconds(s)"
+            time_left = None
+
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
-                "seconds_left": seconds_left}
+                "time_left": time_left or "n/a"}
