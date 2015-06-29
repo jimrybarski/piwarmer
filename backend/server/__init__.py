@@ -19,11 +19,6 @@ def enable_cors():
     response.headers['Content-Type'] = 'application/json'
 
 
-@app.route('/', method=['OPTIONS', 'GET'])
-def status():
-    return "The API is running."
-
-
 @app.route('/stop', method=['OPTIONS', 'POST'])
 def act():
     data.deactivate()
