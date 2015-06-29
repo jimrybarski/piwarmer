@@ -20,3 +20,14 @@ class LinearGradientTests(unittest.TestCase):
         self.assertEqual(lg.get_temperature(3), 70.0)
         self.assertEqual(lg.get_temperature(4), 60.0)
         self.assertEqual(lg.get_temperature(5), 50.0)
+
+    def test_get_temp3(self):
+        lg = LinearGradient(1, 9, 10)
+        self.assertEqual(lg.get_temperature(0), 1.0)
+        self.assertEqual(lg.get_temperature(1), 1.8)
+        self.assertEqual(lg.get_temperature(2), 2.6)
+        self.assertEqual(lg.get_temperature(3), 3.4)
+        self.assertEqual(lg.get_temperature(4), 4.2)
+        self.assertEqual(lg.get_temperature(5), 5.0)
+
+
