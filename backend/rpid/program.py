@@ -5,12 +5,19 @@ log = logging.getLogger(__name__)
 
 
 def calculate_seconds_left(data):
-    seconds_left = int(max(data.program.total_duration - data.current_time + data.start, 0))
+    assert data.program is not None
+    assert data.current_time is not None
+    assert data.start_time is not None
+
+    seconds_left = int(max(data.program.total_duration - data.current_time + data.start_time, 0))
     return seconds_left
 
 
 def get_desired_temperature(data):
-    elapsed = data.current_time - data.start
+    assert data.program is not None
+    assert data.current_time is not None
+    assert data.start_time is not None
+    elapsed = data.current_time - data.start_time
     for setting in data.program.settings:
         elapsed -= setting.duration
         if elapsed < 0:
@@ -68,6 +75,7 @@ class TemperatureProgram(object):
         :type json_program:     str
 
         """
+        print(json_program)
         action = {"set": self._set_temperature,
                   "linear": self._linear,
                   "repeat": self._repeat,

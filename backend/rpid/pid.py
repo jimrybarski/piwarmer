@@ -37,14 +37,18 @@ class PID:
         self._accumulated_error_max = driver.error_max
         self._accumulated_error_min = driver.error_min
 
-    def update(self, current_temperature, set_point, accumulated_error):
-        error = set_point - current_temperature
-        new_accumulated_error = self._calculate_accumulated_error(error, accumulated_error)
+    def update(self, data):
+        assert data.desired_temperature is not None
+        assert data.current_temperature is not None
+        assert data.accumulated_error is not None
+
+        error = data.desired_temperature - data.current_temperature
+        new_accumulated_error = self._calculate_accumulated_error(error, data.accumulated_error)
         p = self._kp * error
         i = new_accumulated_error * self._ki
         # scale the result by the temperature to give it some approximation of the neighborhood it should be in
         # I don't think this is mathematically sound and might just work purely by coincidence
-        total = 100 * int(p + i) / abs(set_point)
+        total = 100 * int(p + i) / abs(data.desired_temperature)
         duty_cycle = max(0, min(100, total))
         return duty_cycle, new_accumulated_error
 

@@ -1,4 +1,5 @@
 import logging
+import random
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +23,11 @@ class FakeGPIO(object):
 class FakeMAX31855(object):
     """ Allows testing of thermometer functionality outside of Raspberry Pi. """
     def __init__(self, *args):
-        self.temperature = 20.0
+        pass
+
+    @staticmethod
+    def MAX31855(*args):
+        return FakeMAX31855()
 
     def readTempC(self):
-        return self.temperature
+        return random.randint(20, 105)
