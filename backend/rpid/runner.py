@@ -1,8 +1,3 @@
-"""
-This is great and all, but you need to think hard about how you'll carry state around.
-Also where errors occur and how you'll handle partial compliance.
-
-"""
 from abc import abstractmethod
 from datetime import datetime
 import logging
