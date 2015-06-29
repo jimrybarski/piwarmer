@@ -94,6 +94,7 @@ class ProgramRunner(BaseRunner):
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
         self._program = program.TemperatureProgram(self._api_data.program)
+        self._heater.enable()
 
     def _run(self):
         """
