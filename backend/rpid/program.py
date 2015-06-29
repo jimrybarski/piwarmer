@@ -9,7 +9,8 @@ def calculate_seconds_left(data):
     assert data.current_time is not None
     assert data.start_time is not None
 
-    seconds_left = int(max(data.program.total_duration - data.current_time + data.start_time, 0))
+    elapsed = (data.current_time - data.start_time).total_seconds()
+    seconds_left = int(max(data.program.total_duration - elapsed, 0))
     return seconds_left
 
 
@@ -17,7 +18,7 @@ def get_desired_temperature(data):
     assert data.program is not None
     assert data.current_time is not None
     assert data.start_time is not None
-    elapsed = data.current_time - data.start_time
+    elapsed = (data.current_time - data.start_time).total_seconds()
     for setting in data.program.settings:
         elapsed -= setting.duration
         if elapsed < 0:
@@ -54,6 +55,10 @@ class TemperatureProgram(object):
     @property
     def hold_temp(self):
         return self._hold_temp
+
+    @property
+    def total_duration(self):
+        return self._total_duration
 
     def _load_json(self, json_program):
         """
