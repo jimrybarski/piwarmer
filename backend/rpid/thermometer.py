@@ -7,6 +7,10 @@ try:
 except ImportError:
     MAX31855 = FakeMAX31855
 
+# Because they have an annoying and useless message
+maxlog = logging.getLogger('Adafruit_MAX31855.MAX31855')
+maxlog.disabled = True
+
 log = logging.getLogger(__name__)
 
 
