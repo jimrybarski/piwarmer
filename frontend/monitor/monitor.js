@@ -55,4 +55,3 @@ $(document).ready(function(){
     );
     var intervalID = window.setInterval(update, 1000);
 });
-
