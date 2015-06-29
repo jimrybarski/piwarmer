@@ -25,7 +25,7 @@ function post(endpoint, func){
         func(data)
       },
       failure: function(data) {
-        alert("The API could not be reached.")
+        alert("Error! Could not stop heater. Please turn off the device power.")
       },
     });
 }
@@ -42,9 +42,17 @@ $(document).ready(function(){
     $("#stop").click( function()
         {
             post("stop", function(data){
+                alert("Program has stopped and the heater is shut down.")
+            })
+        }
+    );
+    $("#new_program").click( function()
+        {
+            post("stop", function(data){
                 window.location.replace("http://192.168.10.1/");
             })
         }
     );
-    var intervalID = window.setInterval(update, 2500);
+    var intervalID = window.setInterval(update, 1050);
 });
+
