@@ -29,5 +29,3 @@ class LinearGradientTests(unittest.TestCase):
         self.assertEqual(lg.get_temperature(3), 3.4)
         self.assertEqual(lg.get_temperature(4), 4.2)
         self.assertEqual(lg.get_temperature(5), 5.0)
-
-

@@ -42,6 +42,11 @@ class BaseSetting(object):
     def get_temperature(self, seconds_into_setting):
         raise NotImplemented
 
+    @abc.abstractproperty
+    def description(self):
+        """ Text to describe the step being run for the frontend. """
+        raise NotImplemented
+
 
 class SetTemperature(BaseSetting):
     def __init__(self, temperature, duration):
@@ -67,7 +72,6 @@ class LinearGradient(BaseSetting):
 class TemperatureProgram(object):
     def __init__(self, json_program):
         self._settings = []
-        self._display_settings = []
         self._hold_temp = None
         self._total_duration = 0.0
         self._load_json(json_program)
