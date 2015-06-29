@@ -1,6 +1,3 @@
-import math
-
-
 class RoundData(object):
     def __init__(self):
         self.accumulated_error = None
