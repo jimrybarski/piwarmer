@@ -16,6 +16,7 @@ def enable_cors():
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+    response.headers['Content-Type'] = 'application/json'
 
 
 @app.route('/', method=['OPTIONS', 'GET'])
@@ -25,50 +26,33 @@ def status():
 
 @app.route('/stop', method=['OPTIONS', 'POST'])
 def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method != 'OPTIONS':
-        data.deactivate()
-    return {}
+    data.deactivate()
+
 
 @app.route('/start', method=['OPTIONS', 'POST'])
 def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method != 'OPTIONS':
-        data.activate()
-    return {}
+    data.activate()
+
 
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        return json.loads(data.program) or {}
+    return json.loads(data.program) or {}
 
 
 @app.route('/program', method=['POST'])
 def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        data.set_program(request.json)
-        data.activate()
+    data.set_program(request.json)
+    data.activate()
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])
 def current():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        current_temp = data.current_temp or "n/a"
-        current_setting = data.current_setting or "off"
-        try:
-            time_left = data.time_left
-        except TypeError:
-            time_left = None
-
-        return {"setting": current_setting,
-                "temp": str(current_temp) + " &deg;C",
-                "time_left": time_left or "n/a"}
+    current_temp = data.current_temp or "n/a"
+    current_setting = data.current_setting or "off"
+    try:
+        time_left = data.time_left
+    except TypeError:
+        time_left = None
+    return {"setting": current_setting,
+            "temp": str(current_temp) + " &deg;C",
+            "time_left": time_left or "n/a"}
