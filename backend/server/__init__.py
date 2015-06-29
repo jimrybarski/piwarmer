@@ -69,17 +69,15 @@ def act():
 def current():
     response.headers['Content-Type'] = 'application/json'
     if request.method == 'OPTIONS':
-        print("OPTIONS")
         return {}
     else:
-        print("NORMAL")
         current_temp = data.current_temp or "n/a"
         current_setting = data.current_setting or "off"
         try:
-            minutes_left = data.minutes_left
+            seconds_left = data.seconds_left
         except TypeError:
-            minutes_left = None
-        minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
+            seconds_left = None
+        seconds_left = "n/a" if seconds_left is None else seconds_left + " seconds(s)"
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
-                "minutes_left": minutes_left}
+                "seconds_left": seconds_left}
