@@ -34,7 +34,7 @@ function update() {
   get("current", function(data){
     $("#current_temp").html("Temp: " + data.temp)
     $("#current_mode").html("Current Setting: " + data.setting)
-    $("#minutes_left").html("Time remaining: " + data.minutes_left)
+    $("#seconds_left").html("Time remaining: " + data.seconds_left)
   })
 }
 

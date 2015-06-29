@@ -1,9 +1,9 @@
 from bottle import Bottle, request, response
 import json
-from rpid import Data
+from rpid.api import APIData
 
 app = Bottle()
-data = Data()
+api_data = APIData()
 app.mount('/backend/', app)
 
 
@@ -27,24 +27,15 @@ def status():
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        data.deactivate()
+        api_data.deactivate()
     return {}
 
 @app.route('/start', method=['OPTIONS', 'POST'])
 def act():
     response.headers['Content-Type'] = 'application/json'
     if request.method != 'OPTIONS':
-        data.activate()
+        api_data.activate()
     return {}
-
-@app.route('/manual', method=['OPTIONS', 'POST'])
-def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        data.set_mode('manual')
-        data.update_setting(int(request.json['temp']))
 
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():
@@ -52,7 +43,7 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        return json.loads(data.program) or {}
+        return json.loads(api_data.program) or {}
 
 
 @app.route('/program', method=['POST'])
@@ -61,8 +52,8 @@ def act():
     if request.method == 'OPTIONS':
         return {}
     else:
-        data.set_program(request.json)
-        data.activate()
+        api_data.set_program(request.json)
+        api_data.activate()
 
 
 @app.route('/current', method=['OPTIONS', 'GET'])
@@ -71,13 +62,13 @@ def current():
     if request.method == 'OPTIONS':
         return {}
     else:
-        current_temp = data.current_temp or "n/a"
-        current_setting = data.current_setting or "off"
+        current_temp = api_data.current_temp or "n/a"
+        current_setting = api_data.current_setting or "off"
         try:
-            minutes_left = data.minutes_left
+            seconds_left = api_data.seconds_left
         except TypeError:
-            minutes_left = None
-        minutes_left = "n/a" if minutes_left is None else minutes_left + " minute(s)"
+            seconds_left = None
+        seconds_left = "n/a" if seconds_left is None else seconds_left + " seconds(s)"
         return {"setting": current_setting,
                 "temp": str(current_temp) + " &deg;C",
-                "minutes_left": minutes_left}
+                "seconds_left": seconds_left}
