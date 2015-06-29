@@ -1,5 +1,6 @@
 from dummy import FakeMAX31855
 import logging
+import math
 
 try:
     import Adafruit_MAX31855.MAX31855 as MAX31855
@@ -18,4 +19,5 @@ class Thermometer(object):
 
     @property
     def current_temperature(self):
-        return self._sensor.readTempC()
+        temperature = float(self._sensor.readTempC())
+        return None if math.isnan(temperature) else temperature
