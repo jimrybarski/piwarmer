@@ -1,3 +1,4 @@
+import abc
 import json
 import logging
 import time
@@ -32,23 +33,41 @@ def convert_seconds_to_hhmmss(seconds):
     return time.strftime('%H:%M:%S', time.gmtime(seconds))
 
 
-class TemperatureSetting(object):
-    def __init__(self, temperature, duration_in_seconds):
-        self._temperature = temperature
-        self._duration = duration_in_seconds
+class BaseSetting(object):
+    def __init__(self, duration):
+        assert duration > 0
+        self._duration = int(duration)
 
-    @property
-    def temperature(self):
+    @abc.abstractmethod
+    def get_temperature(self, seconds_into_setting):
+        raise NotImplemented
+
+
+class SetTemperature(BaseSetting):
+    def __init__(self, temperature, duration):
+        super(SetTemperature, self).__init__(duration)
+        self._temperature = float(temperature)
+
+    def get_temperature(self, seconds_into_setting):
         return self._temperature
 
-    @property
-    def duration(self):
-        return self._duration
+
+class LinearGradient(BaseSetting):
+    def __init__(self, start_temp, final_temp, duration):
+        super(LinearGradient, self).__init__(duration)
+        self._start_temp = float(start_temp)
+        self._final_temp = float(final_temp)
+
+    def get_temperature(self, seconds_into_setting):
+        percentage_done = float(seconds_into_setting) / self._duration
+        offset = (self._final_temp - self._start_temp) * percentage_done
+        return self._start_temp + offset
 
 
 class TemperatureProgram(object):
     def __init__(self, json_program):
         self._settings = []
+        self._display_settings = []
         self._hold_temp = None
         self._total_duration = 0.0
         self._load_json(json_program)
