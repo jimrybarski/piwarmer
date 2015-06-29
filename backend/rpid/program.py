@@ -80,7 +80,6 @@ class TemperatureProgram(object):
         :type json_program:     str
 
         """
-        print(json_program)
         action = {"set": self._set_temperature,
                   "linear": self._linear,
                   "repeat": self._repeat,

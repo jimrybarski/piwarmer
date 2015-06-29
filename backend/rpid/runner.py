@@ -28,9 +28,11 @@ class BaseRunner(object):
         return self
 
     def _boot(self):
+        log.debug("*** BOOT ***")
         self._api_data.clear()
 
     def _listen(self):
+        log.debug("*** LISTEN ***")
         while True:
             if self._api_data.active:
                 break
@@ -73,24 +75,30 @@ class ProgramRunner(BaseRunner):
         self._pid = None
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        log.debug("Exiting program runner.")
         self._shutdown()
 
     def _shutdown(self):
+        log.debug("Shutting down heater.")
         try:
             self._heater.disable()
         except:
-            pass
+            log.critical("DANGER! HEATER DID NOT SHUT DOWN")
+        else:
+            log.debug("Heater shutdown successful.")
+        log.debug("Clearing API data.")
         try:
             self._api_data.clear()
         except:
-            pass
+            log.error("Failed to clear API data!")
+        else:
+            log.debug("API data cleared.")
 
     def _prerun(self):
+        log.debug("*** PRERUN ***")
         # in the near future, the driver will be chosen by the user
         driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 10.0, -10.0)
         self._pid = pid.PID(driver)
-        assert self._start_time is None
-        assert self._program is None
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
         self._program = program.TemperatureProgram(self._api_data.program)
@@ -135,4 +143,11 @@ class ProgramRunner(BaseRunner):
 
             # make calculations based on I/O having worked
             round_data.duty_cycle, self._accumulated_error = self._pid.update(round_data)
+
+            # run the heating sequence, if necessary
             self._heater.heat(round_data.duty_cycle)
+
+            # update the API data so the frontend can know what's happening
+            self._api_data.seconds_left = round_data.seconds_left
+            self._api_data.update_temperature(round_data.current_temperature)
+            self._api_data.update_setting(round_data.desired_temperature)

@@ -47,15 +47,6 @@ class APIData(redis.StrictRedis):
         return self.get("current_setting")
 
     @property
-    def mode(self):
-        return self.get("mode")
-
-    @mode.setter
-    def mode(self, value):
-        assert value in ('manual', 'programmed')
-        self.set("mode", value)
-
-    @property
     def seconds_left(self):
         return self.get("seconds_left")
 

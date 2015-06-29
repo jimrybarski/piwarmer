@@ -37,15 +37,6 @@ def act():
         api_data.activate()
     return {}
 
-@app.route('/manual', method=['OPTIONS', 'POST'])
-def act():
-    response.headers['Content-Type'] = 'application/json'
-    if request.method == 'OPTIONS':
-        return {}
-    else:
-        api_data.set_mode('manual')
-        api_data.update_setting(int(request.json['temp']))
-
 @app.route('/program', method=['OPTIONS', 'GET'])
 def act():
     response.headers['Content-Type'] = 'application/json'

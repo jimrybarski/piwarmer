@@ -1,6 +1,7 @@
 import time
 import logging
 from dummy import FakeGPIO
+
 log = logging.getLogger(__name__)
 
 
