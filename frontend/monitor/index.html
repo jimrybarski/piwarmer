@@ -3,11 +3,32 @@
     <title>Raspberry PID</title>
     <script type="text/javascript" src="../jquery.min.js"></script>
     <script type="text/javascript" src="monitor.js"></script>
+  <style>
+        input {
+           font-size: 20px;
+           padding: 20px;
+        }
+        select {
+           font-size: 20px;
+           padding: 20px;
+        }
+        entry {
+           width: 100px;
+        }
+        input[type="text"] {
+            width: 250px;
+        }
+        td[class="step_id"] {
+           font-size: 0px;
+           color: #FFFFFF;
+        }
+    </style>
   </head>
   <body>
     <a href="http://192.168.10.1/">Enter New Program</a><br><br>
     <div><h1 id="current_temp">n/a</h1></div>
     <div><h2 id="current_mode">n/a</h2></div>
     <div><h2 id="time_left">n/a</h2></div>
+    <input type="submit" name="stop" value="STOP" id="stop">
   </body>
 </html>

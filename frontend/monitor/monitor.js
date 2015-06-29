@@ -14,9 +14,9 @@ function get(endpoint, func){
     });
 }
 
-function get(endpoint, func){
+function post(endpoint, func){
     $.ajax({
-      type: "GET",
+      type: "POST",
       crossDomain: true,
       url: "http://192.168.10.1/backend/" + endpoint,
       contentType: "application/json; charset=utf-8",
@@ -41,7 +41,9 @@ function update() {
 $(document).ready(function(){
     $("#stop").click( function()
         {
-            alert('I should stop the program now...');
+            post("stop", function(data){
+                window.location.replace("http://192.168.10.1/");
+            })
         }
     );
     var intervalID = window.setInterval(update, 2500);
