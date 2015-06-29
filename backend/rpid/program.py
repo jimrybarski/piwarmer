@@ -121,8 +121,9 @@ class TemperatureProgram(object):
         temperature = start_temperature
         for _ in xrange(setting_count):
             temperature -= step_diff
-            setting = TemperatureSetting(float(temperature), float(duration) / setting_count)
-            self._total_duration += duration
+            setting_duration = float(duration) / setting_count
+            setting = TemperatureSetting(float(temperature), setting_duration)
+            self._total_duration += setting_duration
             log.debug("total duration %s" % self._total_duration)
             self._settings.append(setting)
 
