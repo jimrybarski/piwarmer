@@ -28,11 +28,9 @@ class BaseRunner(object):
         return self
 
     def _boot(self):
-        log.debug("*** BOOT ***")
         self._api_data.clear()
 
     def _listen(self):
-        log.debug("*** LISTEN ***")
         while True:
             if self._api_data.active:
                 break
@@ -95,7 +93,6 @@ class ProgramRunner(BaseRunner):
             log.debug("API data cleared.")
 
     def _prerun(self):
-        log.debug("*** PRERUN ***")
         # in the near future, the driver will be chosen by the user
         driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 10.0, -10.0)
         self._pid = pid.PID(driver)
