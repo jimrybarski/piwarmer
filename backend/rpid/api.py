@@ -47,9 +47,9 @@ class APIData(redis.StrictRedis):
         return self.get("current_setting")
 
     @property
-    def seconds_left(self):
-        return self.get("seconds_left")
+    def time_left(self):
+        return self.get("time_left")
 
-    @seconds_left.setter
-    def seconds_left(self, value):
-        self.set("seconds_left", value)
+    @time_left.setter
+    def time_left(self, value):
+        self.set("time_left", value)

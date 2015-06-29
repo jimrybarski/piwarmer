@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 log = logging.getLogger(__name__)
 
@@ -25,6 +26,10 @@ def get_desired_temperature(data):
             return float(setting.temperature)
     # The program program is over or holding at a specified temperature.
     return float(data.program.hold_temp) if data.program.hold_temp else False
+
+
+def convert_seconds_to_hhmmss(seconds):
+    return time.strftime('%H:%M:%S', time.gmtime(seconds))
 
 
 class TemperatureSetting(object):
