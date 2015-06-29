@@ -139,7 +139,7 @@ class ProgramRunner(BaseRunner):
 
             # run the heating sequence, if necessary
             log.debug("DUTY CYCLE %s" % round_data.duty_cycle)
-            self._heater.heat(round_data.duty_cycle)
+            self._heater.heat(round_data.duty_cycle * 0.8)
 
             # update the API data so the frontend can know what's happening
             self._api_data.time_left = program.convert_seconds_to_hhmmss(round_data.seconds_left)
