@@ -12,4 +12,4 @@ class RoundData(object):
 
     @property
     def can_update_pid(self):
-        return self.desired_temperature is not None and self.current_temperature is not None
+        return bool(self.desired_temperature) and self.current_temperature is not None
