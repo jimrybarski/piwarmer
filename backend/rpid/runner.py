@@ -144,4 +144,4 @@ class ProgramRunner(BaseRunner):
             # update the API data so the frontend can know what's happening
             self._api_data.time_left = program.convert_seconds_to_hhmmss(round_data.seconds_left)
             self._api_data.update_temperature(round_data.current_temperature)
-            self._api_data.update_setting(round_data.desired_temperature)
+            self._api_data.update_setting(round(round_data.desired_temperature, 2))
