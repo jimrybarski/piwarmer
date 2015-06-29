@@ -108,17 +108,22 @@ class TemperatureProgram(object):
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         # at least one minute long, must be multiple of 15
         duration = int(duration)
+        log.debug("duration %s" % duration)
         start_temperature = float(start_temperature)
         end_temperature = float(end_temperature)
         total_diff = start_temperature - end_temperature
+        log.debug("total_diff %s" % total_diff)
         # Limit the granularity to 4 temperature changes per minute
         setting_count = int(max(1, duration / 15))
+        log.debug("setting_count %s" % setting_count)
         step_diff = total_diff / setting_count
+        log.debug("step_diff %s" % step_diff)
         temperature = start_temperature
         for _ in xrange(setting_count):
             temperature -= step_diff
             setting = TemperatureSetting(float(temperature), duration)
             self._total_duration += duration
+            log.debug("total duration %s" % self._total_duration)
             self._settings.append(setting)
 
     def _repeat(self, num_repeats=3):
