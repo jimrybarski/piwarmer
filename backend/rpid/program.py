@@ -47,7 +47,7 @@ class TemperatureSetting(object):
 
 class TemperatureProgram(object):
     def __init__(self, json_program):
-        self._settings = []
+        self._settings = {}
         self._hold_temp = None
         self._total_duration = 0.0
         self._load_json(json_program)
@@ -99,16 +99,19 @@ class TemperatureProgram(object):
             action[mode](**parameters)
 
     def _set_temperature(self, temperature=25.0, duration=60):
-        setting = TemperatureSetting(float(temperature), float(temperature), int(duration))
-        self._total_duration += int(duration)
-        self._settings.append(setting)
+        temperature = float(temperature)
+        duration = int(duration)
+        setting = TemperatureSetting(temperature, temperature, duration)
+        self._settings[(self._total_duration, self._total_duration + duration)] = setting
+        self._total_duration += duration
         return self
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         # at least one minute long, must be multiple of 15
-        setting = TemperatureSetting(float(start_temperature), float(end_temperature), int(duration))
-        self._total_duration += int(duration)
-        self._settings.append(setting)
+        duration = int(duration)
+        setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
+        self._settings[(self._total_duration, self._total_duration + duration)] = setting
+        self._total_duration += duration
         return self
 
     def _repeat(self, num_repeats=3):
