@@ -1,4 +1,4 @@
-import abc
+import copy
 import json
 import logging
 import time
@@ -33,35 +33,11 @@ def convert_seconds_to_hhmmss(seconds):
     return time.strftime('%H:%M:%S', time.gmtime(seconds))
 
 
-class BaseSetting(object):
-    def __init__(self, duration):
-        assert duration > 0
-        self._duration = int(duration)
-
-    @abc.abstractmethod
-    def get_temperature(self, seconds_into_setting):
-        raise NotImplemented
-
-    @abc.abstractproperty
-    def description(self):
-        """ Text to describe the step being run for the frontend. """
-        raise NotImplemented
-
-
-class SetTemperature(BaseSetting):
-    def __init__(self, temperature, duration):
-        super(SetTemperature, self).__init__(duration)
-        self._temperature = float(temperature)
-
-    def get_temperature(self, seconds_into_setting):
-        return self._temperature
-
-
-class LinearGradient(BaseSetting):
+class TemperatureSetting(object):
     def __init__(self, start_temp, final_temp, duration):
-        super(LinearGradient, self).__init__(duration)
         self._start_temp = float(start_temp)
         self._final_temp = float(final_temp)
+        self._duration = duration
 
     def get_temperature(self, seconds_into_setting):
         percentage_done = float(seconds_into_setting) / self._duration
@@ -123,34 +99,26 @@ class TemperatureProgram(object):
             action[mode](**parameters)
 
     def _set_temperature(self, temperature=25.0, duration=60):
-        setting = TemperatureSetting(float(temperature), int(duration))
+        setting = TemperatureSetting(float(temperature), float(temperature), int(duration))
         self._total_duration += int(duration)
         self._settings.append(setting)
         return self
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         # at least one minute long, must be multiple of 15
-        duration = int(duration)
-        start_temperature = float(start_temperature)
-        end_temperature = float(end_temperature)
-        total_diff = start_temperature - end_temperature
-        # Limit the granularity to 4 temperature changes per minute
-        setting_count = int(max(1, duration / 15))
-        step_diff = total_diff / setting_count
-        temperature = start_temperature
-        for _ in xrange(setting_count):
-            temperature -= step_diff
-            setting = TemperatureSetting(float(temperature), duration)
-            self._total_duration += duration
-            self._settings.append(setting)
+        setting = TemperatureSetting(float(start_temperature), float(end_temperature), int(duration))
+        self._total_duration += int(duration)
+        self._settings.append(setting)
+        return self
 
     def _repeat(self, num_repeats=3):
         new_settings = []
         for i in range(num_repeats):
-            for action in self._settings:
-                new_settings.append(action)
-                self._total_duration += action.duration
-        self._settings = new_settings
+            for setting in self._settings:
+                new_setting = copy.copy(setting)
+                new_settings.append(new_setting)
+                self._total_duration += new_setting.duration
+        self._settings += new_settings
         return self
 
     def _hold(self, temperature=25.0):
