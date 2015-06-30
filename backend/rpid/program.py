@@ -21,10 +21,9 @@ def get_desired_temperature(data):
     assert data.current_time is not None
     assert data.start_time is not None
     elapsed = (data.current_time - data.start_time).total_seconds()
-    for setting in data.program.settings:
-        elapsed -= setting.duration
-        if elapsed < 0:
-            return float(setting.temperature)
+    for (start, stop), setting in sorted(data.program.settings.items()):
+        if start <= elapsed < stop:
+            return float(setting.get_temperature(elapsed - start))
     # The program program is over or holding at a specified temperature.
     return float(data.program.hold_temp) if data.program.hold_temp else False
 
@@ -95,7 +94,6 @@ class TemperatureProgram(object):
             mode = parameters.pop("mode", None)
             # Run the desired action using the parameters given
             # Parameters of methods must match the keys exactly!
-            log.debug("Adding instruction: %s with parameters: %s" % (mode, parameters))
             action[mode](**parameters)
 
     def _set_temperature(self, temperature=25.0, duration=60):
