@@ -1,5 +1,5 @@
 import unittest
-from rpid.program import TemperatureSetting, TemperatureProgram, get_desired_temperature
+from rpid.program import TemperatureSetting, TemperatureProgram, get_desired_temperature, get_next_n_settings
 from rpid.data import RoundData
 from datetime import datetime
 
@@ -45,6 +45,13 @@ class TemperatureProgramTests(unittest.TestCase):
     def test_duration(self):
         self.assertEqual(self.program.total_duration, 3900)
 
+    def test_get_hold_temperature(self):
+        self.rd.current_time = datetime(2012, 12, 12, 12, 12, 12)
+        self.rd.start_time = datetime(2015, 12, 12, 12, 10, 12)  # three years later
+        temp = get_desired_temperature(self.rd)
+        self.assertEqual(temp, 37.0)
+
+
     def test_get_desired_temperature(self):
         self.rd.current_time = datetime(2012, 12, 12, 12, 12, 12)
         self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
@@ -74,3 +81,37 @@ class TemperatureProgramTests(unittest.TestCase):
         self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
         temp = get_desired_temperature(self.rd)
         self.assertAlmostEqual(temp, 79.583333333)
+
+
+class TemperatureDisplayTests(unittest.TestCase):
+    def setUp(self):
+        self.program = TemperatureProgram("""{
+              "1": {"mode": "set", "temperature": 80.0, "duration": 120},
+              "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 30.0, "duration": 180},
+              "3": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 30.0, "duration": 240},
+              "4": {"mode": "set", "temperature": 80.0, "duration": 60},
+              "5": {"mode": "set", "temperature": 80.0, "duration": 120},
+              "6": {"mode": "set", "temperature": 80.0, "duration": 180},
+              "7": {"mode": "set", "temperature": 80.0, "duration": 240},
+              "8": {"mode": "hold", "temperature": 37.0}}""")
+
+    def test_get_n_next_settings(self):
+        self.rd = RoundData()
+        self.rd.program = self.program
+        self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
+        self.rd.current_time = datetime(2012, 12, 12, 12, 11, 57)
+        settings = get_next_n_settings(5, self.rd)
+        times = [s[1] for s in settings]
+        self.assertListEqual(times, ["Now Running", "00:00:15", "00:03:15", "00:07:15", "00:08:15"])
+
+    def test_get_n_next_settings_fewer_available_than_asked_for(self):
+        self.rd = RoundData()
+        self.rd.program = self.program
+        self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
+        self.rd.current_time = datetime(2012, 12, 12, 12, 22, 27)
+        settings = get_next_n_settings(5, self.rd)
+        times = [s[1] for s in settings]
+        self.assertListEqual(times, ["Now Running", "00:02:45", "00:06:45"])
+
+
+

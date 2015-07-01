@@ -10,9 +10,7 @@ def calculate_seconds_left(data):
     assert data.program is not None
     assert data.current_time is not None
     assert data.start_time is not None
-
-    elapsed = (data.current_time - data.start_time).total_seconds()
-    seconds_left = int(max(data.program.total_duration - elapsed, 0))
+    seconds_left = int(max(data.program.total_duration - data.seconds_elapsed, 0))
     return seconds_left
 
 
@@ -20,12 +18,26 @@ def get_desired_temperature(data):
     assert data.program is not None
     assert data.current_time is not None
     assert data.start_time is not None
-    elapsed = (data.current_time - data.start_time).total_seconds()
+    elapsed = data.seconds_elapsed
     for (start, stop), setting in sorted(data.program.settings.items()):
-        if start <= elapsed < stop:
+        if stop is None or start <= elapsed < stop:
             return float(setting.get_temperature(elapsed - start))
-    # The program program is over or holding at a specified temperature.
-    return float(data.program.hold_temp) if data.program.hold_temp else False
+
+
+def get_next_n_settings(n, data):
+    assert n > 0
+    settings = []
+    found = False
+    elapsed = data.seconds_elapsed
+    for (start, stop), setting in sorted(data.program.settings.items()):
+        if n == 0:
+            break
+        if start <= elapsed < stop or found is True:
+            time_until = "Now Running" if not found else convert_seconds_to_hhmmss(start - elapsed)
+            found = True
+            settings.append((setting, time_until))
+            n -= 1
+    return settings
 
 
 def convert_seconds_to_hhmmss(seconds):
@@ -34,11 +46,16 @@ def convert_seconds_to_hhmmss(seconds):
 
 class TemperatureSetting(object):
     def __init__(self, start_temp, final_temp, duration):
+        assert duration is None or duration > 0.0
         self._start_temp = float(start_temp)
         self._final_temp = float(final_temp)
         self._duration = duration
 
     def get_temperature(self, seconds_into_setting):
+        if self._duration is None:
+            # Hold setting
+            return self._start_temp
+        # Set or Linear Gradient
         percentage_done = float(seconds_into_setting) / self._duration
         offset = (self._final_temp - self._start_temp) * percentage_done
         return self._start_temp + offset
@@ -47,17 +64,13 @@ class TemperatureSetting(object):
 class TemperatureProgram(object):
     def __init__(self, json_program):
         self._settings = {}
-        self._hold_temp = None
+        self._has_hold = False
         self._total_duration = 0.0
         self._load_json(json_program)
 
     @property
     def settings(self):
         return self._settings
-
-    @property
-    def hold_temp(self):
-        return self._hold_temp
 
     @property
     def total_duration(self):
@@ -94,7 +107,8 @@ class TemperatureProgram(object):
             mode = parameters.pop("mode", None)
             # Run the desired action using the parameters given
             # Parameters of methods must match the keys exactly!
-            action[mode](**parameters)
+            if not self._has_hold:
+                action[mode](**parameters)
 
     def _set_temperature(self, temperature=25.0, duration=60):
         temperature = float(temperature)
@@ -105,7 +119,6 @@ class TemperatureProgram(object):
         return self
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
-        # at least one minute long, must be multiple of 15
         duration = int(duration)
         setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
@@ -123,6 +136,7 @@ class TemperatureProgram(object):
         return self
 
     def _hold(self, temperature=25.0):
-        self._hold_temp = temperature
+        setting = TemperatureSetting(float(temperature), float(temperature), None)
+        self._settings[(self._total_duration, None)] = setting
+        self._has_hold = True
         return self
-

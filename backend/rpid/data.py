@@ -13,3 +13,7 @@ class RoundData(object):
     @property
     def can_update_pid(self):
         return bool(self.desired_temperature) and self.current_temperature is not None
+
+    @property
+    def seconds_elapsed(self):
+        return (self.current_time - self.start_time).total_seconds()
