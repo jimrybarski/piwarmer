@@ -50,6 +50,23 @@ class TemperatureSetting(object):
         self._start_temp = float(start_temp)
         self._final_temp = float(final_temp)
         self._duration = duration
+        self._display_message = self._set_display_message()
+
+    def _set_display_message(self):
+        if self._duration is None:
+            # Hold
+            message = "Hold at %s&deg;C" % self._start_temp
+        elif abs(self._start_temp - self._final_temp) < 0.001:
+            # Set
+            message = "%s&deg;C for %s" % (self._start_temp, convert_seconds_to_hhmmss(self._duration))
+        else:
+            # Linear Gradient
+            message = "From %s&deg;C to %s&deg;C over %s" % (self._start_temp, self._final_temp, convert_seconds_to_hhmmss(self._duration))
+        return message
+
+    @property
+    def message(self):
+        return self._display_message
 
     def get_temperature(self, seconds_into_setting):
         if self._duration is None:
@@ -120,6 +137,7 @@ class TemperatureProgram(object):
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         duration = int(duration)
+
         setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
