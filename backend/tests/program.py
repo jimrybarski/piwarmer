@@ -56,3 +56,21 @@ class TemperatureProgramTests(unittest.TestCase):
         self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
         temp = get_desired_temperature(self.rd)
         self.assertEqual(temp, 55.0)
+
+    def test_get_linear_gradient_temperature2(self):
+        self.rd.current_time = datetime(2012, 12, 12, 12, 21, 12)
+        self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
+        temp = get_desired_temperature(self.rd)
+        self.assertEqual(temp, 75.0)
+
+    def test_get_linear_gradient_temperature3(self):
+        self.rd.current_time = datetime(2012, 12, 12, 12, 15, 12)
+        self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
+        temp = get_desired_temperature(self.rd)
+        self.assertEqual(temp, 80.0)
+
+    def test_get_linear_gradient_temperature4(self):
+        self.rd.current_time = datetime(2012, 12, 12, 12, 15, 42)
+        self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
+        temp = get_desired_temperature(self.rd)
+        self.assertAlmostEqual(temp, 79.583333333)
