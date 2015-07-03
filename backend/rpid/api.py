@@ -35,6 +35,14 @@ class APIData(redis.StrictRedis):
             pipe.lset('times_until', n, time_until)
         pipe.execute(False)  # False prevents raising exceptions on error
 
+    @property
+    def next_steps(self):
+        return [step for step in self.get('next_steps')]
+
+    @property
+    def times_until(self):
+        return [time_until for time_until in self.get('times_until')]
+
     def deactivate(self):
         self.set("active", 0)
         self.delete("program")
