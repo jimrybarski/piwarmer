@@ -33,8 +33,15 @@ function post(endpoint, func){
 function update() {
   get("current", function(data){
     $("#current_temp").html("Temp: " + data.temp)
-    $("#current_mode").html("Current Setting: " + data.setting)
+    $("#current_temperature_setting").html("Current Setting: " + data.setting)
     $("#time_left").html("Time remaining: " + data.time_left)
+    var next_steps = "<table><tr><th>Step</th><th>Starts In</th></tr>"
+    for (i=0; i<data.next_steps.length; i++) {
+        line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
+        next_steps += line
+    }
+    next_steps += "</table>"
+    $("next_steps").html(next_steps)
   })
 }
 
