@@ -125,6 +125,7 @@ class ProgramRunner(BaseRunner):
             # derive some data from the things that were just assigned
             round_data.desired_temperature = program.get_desired_temperature(round_data)
             round_data.seconds_left = program.calculate_seconds_left(round_data)
+            round_data.next_steps = program.get_next_n_settings(5, round_data)
 
             # I/O - read the temperature
             round_data.current_temperature = self._thermometer.current_temperature
@@ -145,3 +146,4 @@ class ProgramRunner(BaseRunner):
             self._api_data.time_left = program.convert_seconds_to_hhmmss(round_data.seconds_left)
             self._api_data.update_temperature(round_data.current_temperature)
             self._api_data.update_setting(round_data.desired_temperature)
+            self._api_data.update_next_steps(round_data.next_steps)
