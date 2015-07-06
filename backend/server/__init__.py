@@ -44,10 +44,14 @@ def act():
 def current():
     current_temp = data.current_temp or "n/a"
     current_setting = data.current_setting or "off"
+    next_steps = data.next_steps or ["---"]
+    times_until = data.times_until or ["---"]
     try:
         time_left = data.time_left
     except TypeError:
         time_left = None
     return {"setting": current_setting,
             "temp": str(current_temp) + " &deg;C",
-            "time_left": time_left or "n/a"}
+            "time_left": time_left or "n/a",
+            "next_steps": next_steps,
+            "times_until": times_until}
