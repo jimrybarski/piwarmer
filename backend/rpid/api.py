@@ -27,8 +27,8 @@ class APIData(redis.StrictRedis):
         # in case there's a request for this data while we're deleting the old records,
         # we start from the end so that we never send back anything inconsistent
         for n in range(5 - len(next_steps)):
-            self.hdel('next_steps', 5 - n)
-            self.hdel('times_until', 5 - n)
+            self.hdel('next_steps', 4 - n)
+            self.hdel('times_until', 4 - n)
         # race condition here. it won't affect anything but it may be surprising to the user that the times are off for one
         # second. if we want this to be truly bulletproof we need to implement a mutex or something similar.
         # it may be fast enough that errors will just never be visible

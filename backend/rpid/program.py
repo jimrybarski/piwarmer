@@ -38,7 +38,7 @@ def get_next_n_settings(n, data):
         if start <= elapsed < stop or found is True:
             time_until = "Now Running" if not found else convert_seconds_to_hhmmss(start - elapsed)
             found = True
-            next_steps[total - n] = setting
+            next_steps[total - n] = setting.message
             times_until[total - n] = time_until
             n -= 1
     return next_steps, times_until

@@ -100,25 +100,21 @@ class TemperatureDisplayTests(unittest.TestCase):
         self.rd.program = self.program
         self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
         self.rd.current_time = datetime(2012, 12, 12, 12, 11, 57)
-        settings = get_next_n_settings(5, self.rd)
-        times = [s[1] for s in settings]
-        self.assertListEqual(times, ["Now Running", "00:00:15", "00:03:15", "00:07:15", "00:08:15"])
-        messages = [s[0].message for s in settings]
-        self.assertListEqual(messages, ["80.0&deg;C for 00:02:00",
-                                        "From 80.0&deg;C to 30.0&deg;C over 00:03:00",
-                                        "From 80.0&deg;C to 30.0&deg;C over 00:04:00",
-                                        "80.0&deg;C for 00:01:00",
-                                        "80.0&deg;C for 00:02:00"])
+        settings, times = get_next_n_settings(5, self.rd)
+        self.assertDictEqual(times, {0: "Now Running", 1: "00:00:15", 2: "00:03:15", 3: "00:07:15", 4: "00:08:15"})
+        self.assertDictEqual(settings, {0: "80.0&deg;C for 00:02:00",
+                                        1: "From 80.0&deg;C to 30.0&deg;C over 00:03:00",
+                                        2: "From 80.0&deg;C to 30.0&deg;C over 00:04:00",
+                                        3: "80.0&deg;C for 00:01:00",
+                                        4: "80.0&deg;C for 00:02:00"})
 
     def test_get_n_next_settings_fewer_available_than_asked_for(self):
         self.rd = RoundData()
         self.rd.program = self.program
         self.rd.start_time = datetime(2012, 12, 12, 12, 10, 12)
         self.rd.current_time = datetime(2012, 12, 12, 12, 22, 27)
-        settings = get_next_n_settings(5, self.rd)
-        times = [s[1] for s in settings]
-        self.assertListEqual(times, ["Now Running", "00:02:45", "00:06:45"])
-        messages = [s[0].message for s in settings]
-        self.assertListEqual(messages, ["80.0&deg;C for 00:03:00",
-                                        "80.0&deg;C for 00:04:00",
-                                        "Hold at 37.0&deg;C"])
+        settings, times = get_next_n_settings(5, self.rd)
+        self.assertDictEqual(times, {0: "Now Running", 1: "00:02:45", 2: "00:06:45"})
+        self.assertDictEqual(settings, {0: "80.0&deg;C for 00:03:00",
+                                        1: "80.0&deg;C for 00:04:00",
+                                        2: "Hold at 37.0&deg;C"})
