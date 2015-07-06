@@ -127,6 +127,11 @@ class ProgramRunner(BaseRunner):
             round_data.seconds_left = program.calculate_seconds_left(round_data)
             round_data.next_steps, round_data.times_until = program.get_next_n_settings(5, round_data)
 
+            # the program is over and we're not using a Hold setting
+            if not round_data.next_steps:
+                self._shutdown()
+                break
+
             # I/O - read the temperature
             round_data.current_temperature = self._thermometer.current_temperature
             log.debug("CURRENT TEMP %s" % round_data.current_temperature)
