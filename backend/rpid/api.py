@@ -1,5 +1,8 @@
 import redis
 import json
+import logging
+
+log = logging.getLogger()
 
 TEN_MINUTES = 600  # seconds
 
@@ -10,7 +13,7 @@ class APIData(redis.StrictRedis):
         Resets everything.
 
         """
-        labels = ["current_temp", "current_setting", "active", "program", "mode", "seconds_left"]
+        labels = ["current_temp", "current_setting", "active", "program", "mode", "seconds_left", "next_steps", "time_until"]
         for label in labels:
             self.delete(label)
 
@@ -21,27 +24,23 @@ class APIData(redis.StrictRedis):
         self.set("current_setting", desired_temp)
 
     def update_next_steps(self, next_steps):
-        """
-        Use a transaction to make this whole step atomic. This is important because we want the API to always
-        have data available. We have to delete the "next steps" entirely and rebuild it so that all the data is
-        consistent and because at the end there will be fewer than five steps, and this is the easiest way.
-
-        """
-        pipe = self.pipeline()
-        pipe.delete('next_steps')
-        pipe.delete('times_until')
+        current_steps_count = self.llen('next_steps')
+        # update the steps with current data
         for n, (time_until, step) in enumerate(next_steps):
-            pipe.lset('next_steps', n, step)
-            pipe.lset('times_until', n, time_until)
-        pipe.execute(False)  # False prevents raising exceptions on error
+            self.lpush('next_steps', step.message)
+            self.lpush('times_until', time_until)
+        # remove any old steps that are now at the end of the list
+        for _ in range(current_steps_count):
+            self.rpop('next_steps')
+            self.rpop('times_until')
 
     @property
     def next_steps(self):
-        return [step for step in self.get('next_steps')]
+        return [step for step in self.lrange('next_steps', 0, -1) or []]
 
     @property
     def times_until(self):
-        return [time_until for time_until in self.get('times_until')]
+        return [time_until for time_until in self.lrange('times_until', 0, -1) or []]
 
     def deactivate(self):
         self.set("active", 0)
