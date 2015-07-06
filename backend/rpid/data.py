@@ -6,8 +6,8 @@ class RoundData(object):
         self.desired_temperature = None
         self.duty_cycle = None
         self.next_steps = None
+        self.times_until = None
         self.program = None
-        self.seconds_left = None
         self.start_time = None
         self.current_time = None
 

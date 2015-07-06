@@ -25,8 +25,11 @@ def get_desired_temperature(data):
 
 
 def get_next_n_settings(n, data):
+    # WELCOME TO THE SPAGHETTI FACTORY
     assert n > 0
-    settings = []
+    total = n
+    next_steps = {}
+    times_until = {}
     found = False
     elapsed = data.seconds_elapsed
     for (start, stop), setting in sorted(data.program.settings.items()):
@@ -35,9 +38,10 @@ def get_next_n_settings(n, data):
         if start <= elapsed < stop or found is True:
             time_until = "Now Running" if not found else convert_seconds_to_hhmmss(start - elapsed)
             found = True
-            settings.append((time_until, setting))
+            next_steps[total - n] = setting
+            times_until[total - n] = time_until
             n -= 1
-    return settings
+    return next_steps, times_until
 
 
 def convert_seconds_to_hhmmss(seconds):
