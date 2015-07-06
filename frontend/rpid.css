@@ -1,0 +1,70 @@
+body { 
+	margin:0; 
+	padding:20px; 
+	font:30px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
+    width:50%;
+}
+
+select {
+   font-size: 20px;
+   padding: 20px;
+}
+
+entry {
+   width: 100px;
+}
+
+input[type="text"] {
+    width: 360px;
+}
+
+input[id="stop"] {
+   background-color: #FF2020;
+   color: #FFFFFF;
+}
+
+td[class="step_id"] {
+   font-size: 0px;
+}
+
+input {
+   font-size: 30px;
+   padding: 20px;
+   width: 400px;
+}
+
+select {
+   font-size: 20px;
+   padding: 20px;
+}
+
+entry {
+   width: 100px;
+}
+
+table {
+    width: 600px;
+}
+
+thead {
+    background:#91c5d4;
+}
+
+thead th[colspan],
+thead th[rowspan] {
+	background:#66a9bd;
+}
+
+tbody[class="setting"],
+tfoot[class="setting"] {
+	text-align:center;
+	background:#d5eaf0;
+}
+
+tbody[class="setting"] th {
+    background:#b0cc7f;
+}
+
+tbody[class="setting"] td {
+    background:#d7e1c5;
+}

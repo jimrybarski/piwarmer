@@ -1,5 +1,8 @@
 import redis
 import json
+import logging
+
+log = logging.getLogger()
 
 TEN_MINUTES = 600  # seconds
 
@@ -10,7 +13,7 @@ class APIData(redis.StrictRedis):
         Resets everything.
 
         """
-        labels = ["current_temp", "current_setting", "active", "program", "mode", "seconds_left"]
+        labels = ["current_temp", "current_setting", "active", "program", "mode", "next_steps", "times_until"]
         for label in labels:
             self.delete(label)
 
@@ -19,6 +22,26 @@ class APIData(redis.StrictRedis):
 
     def update_setting(self, desired_temp):
         self.set("current_setting", desired_temp)
+
+    def update_next_steps(self, next_steps, times_until):
+        # in case there's a request for this data while we're deleting the old records,
+        # we start from the end so that we never send back anything inconsistent
+        for n in range(5 - len(next_steps)):
+            self.hdel('next_steps', 4 - n)
+            self.hdel('times_until', 4 - n)
+        # race condition here. it won't affect anything but it may be surprising to the user that the times are off for one
+        # second. if we want this to be truly bulletproof we need to implement a mutex or something similar.
+        # it may be fast enough that errors will just never be visible
+        self.hmset('next_steps', next_steps)
+        self.hmset('times_until', times_until)
+
+    @property
+    def next_steps(self):
+        return self.hgetall('next_steps')
+
+    @property
+    def times_until(self):
+        return self.hgetall('times_until')
 
     def deactivate(self):
         self.set("active", 0)
