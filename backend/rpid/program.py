@@ -141,7 +141,6 @@ class TemperatureProgram(object):
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         duration = int(duration)
-
         setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration

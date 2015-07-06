@@ -89,7 +89,7 @@ class ProgramRunner(BaseRunner):
 
     def _prerun(self):
         # in the near future, the driver will be chosen by the user
-        driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 10.0, -10.0)
+        driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 6.0, -15.0)
         self._pid = pid.PID(driver)
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
@@ -140,7 +140,7 @@ class ProgramRunner(BaseRunner):
 
             # run the heating sequence, if necessary
             log.debug("DUTY CYCLE %s" % round_data.duty_cycle)
-            self._heater.heat(round_data.duty_cycle)
+            self._heater.heat(round_data.duty_cycle * 0.8)
 
             # update the API data so the frontend can know what's happening
             self._api_data.time_left = program.convert_seconds_to_hhmmss(round_data.seconds_left)
