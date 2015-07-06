@@ -35,15 +35,14 @@ function update() {
     $("#current_temp").html("Temp: " + data.temp)
     $("#current_temperature_setting").html("Current Setting: " + data.setting)
     $("#time_left").html("Time remaining: " + data.time_left)
-    var next_steps = "<table><tr><th>Step</th><th>Starts In</th></tr>"
-    console.log(data.next_steps.length);
-    for (i=0; i<data.next_steps.length; i++) {
-        line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>";
-        next_steps += line;
+    var next_steps = "<table><thead class="setting"><tr><th scope="col">Step</th><th>Starts In</th></tr></thead>"
+    next_steps += "<tbody><tr><td>" + data.next_steps[0] + "</td><td>Running</td></tr></tbody>"
+    for (i=1; i<data.next_steps.length; i++) {
+        line = "<tfoot><tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr></tfoot>"
+        next_steps += line
     }
-    next_steps += "</table>";
-    console.log(next_steps);
-    $("#next_steps").html(next_steps)
+    next_steps += "</table>"
+    $("next_steps").html(next_steps)
   })
 }
 
