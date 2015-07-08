@@ -37,7 +37,9 @@ class APIData(redis.StrictRedis):
 
     @property
     def next_steps(self):
-        return self.hgetall('next_steps')
+        ns = self.hgetall('next_steps')
+        print(ns)
+        return ns
 
     @property
     def times_until(self):

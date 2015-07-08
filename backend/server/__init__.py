@@ -43,15 +43,19 @@ def act():
 @app.route('/current', method=['OPTIONS', 'GET'])
 def current():
     current_temp = data.current_temp or "n/a"
-    current_setting = data.current_setting or "off"
+    current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
     next_steps = data.next_steps or ["---"]
     times_until = data.times_until or ["---"]
+    print(next_steps)
+    print(times_until)
     try:
         time_left = data.time_left
     except TypeError:
         time_left = None
-    return {"setting": current_setting,
+    out = {"setting": current_setting,
             "temp": str(current_temp) + " &deg;C",
             "time_left": time_left or "n/a",
             "next_steps": next_steps,
             "times_until": times_until}
+    print(out)
+    return out
