@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from backend.api.app.rpidapi import serializers, models
+from app.rpidapi import serializers, models
 from rpid.api import APIData
 
 
