@@ -78,3 +78,4 @@ class APIData(redis.StrictRedis):
     @time_left.setter
     def time_left(self, value):
         self.set("time_left", value)
+
