@@ -1,23 +1,16 @@
 <html>
-  <head profile="http://www.w3.org/2005/10/profile">
-    <title>Raspberry PID</title>
+  <head>
+    <title>Raspberry PID: Select a Program</title>
     <script type="text/javascript" src="jquery.min.js"></script>
-    <script type="text/javascript" src="api.js"></script>
+    <script type="text/javascript" src="../common.js"></script>
+    <script type="text/javascript" src="../home.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="rpid.css" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style>
-    </style>
   </head>
   <body>
-    <h2>Program Input</h2>
-    <input type="submit" name="run" value="Run program!" id="run_program">
-    <input type="submit" value="Add Step" id="add_button">
-    <form name="settings" id="settings">
-    <table>
-      <tbody id="temperature_settings">
-        <tr></tr>
-      </tbody>
-    </table> 
-    </form>
+    <div id="users"></div>
+    <div style="float:left">
+        <input type="submit" value="Create New User">
+        <input type="text" id="new_user" placeholder="Enter New Name...">
+    </div>
   </body>
 </html>
