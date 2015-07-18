@@ -29,6 +29,11 @@ input[id="stop"] {
    color: #FFFFFF;
 }
 
+input[class="oddball"] {
+    background-color: #6699FF;
+    color: #FFFFFF;
+}
+
 td[class="step_id"] {
    font-size: 0px;
 }
