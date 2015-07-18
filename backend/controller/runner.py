@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from datetime import datetime
 import logging
-from rpid import program, thermometer, heater, pid, data
-from interface import api
+from controller import program, thermometer, heater, pid, data
+from interface import APIData
 import time
 
 log = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 class BaseRunner(object):
     def __init__(self):
-        self._api_data = api.APIData()
+        self._api_data = APIData()
         self._thermometer = thermometer.Thermometer()
 
     def run(self):

@@ -12,8 +12,6 @@ class DriverSerializer(serializers.ModelSerializer):
 
 
 class ProgramSerializer(serializers.ModelSerializer):
-    # scientist = serializers.SlugRelatedField(slug_field='scientist', queryset=models.Scientist.objects.all())
-
     class Meta:
         model = models.Program
-        fields = ('steps', 'scientist', 'driver')
+        fields = ('name', 'steps', 'scientist', 'driver')

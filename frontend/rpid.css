@@ -2,7 +2,7 @@ body {
 	margin:0; 
 	padding:20px; 
 	font:30px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
-    width:50%;
+    width:100%;
 }
 
 select {
@@ -14,6 +14,12 @@ entry {
    width: 100px;
 }
 
+input {
+   font-size: 30px;
+   padding: 20px;
+   width: 400px;
+}
+
 input[type="text"] {
     width: 360px;
 }
@@ -23,14 +29,13 @@ input[id="stop"] {
    color: #FFFFFF;
 }
 
-td[class="step_id"] {
-   font-size: 0px;
+input[class="oddball"] {
+    background-color: #6699FF;
+    color: #FFFFFF;
 }
 
-input {
-   font-size: 30px;
-   padding: 20px;
-   width: 400px;
+td[class="step_id"] {
+   font-size: 0px;
 }
 
 select {

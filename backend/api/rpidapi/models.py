@@ -16,6 +16,7 @@ class Driver(models.Model):
 
 
 class Program(models.Model):
+    name = models.CharField(max_length=128)
     steps = models.TextField()
     scientist = models.ForeignKey(Scientist)
     driver = models.ForeignKey(Driver)
