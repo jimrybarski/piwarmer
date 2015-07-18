@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from datetime import datetime
 import logging
-from rpid import program, thermometer, heater, pid, data, api
+from rpid import program, thermometer, heater, pid, data
+from interface import api
 import time
 
 log = logging.getLogger(__name__)
