@@ -2,13 +2,20 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from app.rpidapi import serializers, models
-from rpid.api import APIData
+from rest_framework.decorators import detail_route
+from . import serializers, models
+from interface import APIData
 
 
 class ScientistViewset(ModelViewSet):
     serializer_class = serializers.ScientistSerializer
     queryset = models.Scientist.objects.all()
+
+    @detail_route(methods=['get'])
+    def programs(self, request, pk=None):
+        programs = models.Program.objects.filter(scientist=pk)
+        programs = serializers.ProgramSerializer(programs, many=True)
+        return Response(programs.data)
 
 
 class DriverViewset(ModelViewSet):
@@ -18,6 +25,7 @@ class DriverViewset(ModelViewSet):
 
 class ProgramViewset(ModelViewSet):
     serializer_class = serializers.ProgramSerializer
+    lookup_field = 'scientist'
 
     def get_queryset(self):
         return models.Program.objects.filter(scientist=self.request.data['scientist'])
