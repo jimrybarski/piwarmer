@@ -2,7 +2,7 @@ body {
 	margin:0; 
 	padding:20px; 
 	font:30px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
-    width:50%;
+    width:100%;
 }
 
 select {
@@ -12,6 +12,12 @@ select {
 
 entry {
    width: 100px;
+}
+
+input {
+   font-size: 30px;
+   padding: 20px;
+   width: 400px;
 }
 
 input[type="text"] {
@@ -25,12 +31,6 @@ input[id="stop"] {
 
 td[class="step_id"] {
    font-size: 0px;
-}
-
-input {
-   font-size: 30px;
-   padding: 20px;
-   width: 400px;
 }
 
 select {
