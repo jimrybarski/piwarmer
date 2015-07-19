@@ -34,7 +34,6 @@ $(document).ready(function(){
   var first_row = get_new_row(1, "set");
   $("#temperature_settings tr:first").html(first_row);
 
-
   // adds additional rows so any number of instructions can be given to the temperature controller
   $(document.body).on('click', '#add_button' ,function() {
     var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
@@ -66,24 +65,68 @@ $(document).ready(function(){
         program[row_id][item.name] = item.value;
       };
     });
-
-    $.ajax({
-      type: "POST",
-      crossDomain: true,
-      url: "http://192.168.10.1/backend/program",
-      data: JSON.stringify(program),
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      success: function(data) {
-        // the program has been received, so we move to the monitoring page
-        window.location.replace("http://192.168.10.1/monitor");
-      },
-      failure: function(data) { 
-          console.log(data);
-          alert("Something went wrong! Is the web server not really running?");
-      },
-    });
   });
 
-
+    http('driver', 'GET', null, function(d){
+        options = '<option>Choose a Driver</option>'
+        for (i=0; i<d.length; i++) {
+            option = "<option name='" + d[i]['id'] + "'>"
+            option += d[i]['name']
+            option += "</option>"
+            options += option;
+        }
+        $("#driver").empty().append(options)
+    });
 });
+
+//$(document).ready(function(){
+//    // get all available drivers and put them into the dropdown
+//    http('driver', 'GET', null, function(data){
+//        options = '<option>Choose a Driver</option>'
+//        for (i=0; i<data.length; i++) {
+//            option = "<option id='" + data[i]['id'] + "'>"
+//            option += data[i]['name']
+//            option += "</option>"
+//            options += option;
+//        }
+//        $("#driver").empty().append(options)
+//    });
+//
+//  // generate the first row instead of hard coding it in the HTML so we can guarantee consistency
+//  var first_row = get_new_row(1, "set");
+//  $("#temperature_settings tr:first").html(first_row);
+//
+//
+//  // adds additional rows so any number of instructions can be given to the temperature controller
+//    $(document.body).on('click', '#add_button' ,function() {
+//        var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
+//        var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
+//        $("#temperature_settings tr:last").after(new_row);
+//    });
+//
+//
+//  // different modes need different inputs, so we change the elements available in the row to accommodate that
+//  $(document.body).on('change', '.mode' ,function() {
+//     var new_row = get_new_row(this.id, this.value);
+//     var id = this.id;
+//     var mode = this.value;
+//     // we're currently in the dropdown element. two levels up gives us the entire row
+//     $(this).parent().parent().html(new_row);
+//     $("#" + id).val(mode);
+//  });
+//
+//  // submit form data to the API
+//  $(document.body).on('click', '#run_program', function() {
+//    var program = {};
+//    var row_id = 0;
+//        $("#settings").serializeArray().map(function(item) {
+//            if (item.name == "mode") {
+//                // we're on a new row (i.e. a new instruction)
+//                row_id++;
+//                program[row_id] = {"mode": item.value};
+//            } else {
+//                program[row_id][item.name] = item.value;
+//            };
+//        });
+//    });
+//});

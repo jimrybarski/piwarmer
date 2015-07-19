@@ -1,9 +1,10 @@
 $(document).ready(function(){
-    var parser = document.createElement('a');
-    parser.href = window.location.href;
-    user_id = parser.search.replace(/\?user=/, '')
+    $("#new_program").click( function(){
+            window.location.href = '/program/new?user=' + get_user_id();
+        }
+    );
 
-    http('user/' + user_id + '/programs', 'GET', null, function(data){
+    http('user/' + get_user_id() + '/programs', 'GET', null, function(data){
         buttons = ''
         for (i=0; i<data.length; i++) {
             line = "<input type='submit' value='"
@@ -13,5 +14,4 @@ $(document).ready(function(){
         }
     $("#programs").html(buttons);
     });
-
 });
