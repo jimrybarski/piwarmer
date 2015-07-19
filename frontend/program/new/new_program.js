@@ -41,6 +41,16 @@ $(document).ready(function(){
     $("#temperature_settings tr:last").after(new_row);
   });
 
+  http('driver', 'GET', null, function(d){
+      options = '<option value="-1">Choose a Driver</option>'
+          for (i=0; i<d.length; i++) {
+              option = "<option value='" + d[i]['id'] + "'>"
+              option += d[i]['name']
+              option += "</option>"
+              options += option;
+          }
+      $("#driver").empty().append(options)
+  });
 
   // different modes need different inputs, so we change the elements available in the row to accommodate that
   $(document.body).on('change', '.mode' ,function() {
@@ -52,8 +62,8 @@ $(document).ready(function(){
      $("#" + id).val(mode);
   });
 
-  // submit form data to the API
-  $(document.body).on('click', '#run_program' ,function() {
+  // validate and save the program
+  $(document.body).on('click', '#save' ,function() {
     var program = {};
     var row_id = 0;
     $("#settings").serializeArray().map(function(item) {
@@ -65,68 +75,33 @@ $(document).ready(function(){
         program[row_id][item.name] = item.value;
       };
     });
-  });
 
-    http('driver', 'GET', null, function(d){
-        options = '<option>Choose a Driver</option>'
-        for (i=0; i<d.length; i++) {
-            option = "<option name='" + d[i]['id'] + "'>"
-            option += d[i]['name']
-            option += "</option>"
-            options += option;
+    errors = [];
+    name = $("#name").val();
+    if (name.length == 0) {
+        errors.push("You need to enter a name.")
+    }
+    driver = $("#driver").val();
+    if (driver == "-1") {
+        errors.push("You need to choose a driver.")
+    }
+    data = {'program': program,
+            'name': name,
+            'driver': driver}
+
+    // validate program here
+    if (errors.length > 0) {
+        message = "Error! "
+        for (i=0; i<errors.length; i++) {
+            message += " " + errors[i];
         }
-        $("#driver").empty().append(options)
-    });
+        alert(message);
+    }
+    else {
+        http('program', 'POST', data, function(response) {
+            alert(response);
+            //window.location.href = '/program/' + response['id'];
+        });
+    }
+  });
 });
-
-//$(document).ready(function(){
-//    // get all available drivers and put them into the dropdown
-//    http('driver', 'GET', null, function(data){
-//        options = '<option>Choose a Driver</option>'
-//        for (i=0; i<data.length; i++) {
-//            option = "<option id='" + data[i]['id'] + "'>"
-//            option += data[i]['name']
-//            option += "</option>"
-//            options += option;
-//        }
-//        $("#driver").empty().append(options)
-//    });
-//
-//  // generate the first row instead of hard coding it in the HTML so we can guarantee consistency
-//  var first_row = get_new_row(1, "set");
-//  $("#temperature_settings tr:first").html(first_row);
-//
-//
-//  // adds additional rows so any number of instructions can be given to the temperature controller
-//    $(document.body).on('click', '#add_button' ,function() {
-//        var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
-//        var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
-//        $("#temperature_settings tr:last").after(new_row);
-//    });
-//
-//
-//  // different modes need different inputs, so we change the elements available in the row to accommodate that
-//  $(document.body).on('change', '.mode' ,function() {
-//     var new_row = get_new_row(this.id, this.value);
-//     var id = this.id;
-//     var mode = this.value;
-//     // we're currently in the dropdown element. two levels up gives us the entire row
-//     $(this).parent().parent().html(new_row);
-//     $("#" + id).val(mode);
-//  });
-//
-//  // submit form data to the API
-//  $(document.body).on('click', '#run_program', function() {
-//    var program = {};
-//    var row_id = 0;
-//        $("#settings").serializeArray().map(function(item) {
-//            if (item.name == "mode") {
-//                // we're on a new row (i.e. a new instruction)
-//                row_id++;
-//                program[row_id] = {"mode": item.value};
-//            } else {
-//                program[row_id][item.name] = item.value;
-//            };
-//        });
-//    });
-//});
