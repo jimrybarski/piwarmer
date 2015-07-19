@@ -14,4 +14,4 @@ class DriverSerializer(serializers.ModelSerializer):
 class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Program
-        fields = ('name', 'steps', 'scientist', 'driver')
+        fields = ('id', 'name', 'steps', 'scientist', 'driver')

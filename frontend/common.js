@@ -1,6 +1,6 @@
 var API_URL = 'temp.control:8001'
 
-function get_user_id () {
+function get_user_id() {
     var parser = document.createElement('a');
     parser.href = window.location.href;
     return parser.search.replace(/\?user=/, '')

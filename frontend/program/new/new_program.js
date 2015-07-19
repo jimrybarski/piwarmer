@@ -85,23 +85,26 @@ $(document).ready(function(){
     if (driver == "-1") {
         errors.push("You need to choose a driver.")
     }
-    data = {'program': program,
+    scientist = get_user_id();
+    if (scientist === undefined || scientist < 1) {
+        errors.push("You somehow have an invalid scientist ID. Go pick a user first.")
+    }
+    data = {'steps': JSON.stringify(program),
             'name': name,
-            'driver': driver}
+            'driver': driver,
+            'scientist': scientist}
 
     // validate program here
     if (errors.length > 0) {
-        message = "Error! "
+        message = "Your program has a problem! "
         for (i=0; i<errors.length; i++) {
             message += " " + errors[i];
         }
-        alert(message);
     }
     else {
-        http('program', 'POST', data, function(response) {
-            alert(response);
-            //window.location.href = '/program/' + response['id'];
-        });
+      http('program', 'POST', data, function(response) {
+        window.location.href = '/program/?id=' + response['id'];
+      });
     }
   });
 });
