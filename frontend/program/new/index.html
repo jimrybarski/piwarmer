@@ -1,17 +1,21 @@
 <html>
   <head profile="http://www.w3.org/2005/10/profile">
-    <title>Raspberry PID</title>
-    <script type="text/javascript" src="jquery.min.js"></script>
-    <script type="text/javascript" src="api.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="rpid.css" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style>
-    </style>
+    <meta charset="utf-8"/>
+    <title>Raspberry PID: Create New Program</title>
+    <script type="text/javascript" src="../../jquery.min.js"></script>
+    <script type="text/javascript" src="../../common.js"></script>
+    <script type="text/javascript" src="new_program.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../../rpid.css" />
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
   </head>
+
   <body>
-    <h2>Program Input</h2>
-    <input type="submit" name="run" value="Run program!" id="run_program">
-    <input type="submit" value="Add Step" id="add_button">
+    <h2>Create New Program</h2>
+    <input type="text" name="name" id="name" placeholder="Program Name">
+    <select id="driver">
+        <option>Choose a Driver...</option>
+    </select>
+    <br><br>
     <form name="settings" id="settings">
     <table>
       <tbody id="temperature_settings">
@@ -19,5 +23,9 @@
       </tbody>
     </table> 
     </form>
+    <input type="submit" value="Add Step" id="add_button"><input type="submit" name="save" class="oddball" value="Save program!" id="save"><br><br>
+
+
   </body>
+
 </html>

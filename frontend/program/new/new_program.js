@@ -34,7 +34,6 @@ $(document).ready(function(){
   var first_row = get_new_row(1, "set");
   $("#temperature_settings tr:first").html(first_row);
 
-
   // adds additional rows so any number of instructions can be given to the temperature controller
   $(document.body).on('click', '#add_button' ,function() {
     var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
@@ -42,6 +41,16 @@ $(document).ready(function(){
     $("#temperature_settings tr:last").after(new_row);
   });
 
+  http('driver', 'GET', null, function(d){
+      options = '<option value="-1">Choose a Driver</option>'
+          for (i=0; i<d.length; i++) {
+              option = "<option value='" + d[i]['id'] + "'>"
+              option += d[i]['name']
+              option += "</option>"
+              options += option;
+          }
+      $("#driver").empty().append(options)
+  });
 
   // different modes need different inputs, so we change the elements available in the row to accommodate that
   $(document.body).on('change', '.mode' ,function() {
@@ -53,8 +62,8 @@ $(document).ready(function(){
      $("#" + id).val(mode);
   });
 
-  // submit form data to the API
-  $(document.body).on('click', '#run_program' ,function() {
+  // validate and save the program
+  $(document.body).on('click', '#save' ,function() {
     var program = {};
     var row_id = 0;
     $("#settings").serializeArray().map(function(item) {
@@ -67,23 +76,35 @@ $(document).ready(function(){
       };
     });
 
-    $.ajax({
-      type: "POST",
-      crossDomain: true,
-      url: "http://192.168.10.1/backend/program",
-      data: JSON.stringify(program),
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      success: function(data) {
-        // the program has been received, so we move to the monitoring page
-        window.location.replace("http://192.168.10.1/monitor");
-      },
-      failure: function(data) { 
-          console.log(data);
-          alert("Something went wrong! Is the web server not really running?");
-      },
-    });
+    errors = [];
+    name = $("#name").val();
+    if (name.length == 0) {
+        errors.push("You need to enter a name.")
+    }
+    driver = $("#driver").val();
+    if (driver == "-1") {
+        errors.push("You need to choose a driver.")
+    }
+    scientist = get_user_id();
+    if (scientist === undefined || scientist < 1) {
+        errors.push("You somehow have an invalid scientist ID. Go pick a user first.")
+    }
+    data = {'steps': JSON.stringify(program),
+            'name': name,
+            'driver': driver,
+            'scientist': scientist}
+
+    // validate program here
+    if (errors.length > 0) {
+        message = "Your program has a problem! "
+        for (i=0; i<errors.length; i++) {
+            message += " " + errors[i];
+        }
+    }
+    else {
+      http('program', 'POST', data, function(response) {
+        window.location.href = '/program/?id=' + response['id'];
+      });
+    }
   });
-
-
 });

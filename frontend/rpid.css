@@ -2,26 +2,20 @@ body {
 	margin:0; 
 	padding:20px; 
 	font:30px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
-    width:100%;
+    width:95%;
 }
 
-select {
-   font-size: 20px;
+input, select {
+   font-size: 22px;
    padding: 20px;
+   width: 300px;
+   height: 70px;
 }
 
-entry {
-   width: 100px;
-}
-
-input {
-   font-size: 30px;
-   padding: 20px;
-   width: 400px;
-}
-
-input[type="text"] {
-    width: 360px;
+.program_setting {
+    height: 70px;
+    font-size: 24px;
+    width: 100%;
 }
 
 input[id="stop"] {
@@ -38,17 +32,8 @@ td[class="step_id"] {
    font-size: 0px;
 }
 
-select {
-   font-size: 20px;
-   padding: 20px;
-}
-
-entry {
-   width: 100px;
-}
-
 table {
-    width: 600px;
+    width: 95%;
 }
 
 thead {
