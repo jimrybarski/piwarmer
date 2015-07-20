@@ -23,6 +23,11 @@ input[id="stop"] {
    color: #FFFFFF;
 }
 
+input[id="delete"] {
+   background-color: #FF2020;
+   color: #FFFFFF;
+}
+
 input[class="oddball"] {
     background-color: #6699FF;
     color: #FFFFFF;
