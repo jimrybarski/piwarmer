@@ -16,7 +16,16 @@ function display_step(data) {
 $(document).ready(function(){
     program_id = get_id('id');
     http('program/' + program_id, 'GET', null, function(response) {
+
+        // Set the program name
         $("#program_title").html(response['name']);
+
+        // Set the driver name
+        http('driver/' + response['driver'], 'GET', null, function(driver_response){
+            $("#driver_name").html("Driver: " + driver_response['name']);
+        });
+
+        // Parse the steps and build up the HTML
         step_data = JSON.parse(response['steps']);
         step_keys = [];
         steps = "";
@@ -27,7 +36,6 @@ $(document).ready(function(){
         for (var key in step_keys) {
             steps += '<tr><td>' + step_keys[key] + '</td><td>' + display_step(step_data[step_keys[key]]) + '</td></tr>';
         }
-
         $("#program_details").html(steps);
     });
 });
