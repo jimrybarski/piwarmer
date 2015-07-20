@@ -16,7 +16,7 @@ function display_step(data) {
 $(document).ready(function(){
     program_id = get_id('id');
     http('program/' + program_id, 'GET', null, function(response) {
-
+        scientist = response['scientist']
         // Set the program name
         $("#program_title").html(response['name']);
 
@@ -37,5 +37,13 @@ $(document).ready(function(){
             steps += '<tr><td>' + step_keys[key] + '</td><td>' + display_step(step_data[step_keys[key]]) + '</td></tr>';
         }
         $("#program_details").html(steps);
+    });
+
+    $(document.body).on('click', '#delete', function() {
+        if (window.confirm('Are you sure you want to delete this program? This CANNOT be undone.')) {
+            http('program/' + program_id, 'DELETE', null, function(response) {
+                window.location.href = '/program?user=' + scientist;
+            })
+        }
     });
 });
