@@ -85,7 +85,7 @@ $(document).ready(function(){
     if (driver == "-1") {
         errors.push("You need to choose a driver.")
     }
-    scientist = get_user_id();
+    scientist = get_id('user');
     if (scientist === undefined || scientist < 1) {
         errors.push("You somehow have an invalid scientist ID. Go pick a user first.")
     }

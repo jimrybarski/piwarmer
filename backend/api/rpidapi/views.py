@@ -5,17 +5,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import detail_route
 from . import serializers, models
 from interface import APIData
+from pprint import pprint
 
 
 class ScientistViewset(ModelViewSet):
     serializer_class = serializers.ScientistSerializer
     queryset = models.Scientist.objects.all()
-
-    @detail_route(methods=['get'])
-    def programs(self, request, pk=None):
-        programs = models.Program.objects.filter(scientist=pk)
-        programs = serializers.ProgramSerializer(programs, many=True)
-        return Response(programs.data)
 
 
 class DriverViewset(ModelViewSet):
@@ -25,10 +20,11 @@ class DriverViewset(ModelViewSet):
 
 class ProgramViewset(ModelViewSet):
     serializer_class = serializers.ProgramSerializer
-    lookup_field = 'scientist'
 
     def get_queryset(self):
-        return models.Program.objects.filter(scientist=self.request.data['scientist'])
+        if 'user' in self.request.query_params.keys():
+            return models.Program.objects.filter(scientist=self.request.query_params['user'])
+        return models.Program.objects.all()
 
 
 class StartView(APIView):
