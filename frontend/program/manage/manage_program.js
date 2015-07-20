@@ -16,17 +16,16 @@ function display_step(data) {
 $(document).ready(function(){
     program_id = get_id('id');
     http('program/' + program_id, 'GET', null, function(response) {
-        console.log(response);
+        $("#program_title").html(response['name']);
         step_data = JSON.parse(response['steps']);
-        console.log(step_data);
         step_keys = [];
-        steps = ""
+        steps = "";
         for (var key in step_data) {
             step_keys.push(key);
         }
         step_keys.sort()
         for (var key in step_keys) {
-            steps += '<tr><td>' + step_keys[key] + '</td><td>' + display_step(step_data[step_keys[key]]) + '</td></tr>'
+            steps += '<tr><td>' + step_keys[key] + '</td><td>' + display_step(step_data[step_keys[key]]) + '</td></tr>';
         }
 
         $("#program_details").html(steps);
