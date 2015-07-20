@@ -103,7 +103,7 @@ $(document).ready(function(){
     }
     else {
       http('program', 'POST', data, function(response) {
-        window.location.href = '/program/?id=' + response['id'];
+        window.location.href = '/program/manage/?id=' + response['id'];
       });
     }
   });
