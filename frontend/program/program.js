@@ -12,7 +12,8 @@ $(document).ready(function(){
         for (i=0; i<data.length; i++) {
             line = "<input type='submit' value='"
             line += data[i]['name']
-            line += "'><br>"
+            line += "'"
+            line += "onclick='window.location.href=\"/program/manage/?id=" + data[i]['id'] + "\"'><br>"
             buttons += line;
         }
     $("#programs").html(buttons);
