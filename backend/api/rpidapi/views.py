@@ -1,10 +1,10 @@
+import json
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from . import serializers, models
 from interface import APIData
-from pprint import pprint
 
 
 class ScientistViewset(ModelViewSet):
@@ -29,7 +29,23 @@ class ProgramViewset(ModelViewSet):
 class StartView(APIView):
     def post(self, request, format=None):
         data = APIData()
-        data.activate()
+        try:
+            driver = models.Driver.objects.get(id=request.data['driver'])
+            json_driver = serializers.DriverSerializer(driver)
+            data.driver = json_driver.data
+
+            program = models.Program.objects.get(id=request.data['program'])
+            json_program = serializers.ProgramSerializer(program)
+            print("STEPS STEPS")
+            print(json_program.data['steps'])
+            print(type(json_program.data['steps']))
+            data.program = json_program.data['steps']
+
+
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
+        else:
+            data.activate()
         return Response(status=status.HTTP_200_OK)
 
 
@@ -47,6 +63,8 @@ class CurrentView(APIView):
         current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
         next_steps = data.next_steps or ["---"]
         times_until = data.times_until or ["---"]
+        print("ns", next_steps)
+        print("tu", times_until)
         try:
             time_left = data.time_left
         except TypeError:

@@ -9,6 +9,12 @@ log = logging.getLogger(__name__)
 
 
 class BaseRunner(object):
+    """
+    These methods are implemented here in this base class because we foresee the possibility that people might
+    want to have some kind of manual control mode, where they can adjust the temperature on the fly without a
+    program. That has not yet been written though.
+
+    """
     def __init__(self):
         self._api_data = APIData()
         self._thermometer = thermometer.Thermometer()
@@ -90,8 +96,13 @@ class ProgramRunner(BaseRunner):
 
     def _prerun(self):
         # in the near future, the driver will be chosen by the user
-        driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 6.0, -15.0)
+        driver = self._api_data.driver
+        print("got driver in prerun")
+        driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
+                            driver['max_accumulated_error'], driver['min_accumulated_error'])
+        print("we've built the driver")
         self._pid = pid.PID(driver)
+        print("PID ACTIVE")
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
         self._program = program.TemperatureProgram(self._api_data.program)
@@ -99,11 +110,11 @@ class ProgramRunner(BaseRunner):
 
     def _run(self):
         """
-        Are we still running?
-        What is the current temperature?
-        What should the temperature be?
-        Run the heater if needed.
-        Update the API information.
+        1. Are we still running?
+        2. What is the current temperature?
+        3. What should the temperature be?
+        4. Physically activate the heater if needed.
+        5. Update the API information.
 
         """
         while True:

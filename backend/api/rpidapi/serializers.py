@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rpidapi import models
 
+
 class ScientistSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Scientist
