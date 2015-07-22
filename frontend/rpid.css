@@ -63,3 +63,31 @@ tbody[class="setting"] th {
 tbody[class="setting"] td {
     background:#d7e1c5;
 }
+
+ul {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+li {
+    float:left;
+}
+
+a[class="breadcrumb"]{
+    display:block;
+    width:200px;
+}
+
+a[class="breadcrumb"]:link, a[class="breadcrumb"]:visited {
+    font-weight:bold;
+    color:#FFFFFF;
+    background-color:#91c5d4;
+    text-align:center;
+    padding:4px;
+    text-decoration:none;
+}
+
+a[class="breadcrumb"]:hover, a[class="breadcrumb"]:active {
+    background-color:#66a9bd;
+}
