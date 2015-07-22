@@ -39,7 +39,6 @@ class APIData(redis.StrictRedis):
     @property
     def next_steps(self):
         ns = self.hgetall('next_steps')
-        print(ns)
         return ns
 
     @property

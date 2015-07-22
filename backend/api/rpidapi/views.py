@@ -36,12 +36,7 @@ class StartView(APIView):
 
             program = models.Program.objects.get(id=request.data['program'])
             json_program = serializers.ProgramSerializer(program)
-            print("STEPS STEPS")
-            print(json_program.data['steps'])
-            print(type(json_program.data['steps']))
             data.program = json_program.data['steps']
-
-
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
@@ -63,8 +58,6 @@ class CurrentView(APIView):
         current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
         next_steps = data.next_steps or ["---"]
         times_until = data.times_until or ["---"]
-        print("ns", next_steps)
-        print("tu", times_until)
         try:
             time_left = data.time_left
         except TypeError:
