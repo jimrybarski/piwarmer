@@ -24,6 +24,7 @@ class APIData(redis.StrictRedis):
         self.set("current_setting", desired_temp)
 
     def update_next_steps(self, next_steps, times_until):
+
         # in case there's a request for this data while we're deleting the old records,
         # we start from the end so that we never send back anything inconsistent
         for n in range(5 - len(next_steps)):

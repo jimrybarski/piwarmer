@@ -11,7 +11,6 @@ function update() {
         for (i=1; i<Object.keys(data.next_steps).length; i++) {
             line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
             next_steps += line
-            console.log(line)
         }
         next_steps += "</tfoot></table>"
         $("#next_steps").html(next_steps)
