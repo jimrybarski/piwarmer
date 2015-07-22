@@ -1,3 +1,4 @@
+import json
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -35,7 +36,12 @@ class StartView(APIView):
 
             program = models.Program.objects.get(id=request.data['program'])
             json_program = serializers.ProgramSerializer(program)
-            data.program = json_program.data
+            print("STEPS STEPS")
+            print(json_program.data['steps'])
+            print(type(json_program.data['steps']))
+            data.program = json_program.data['steps']
+
+
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:

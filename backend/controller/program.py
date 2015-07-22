@@ -97,9 +97,9 @@ class TemperatureProgram(object):
     def total_duration(self):
         return self._total_duration
 
-    def _load_json(self, json_program):
+    def _load_json(self, steps):
         """
-        json_program will be a dict like:
+        steps will be a dict like:
         {
           "1": {"mode": "set", "temperature": 80.0, "duration": 300},
           "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": 3600},
@@ -113,8 +113,8 @@ class TemperatureProgram(object):
         hold: temperature
         linear: temperature, duration
 
-        :param json_program:    temperature settings for an experiment
-        :type json_program:     str
+        :param steps:    temperature settings for an experiment
+        :type steps:     dict
 
         """
         action = {"set": self._set_temperature,
@@ -122,8 +122,7 @@ class TemperatureProgram(object):
                   "repeat": self._repeat,
                   "hold": self._hold
                   }
-        raw_program = json.loads(json_program)
-        for index, parameters in sorted(raw_program.items(), key=lambda x: int(x[0])):
+        for index, parameters in sorted(steps.items(), key=lambda x: int(x[0])):
             # Get the mode and remove it from the parameters
             mode = parameters.pop("mode", None)
             # Run the desired action using the parameters given

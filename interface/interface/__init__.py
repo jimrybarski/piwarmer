@@ -55,7 +55,7 @@ class APIData(redis.StrictRedis):
 
     @property
     def program(self):
-        return self.get("program")
+        return json.loads(self.get("program"))
 
     @program.setter
     def program(self, value):
@@ -67,7 +67,7 @@ class APIData(redis.StrictRedis):
 
     @driver.setter
     def driver(self, value):
-        self.set("driver", value)
+        self.set("driver", json.dumps(value))
 
     @property
     def active(self):

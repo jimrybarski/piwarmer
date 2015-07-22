@@ -97,9 +97,12 @@ class ProgramRunner(BaseRunner):
     def _prerun(self):
         # in the near future, the driver will be chosen by the user
         driver = self._api_data.driver
+        print("got driver in prerun")
         driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
                             driver['max_accumulated_error'], driver['min_accumulated_error'])
+        print("we've built the driver")
         self._pid = pid.PID(driver)
+        print("PID ACTIVE")
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
         self._program = program.TemperatureProgram(self._api_data.program)
