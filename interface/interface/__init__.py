@@ -13,8 +13,9 @@ class APIData(redis.StrictRedis):
         Resets everything.
 
         """
-        labels = ["current_temp", "current_setting", "active", "program", "mode", "next_steps", "times_until"]
+        labels = ["current_temp", "current_setting", "time_left", "active", "program", "mode", "next_steps", "times_until"]
         for label in labels:
+            print("deleting %s" % label)
             self.delete(label)
 
     def update_temperature(self, temp):
@@ -47,7 +48,6 @@ class APIData(redis.StrictRedis):
 
     def deactivate(self):
         self.set("active", 0)
-        self.delete("program")
 
     def activate(self):
         self.set("active", 1)

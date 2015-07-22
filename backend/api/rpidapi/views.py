@@ -48,13 +48,14 @@ class StopView(APIView):
     def post(self, request, format=None):
         data = APIData()
         data.deactivate()
+        data.clear()
         return Response(status=status.HTTP_200_OK)
 
 
 class CurrentView(APIView):
     def get(self, request, format=None):
         data = APIData()
-        current_temp = data.current_temp or "n/a"
+        current_temp = data.current_temp
         current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
         next_steps = data.next_steps or ["---"]
         times_until = data.times_until or ["---"]
@@ -63,8 +64,8 @@ class CurrentView(APIView):
         except TypeError:
             time_left = None
         out = {"setting": current_setting,
-               "temp": str(current_temp) + " &deg;C",
-               "time_left": time_left or "n/a",
+               "temp": str(current_temp) + " &deg;C" if current_temp else "---",
+               "time_left": time_left or "---",
                "next_steps": next_steps,
                "times_until": times_until}
         return Response(out, status=status.HTTP_200_OK)
