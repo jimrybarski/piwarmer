@@ -4,7 +4,9 @@ function get_id(search_term) {
     var regex = new RegExp('\\?' + search_term + '=');
     var parser = document.createElement('a');
     parser.href = window.location.href;
-    return parser.search.replace(regex, '');
+    // Take the 'search' part of the URL (the keyword arguments) and get rid of everything except the ID.
+    // Then delete the trailing slash in case one is inserted by the browser
+    return parser.search.replace(regex, '').replace('/', '');
 }
 
 function http(endpoint, verb, d, func){

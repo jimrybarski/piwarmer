@@ -96,10 +96,11 @@ $(document).ready(function(){
 
     // validate program here
     if (errors.length > 0) {
-        message = "Your program has a problem! "
+        message = "Your program cannot be saved! "
         for (i=0; i<errors.length; i++) {
             message += " " + errors[i];
         }
+        alert(message);
     }
     else {
       http('program', 'POST', data, function(response) {

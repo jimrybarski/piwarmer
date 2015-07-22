@@ -22,7 +22,7 @@ $(document).ready(function(){
 
         // Set the driver name
         http('driver/' + response['driver'], 'GET', null, function(driver_response){
-            driver_id = driver_response['id'])
+            driver_id = driver_response['id']
             $("#driver_name").html("Driver: " + driver_response['name']);
         });
 
