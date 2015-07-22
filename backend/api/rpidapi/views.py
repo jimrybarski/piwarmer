@@ -5,6 +5,8 @@ from rest_framework.viewsets import ModelViewSet
 from . import serializers, models
 from interface import APIData
 from pprint import pprint
+from rest_framework import permissions, authentication
+from django.views.decorators.csrf import csrf_exempt
 
 
 class ScientistViewset(ModelViewSet):
@@ -26,7 +28,11 @@ class ProgramViewset(ModelViewSet):
         return models.Program.objects.all()
 
 
+@csrf_exempt
 class StartView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
     def post(self, request, format=None):
         data = APIData()
         try:
@@ -46,6 +52,7 @@ class StartView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+@csrf_exempt
 class StopView(APIView):
     def post(self, request, format=None):
         data = APIData()
@@ -53,6 +60,7 @@ class StopView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+@csrf_exempt
 class CurrentView(APIView):
     def get(self, request, format=None):
         data = APIData()
