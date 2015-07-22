@@ -69,6 +69,10 @@ class TemperatureSetting(object):
         return message
 
     @property
+    def duration(self):
+        return self._duration
+
+    @property
     def message(self):
         return self._display_message
 
@@ -147,8 +151,8 @@ class TemperatureProgram(object):
 
     def _repeat(self, num_repeats=3):
         new_settings = []
-        for i in range(num_repeats):
-            for setting in self._settings:
+        for i in range(int(num_repeats)):
+            for time_range, setting in sorted(self._settings.items()):
                 new_setting = copy.copy(setting)
                 new_settings.append(new_setting)
                 self._total_duration += new_setting.duration
