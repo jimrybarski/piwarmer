@@ -96,7 +96,9 @@ class ProgramRunner(BaseRunner):
 
     def _prerun(self):
         # in the near future, the driver will be chosen by the user
-        driver = pid.Driver("small aluminum block", 5.0, 1.0, 0.0, 6.0, -15.0)
+        driver = self._api_data.driver
+        driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
+                            driver['max_accumulated_error'], driver['min_accumulated_error'])
         self._pid = pid.PID(driver)
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()

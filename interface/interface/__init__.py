@@ -56,8 +56,17 @@ class APIData(redis.StrictRedis):
     def program(self):
         return self.get("program")
 
-    def set_program(self, program):
-        self.set("program", json.dumps(program))
+    @program.setter
+    def program(self, value):
+        self.set("program", value)
+
+    @property
+    def driver(self):
+        return json.loads(self.get("driver"))
+
+    @driver.setter
+    def driver(self, value):
+        self.set("driver", value)
 
     @property
     def active(self):

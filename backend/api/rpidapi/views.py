@@ -29,7 +29,20 @@ class ProgramViewset(ModelViewSet):
 class StartView(APIView):
     def post(self, request, format=None):
         data = APIData()
-        data.activate()
+        try:
+            driver = models.Driver.objects.get(id=request['driver'])
+            json_driver = serializers.DriverSerializer(driver)
+            json_driver.is_valid()
+            data.driver = json_driver.data
+
+            program = models.Program.objects.get(id=request['program'])
+            json_program = serializers.ProgramSerializer(program)
+            json_program.is_valid()
+            data.program = json_program
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
+        else:
+            data.activate()
         return Response(status=status.HTTP_200_OK)
 
 

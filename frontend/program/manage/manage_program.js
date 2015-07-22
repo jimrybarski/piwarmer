@@ -22,6 +22,7 @@ $(document).ready(function(){
 
         // Set the driver name
         http('driver/' + response['driver'], 'GET', null, function(driver_response){
+            driver_id = driver_response['id'])
             $("#driver_name").html("Driver: " + driver_response['name']);
         });
 
@@ -39,20 +40,25 @@ $(document).ready(function(){
         $("#program_details").html(steps);
     });
 
+    // Run a program
+    $(document.body).on('click', '#run', function() {
+        data = {
+                'driver': driver_id,
+                'program': program_id
+                }
+        // This request will validate the data first, set it in the Redis interface, and only then if all went fine
+        // will the start signal be set. If anything fails, nothing will happen and an HTTP 400 response will be received.
+        http('start', 'POST', data, function(response) {
+            window.location.href = '/monitor'
+        });
+    });
+
+    // Delete this program
     $(document.body).on('click', '#delete', function() {
         if (window.confirm('Are you sure you want to delete this program? This CANNOT be undone.')) {
             http('program/' + program_id, 'DELETE', null, function(response) {
                 window.location.href = '/program?user=' + scientist;
             })
         }
-    });
-    $(document.body).on('click', '#run', function() {
-        // send the program to the API
-        // send the driver to the API
-        // start the program
-        // redirect to the monitor page
-        http('' + program_id, 'POST', null, function(response) {
-
-        });
     });
 });
