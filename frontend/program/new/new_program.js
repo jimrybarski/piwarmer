@@ -1,12 +1,41 @@
+function validate_time(time) {
+    // either HH:MM:SS, MM:SS, H:MM:SS, or M:SS. Also technically H:M:S but that should parse fine into seconds
+    var regex = new RegExp('(\\d{1,2}:)?\\d{1,2}:\\d{2}');
+    return regex.test(time);
+}
+
+function hhmmss_to_seconds(time) {
+    var separated_times = time.split(':')
+    var total_seconds = 0;
+    if (separated_times.length == 3) {
+        // handle hours specially
+        hours = parseInt(separated_times.pop(), 10);
+        console.log(hours);
+        total_seconds += 3600 * hours;
+    }
+    // now just MM, SS
+    minutes = parseInt(separated_times[0], 10)
+    seconds = parseInt(separated_times[1], 10);
+    if (minutes > 59 || seconds > 59) {
+        alert("Invalid time: " + time);
+        throw 'invalid time';
+    }
+    result = total_seconds + (minutes * 60) + seconds;
+    if (result == 0) {
+        alert("Invalid time: " + time);
+        throw 'invalid time';
+    }
+}
+
 function get_new_row(id, mode) {
   var front = get_id_td(id) + get_mode_td(id, mode);
 
   if (mode == "set") {
-    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>';
+    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (HH:MM:SS)"></td>';
   };
 
   if (mode == "linear") {
-    var back = '<td><input type="text" name="start_temperature" placeholder="Start Temperature (&deg;C)"></td><td><input type="text" name="end_temperature" placeholder="End Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (sec)"></td>;'
+    var back = '<td><input type="text" name="start_temperature" placeholder="Start Temperature (&deg;C)"></td><td><input type="text" name="end_temperature" placeholder="End Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (HH:MM:SS)"></td>;'
   }
 
   if (mode == "hold") {
@@ -72,10 +101,15 @@ $(document).ready(function(){
         row_id++;
         program[row_id] = {"mode": item.value};
       } else {
-        program[row_id][item.name] = item.value;
+        if (item.name == "duration") {
+            if (!validate_time(item.value)) {
+               alert("Invalid time in step " + row_id + ": " + item.value);
+               throw 'Invalid time';
+            }
+        }
+        program[row_id][item.name] = (item.name == "duration" ? hhmmss_to_seconds(item.value) : item.value);
       };
     });
-
     errors = [];
     name = $("#name").val();
     if (name.length == 0) {

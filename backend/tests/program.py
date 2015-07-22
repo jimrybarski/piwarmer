@@ -118,3 +118,6 @@ class TemperatureDisplayTests(unittest.TestCase):
         self.assertDictEqual(settings, {0: "80.0&deg;C for 00:03:00",
                                         1: "80.0&deg;C for 00:04:00",
                                         2: "Hold at 37.0&deg;C"})
+
+    def test_parse_duration_hhmmss(self):
+        pass

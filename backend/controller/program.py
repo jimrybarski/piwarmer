@@ -105,8 +105,8 @@ class TemperatureProgram(object):
         """
         steps will be a dict like:
         {
-          "1": {"mode": "set", "temperature": 80.0, "duration": 300},
-          "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": 3600},
+          "1": {"mode": "set", "temperature": 80.0, "duration": "1:30:00"},
+          "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": "12:00"},
           "3": {"mode": "hold", "temperature": 37.0}
         }
 
