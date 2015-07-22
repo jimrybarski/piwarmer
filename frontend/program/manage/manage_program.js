@@ -46,4 +46,13 @@ $(document).ready(function(){
             })
         }
     });
+    $(document.body).on('click', '#run', function() {
+        // send the program to the API
+        // send the driver to the API
+        // start the program
+        // redirect to the monitor page
+        http('' + program_id, 'POST', null, function(response) {
+
+        });
+    });
 });

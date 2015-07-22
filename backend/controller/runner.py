@@ -9,6 +9,12 @@ log = logging.getLogger(__name__)
 
 
 class BaseRunner(object):
+    """
+    These methods are implemented here in this base class because we foresee the possibility that people might
+    want to have some kind of manual control mode, where they can adjust the temperature on the fly without a
+    program. That has not yet been written though.
+
+    """
     def __init__(self):
         self._api_data = APIData()
         self._thermometer = thermometer.Thermometer()
@@ -99,11 +105,11 @@ class ProgramRunner(BaseRunner):
 
     def _run(self):
         """
-        Are we still running?
-        What is the current temperature?
-        What should the temperature be?
-        Run the heater if needed.
-        Update the API information.
+        1. Are we still running?
+        2. What is the current temperature?
+        3. What should the temperature be?
+        4. Physically activate the heater if needed.
+        5. Update the API information.
 
         """
         while True:
