@@ -37,6 +37,10 @@ td[class="step_id"] {
    font-size: 0px;
 }
 
+td[class="program_step"] {
+    width: 25%;
+}
+
 table {
     width: 95%;
 }

@@ -31,7 +31,7 @@ function get_new_row(id, mode) {
   var front = get_id_td(id) + get_mode_td(id, mode);
 
   if (mode == "set") {
-    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td><input type="text" name="duration" placeholder="Duration (HH:MM:SS)"></td>';
+    var back = '<td class="program_step"><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td class="program_step"><input type="text" name="duration" placeholder="Duration (HH:MM:SS)"></td><td class="program_step"></td>';
   };
 
   if (mode == "linear") {
@@ -39,11 +39,11 @@ function get_new_row(id, mode) {
   }
 
   if (mode == "hold") {
-    var back = '<td><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td>';
+    var back = '<td class="program_step"><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td class="program_step"></td><td class="program_step"></td>';
   };
 
   if (mode == "repeat") {
-    var back = '<td><input type="text" name="num_repeats" placeholder="Number of repeats"></td>';
+    var back = '<td class="program_step"><input type="text" name="num_repeats" placeholder="Number of repeats"></td><td class="program_step"></td><td class="program_step"></td>';
   };
 
   return front + back;
