@@ -10,6 +10,8 @@ function get_id(search_term) {
 }
 
 function http(endpoint, verb, d, func){
+    console.log("http(" + endpoint + ", " + verb + ") called with data:")
+    console.log(d)
     $.ajax({
       type: verb,
       crossDomain: true,

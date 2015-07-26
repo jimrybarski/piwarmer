@@ -5,9 +5,6 @@ $(document).ready(function(){
     );
 
     http('program?user=' + get_id('user'), 'GET', null, function(data){
-        console.log("YUP")
-        console.log(data)
-
         buttons = ''
         for (i=0; i<data.length; i++) {
             line = "<input type='submit' value='"

@@ -25,6 +25,7 @@ function hhmmss_to_seconds(time) {
         alert("Invalid time: " + time);
         throw 'invalid time';
     }
+    return result;
 }
 
 function get_new_row(id, mode) {
@@ -107,9 +108,12 @@ $(document).ready(function(){
                throw 'Invalid time';
             }
         }
+
         program[row_id][item.name] = (item.name == "duration" ? hhmmss_to_seconds(item.value) : item.value);
       };
     });
+    console.log(program);
+
     errors = [];
     name = $("#name").val();
     if (name.length == 0) {
@@ -138,7 +142,7 @@ $(document).ready(function(){
     }
     else {
       http('program', 'POST', data, function(response) {
-        window.location.href = '/program/manage/?id=' + response['id'];
+        //window.location.href = '/program/manage/?id=' + response['id'];
       });
     }
   });
