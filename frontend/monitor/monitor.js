@@ -1,10 +1,12 @@
 function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
+        console.log("i'm un update")
         // Update the most important stats
         $("#current_temp").html("Temp: " + data.temp)
         $("#current_temperature_setting").html("Current Setting: " + data.next_steps[0])
         $("#time_left").html("Time remaining: " + data.time_left)
+        var show_stop_button = (data.time_left != '---')
 
         // Build up the table of next steps
         var next_steps = "<table><thead class='setting'><tr><th scope='col'>Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
@@ -14,6 +16,16 @@ function update() {
         }
         next_steps += "</tfoot></table>"
         $("#next_steps").html(next_steps)
+        if (show_stop_button) {
+            $("#stop").prop('disabled', false);
+            $("#stop").val("STOP");
+            $("#stop").attr('style', 'background-color: #FF2020; color: #FFFFFF;')
+        }
+        else {
+            $("#stop").prop('disabled', true);
+            $("#stop").val("No program running");
+            $("#stop").attr('style', 'background-color: #806666; color: #FFFFFF;')
+        }
     });
 }
 

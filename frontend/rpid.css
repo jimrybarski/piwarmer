@@ -18,8 +18,8 @@ input, select {
     width: 100%;
 }
 
-input[id="stop"] {
-   background-color: #FF2020;
+input[name="stop"] {
+   background-color: #806666;
    color: #FFFFFF;
 }
 
