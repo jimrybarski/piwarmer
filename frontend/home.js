@@ -25,6 +25,10 @@ $(document).ready(function(){
             line += '"><br>'
             buttons += line;
         }
+    if (buttons == '') {
+        buttons = 'No users exist yet.'
+    }
     $("#users").html(buttons);
+
     });
 });
