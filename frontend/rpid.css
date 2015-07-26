@@ -91,3 +91,13 @@ a[class="breadcrumb"]:link, a[class="breadcrumb"]:visited {
 a[class="breadcrumb"]:hover, a[class="breadcrumb"]:active {
     background-color:#66a9bd;
 }
+
+#left {
+    float: left;
+    width: 45%;
+}
+
+#right {
+    float: right;
+    width: 55%;
+}
