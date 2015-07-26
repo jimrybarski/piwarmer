@@ -9,8 +9,7 @@ function hhmmss_to_seconds(time) {
     var total_seconds = 0;
     if (separated_times.length == 3) {
         // handle hours specially
-        hours = parseInt(separated_times.pop(), 10);
-        console.log(hours);
+        hours = parseInt(separated_times.shift(), 10);
         total_seconds += 3600 * hours;
     }
     // now just MM, SS
