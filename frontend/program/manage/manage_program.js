@@ -72,7 +72,7 @@ $(document).ready(function(){
     $(document.body).on('click', '#delete', function() {
         if (window.confirm('Are you sure you want to delete this program? This CANNOT be undone.')) {
             http('program/' + program_id, 'DELETE', null, function(response) {
-                window.location.href = '/program?user=' + scientist;
+                window.location.href = '/user?user=' + scientist;
             })
         }
     });

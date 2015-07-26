@@ -18,7 +18,7 @@ $(document).ready(function(){
         buttons = ''
         for (i=0; i<data.length; i++) {
             line = "<input type='submit' onclick='window.location.href="
-            line += '"/program?user='
+            line += '"/user?user='
             line += data[i]['id']
             line += '"\' value="'
             line += data[i]['name']
