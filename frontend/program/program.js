@@ -4,6 +4,19 @@ $(document).ready(function(){
         }
     );
 
+    $("#delete").click( function(){
+            if (window.confirm("Are you sure you want to delete this user? This CANNOT be undone.")) {
+                http('user/' + get_id('user'), 'DELETE', null, function(data) {
+                    window.location.href='/';
+                });
+            }
+        }
+    );
+
+    http('user/' + get_id('user'), 'GET', null, function(data){
+        $("#username").html(data['name']);
+    });
+
     http('program?user=' + get_id('user'), 'GET', null, function(data){
         buttons = ''
         for (i=0; i<data.length; i++) {
@@ -13,6 +26,11 @@ $(document).ready(function(){
             line += "onclick='window.location.href=\"/program/manage/?id=" + data[i]['id'] + "\"'><br>"
             buttons += line;
         }
-    $("#programs").html(buttons);
+    if (buttons == '') {
+        $("#programs").html("No programs for this user.")
+    }
+    else {
+        $("#programs").html(buttons);
+    }
     });
 });

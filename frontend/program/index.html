@@ -8,15 +8,22 @@
         <link rel="stylesheet" type="text/css" media="screen" href="../rpid.css" />
     </head>
     <body>
-    <ul>
-          <li><a class="breadcrumb" href="/">Users</a></li>
-          <li><a class="breadcrumb" href="/monitor">Monitor</a></li>
-          <li><a class="breadcrumb" href="/driver">Drivers</a></li>
-          <li><a class="breadcrumb" href="/help">Help</a></li>
-      </ul>
+        <ul>
+            <li><a class="breadcrumb" href="/">Users</a></li>
+            <li><a class="breadcrumb" href="/monitor">Monitor</a></li>
+            <li><a class="breadcrumb" href="/driver">Drivers</a></li>
+            <li><a class="breadcrumb" href="/help">Help</a></li>
+        </ul><br>
 
-      <br><h3>Select a Program</h3>
-        <input type="submit" id="new_program" value="Create New Program" class="oddball"><br><br>
-        <div id="programs"></div>
+        <div id="left">
+            <h3 id="username">&nbsp;</h3>
+            <div id="programs"></div>
+        </div>
+        <div id="right">
+            <h3>&nbsp;</h3>
+            <div></div>
+            <input type="submit" id="new_program" value="Create New Program" class="oddball"><br><br><br>
+            <input type="submit" id="delete" value="Delete User">
+        </div>
     </body>
 </html>
