@@ -9,13 +9,21 @@ function update() {
         var show_stop_button = (data.time_left != '---')
 
         // Build up the table of next steps
-        var next_steps = "<table><thead class='setting'><tr><th scope='col'>Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
-        for (i=1; i<Object.keys(data.next_steps).length; i++) {
-            line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
-            next_steps += line
-        }
+        var next_steps = "<table><thead class='setting'><tr><th scope='col'>Next Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
+            if (Object.keys(data.next_steps).length > 1) {
+                for (i=1; i<Object.keys(data.next_steps).length; i++) {
+                    line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
+                    next_steps += line
+                }
+            }
+            else {
+                next_steps += "<tr><td>---</td><td>---</td></tr>"
+            }
+
         next_steps += "</tfoot></table>"
+
         $("#next_steps").html(next_steps)
+
         if (show_stop_button) {
             $("#stop").prop('disabled', false);
             $("#stop").val("STOP");
