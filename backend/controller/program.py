@@ -155,8 +155,11 @@ class TemperatureProgram(object):
             for time_range, setting in sorted(self._settings.items()):
                 new_setting = copy.copy(setting)
                 new_settings.append(new_setting)
-                self._total_duration += new_setting.duration
-        self._settings += new_settings
+        for setting in new_settings:
+            # The duration must be defined because otherwise it means there's a repeat after a hold - nonsensical
+            assert setting.duration is not None
+            self._settings[(self._total_duration, self._total_duration + setting.duration)] = setting
+            self._total_duration += setting.duration
         return self
 
     def _hold(self, temperature=25.0):
