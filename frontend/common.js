@@ -1,4 +1,8 @@
-var API_URL = 'temp.control:8001'
+var API_URL = '192.168.10.3/backend'
+
+if (API_URL == '192.168.10.N/backend') {
+    alert("Your Pi Warmer is not properly configured. Change the API_URL variable in common.js")
+}
 
 function get_id(search_term) {
     var regex = new RegExp('\\?' + search_term + '=');
@@ -7,6 +11,11 @@ function get_id(search_term) {
     // Take the 'search' part of the URL (the keyword arguments) and get rid of everything except the ID.
     // Then delete the trailing slash in case one is inserted by the browser
     return parser.search.replace(regex, '').replace('/', '');
+}
+
+function beep(){
+    var audio = new Audio('../smb_coin.wav');
+    audio.play();
 }
 
 function http(endpoint, verb, d, func){

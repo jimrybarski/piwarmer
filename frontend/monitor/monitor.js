@@ -1,18 +1,23 @@
 function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
-        console.log("i'm un update")
         // Update the most important stats
         $("#current_temp").html("Temp: " + data.temp)
         $("#current_temperature_setting").html("Current Setting: " + data.next_steps[0])
         $("#time_left").html("Time remaining: " + data.time_left)
         var show_stop_button = (data.time_left != '---')
-
+        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
+            console.log("Beeping!")
+            beep();
+        }
         // Build up the table of next steps
         var next_steps = "<table><thead class='setting'><tr><th scope='col'>Next Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
             if (Object.keys(data.next_steps).length > 1) {
                 for (i=1; i<Object.keys(data.next_steps).length; i++) {
                     line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
+                    if (data.times_until[i] == "00:00:01") {
+                        beep();
+                    }
                     next_steps += line
                 }
             }
