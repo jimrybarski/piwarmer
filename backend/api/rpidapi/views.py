@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from . import serializers, models
 from interface import APIData
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class ScientistViewset(ModelViewSet):
@@ -30,6 +33,8 @@ class StartView(APIView):
     def post(self, request, format=None):
         data = APIData()
         try:
+            log.info("Program start requested")
+            log.info(str(request.data))
             driver = models.Driver.objects.get(id=request.data['driver'])
             json_driver = serializers.DriverSerializer(driver)
             data.driver = json_driver.data
@@ -38,17 +43,21 @@ class StartView(APIView):
             json_program = serializers.ProgramSerializer(program)
             data.program = json_program.data['steps']
         except Exception as e:
+            log.exception("Could not start program")
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
             data.activate()
+        log.info("Program started fine")
         return Response(status=status.HTTP_200_OK)
 
 
 class StopView(APIView):
     def post(self, request, format=None):
+        log.info("Stop program requested")
         data = APIData()
         data.deactivate()
         data.clear()
+        log.info("Program stopped OK")
         return Response(status=status.HTTP_200_OK)
 
 
