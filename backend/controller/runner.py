@@ -18,6 +18,7 @@ class BaseRunner(object):
     def __init__(self):
         self._api_data = APIData()
         self._thermometer = thermometer.Thermometer()
+        log.info("Started program runner")
 
     def run(self):
         while True:
@@ -30,11 +31,14 @@ class BaseRunner(object):
         return self
 
     def _boot(self):
+        log.info("Booting! About to clear API data")
         self._api_data.clear()
 
     def _listen(self):
+        log.info("No programs to run right now. Waiting for a request to come in")
         while True:
             if self._api_data.active:
+                log.info("We need to run a program!")
                 break
             else:
                 try:
@@ -121,6 +125,7 @@ class ProgramRunner(BaseRunner):
             assert self._accumulated_error is not None
 
             if not self._api_data.active:
+                log.info("The program has ended or been stopped")
                 self._shutdown()
                 break
 
@@ -143,7 +148,8 @@ class ProgramRunner(BaseRunner):
 
             # I/O - read the temperature
             round_data.current_temperature = self._thermometer.current_temperature
-            log.debug("CURRENT TEMP %s" % round_data.current_temperature)
+            if round_data.current_temperature:
+                log.debug("CURRENT TEMP %s" % round_data.current_temperature)
             if not round_data.can_update_pid:
                 # something went wrong - maybe the thermometer returned NaN as it does sometimes,
                 # maybe something got unplugged. We'll just try again until explicitly told to stop
@@ -154,7 +160,7 @@ class ProgramRunner(BaseRunner):
 
             # run the heating sequence, if necessary
             log.debug("DUTY CYCLE %s" % round_data.duty_cycle)
-            self._heater.heat(round_data.duty_cycle * 0.8)
+            self._heater.heat(round_data.duty_cycle)
 
             # update the API data so the frontend can know what's happening
             self._api_data.time_left = program.convert_seconds_to_hhmmss(round_data.seconds_left)
