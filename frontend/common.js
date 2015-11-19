@@ -1,4 +1,8 @@
-var API_URL = 'temp.control:8001'
+var API_URL = '192.168.10.N:8001'
+
+if (API_URL == '192.168.10.N:8001') {
+    alert("Your Pi Warmer is not properly configured. Change the API_URL variable in common.js")
+}
 
 function get_id(search_term) {
     var regex = new RegExp('\\?' + search_term + '=');
