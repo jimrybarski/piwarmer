@@ -12,4 +12,4 @@ stop = url(r'stop', views.StopView.as_view())
 start = url(r'start', views.StartView.as_view())
 current = url(r'current', views.CurrentView.as_view())
 
-urlpatterns = [url(r'^', include(router.urls)), stop, start, current]
+urlpatterns = [url(r'^backend/', include(router.urls)), stop, start, current]
