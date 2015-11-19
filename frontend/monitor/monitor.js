@@ -6,7 +6,7 @@ function update() {
         $("#current_temperature_setting").html("Current Setting: " + data.next_steps[0])
         $("#time_left").html("Time remaining: " + data.time_left)
         var show_stop_button = (data.time_left != '---')
-        if (data.time_left <= 2.0) {
+        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
             console.log("Beeping!")
             beep();
         }
@@ -15,6 +15,9 @@ function update() {
             if (Object.keys(data.next_steps).length > 1) {
                 for (i=1; i<Object.keys(data.next_steps).length; i++) {
                     line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
+                    if (data.times_until[i] == "00:00:01") {
+                        beep();
+                    }
                     next_steps += line
                 }
             }

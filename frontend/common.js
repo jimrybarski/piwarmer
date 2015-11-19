@@ -1,6 +1,6 @@
 var API_URL = '192.168.10.3/backend'
 
-if (API_URL == '192.168.10.3/backend') {
+if (API_URL == '192.168.10.N/backend') {
     alert("Your Pi Warmer is not properly configured. Change the API_URL variable in common.js")
 }
 
@@ -14,7 +14,7 @@ function get_id(search_term) {
 }
 
 function beep(){
-    var audio = new Audio('media/smb_coin.wav');
+    var audio = new Audio('../smb_coin.wav');
     audio.play();
 }
 
