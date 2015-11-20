@@ -71,11 +71,16 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s\t%(name)s\t%(levelname)s\t\t%(message)s'
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/temp_control/piwarmer.log',
+            'filename': '/var/log/piwarmer/api.log',
         },
     },
     'loggers': {

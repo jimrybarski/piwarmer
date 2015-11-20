@@ -3,8 +3,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 log = logging.getLogger()
-handler = RotatingFileHandler('/var/temp_control/backend.log', maxBytes=1024*1024*100, backupCount=5)
-formatter = logging.Formatter('%(asctime)s    %(name)s    %(levelname)s    %(message)s')
+handler = RotatingFileHandler('/var/log/piwarmer/heater.log', maxBytes=1024*1024*100, backupCount=5)
+formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t\t%(message)s')
 handler.setFormatter(formatter)
 log.addHandler(handler)
 log.setLevel(logging.DEBUG)
