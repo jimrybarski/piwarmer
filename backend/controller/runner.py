@@ -138,18 +138,20 @@ class ProgramRunner(BaseRunner):
 
             # derive some data from the things that were just assigned
             round_data.desired_temperature = program.get_desired_temperature(round_data)
+            log.info("Desired temp: %s" % round_data.desired_temperature)
             round_data.seconds_left = program.calculate_seconds_left(round_data)
             round_data.next_steps, round_data.times_until = program.get_next_n_settings(5, round_data)
 
             # the program is over and we're not using a Hold setting
             if not round_data.next_steps:
+                log.info("We're out of steps to run, so we should shut down now.")
                 self._shutdown()
                 break
 
             # I/O - read the temperature
             round_data.current_temperature = self._thermometer.current_temperature
             if round_data.current_temperature:
-                log.debug("CURRENT TEMP %s" % round_data.current_temperature)
+                log.debug("actual temp\t%s" % round_data.current_temperature)
             if not round_data.can_update_pid:
                 # something went wrong - maybe the thermometer returned NaN as it does sometimes,
                 # maybe something got unplugged. We'll just try again until explicitly told to stop
@@ -159,7 +161,7 @@ class ProgramRunner(BaseRunner):
             round_data.duty_cycle, self._accumulated_error = self._pid.update(round_data)
 
             # run the heating sequence, if necessary
-            log.debug("DUTY CYCLE %s" % round_data.duty_cycle)
+            log.debug("duty cycle\t%s" % round_data.duty_cycle)
             self._heater.heat(round_data.duty_cycle)
 
             # update the API data so the frontend can know what's happening

@@ -33,13 +33,16 @@ def get_next_n_settings(n, data):
     times_until = {}
     found = False
     elapsed = data.seconds_elapsed
+    log.info("Getting next N settings")
     for (start, stop), setting in sorted(data.program.settings.items()):
         if n == 0:
+            log.info("Zero settings requested, quitting...")
             break
         if start <= elapsed < stop or found is True:
             time_until = "Now Running" if not found else convert_seconds_to_hhmmss(start - elapsed)
             found = True
             next_steps[total - n] = setting.message
+            log.info("Yielding %s" % setting.message)
             times_until[total - n] = time_until
             n -= 1
     return next_steps, times_until
@@ -139,6 +142,7 @@ class TemperatureProgram(object):
                 action[mode](**parameters)
 
     def _set_temperature(self, temperature=25.0, duration=60):
+        log.info("Adding a regular setting")
         temperature = float(temperature)
         duration = int(duration)
         setting = TemperatureSetting(temperature, temperature, duration)
@@ -147,6 +151,7 @@ class TemperatureProgram(object):
         return self
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
+        log.info("Adding a linear gradient setting")
         duration = int(duration)
         setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
@@ -154,6 +159,7 @@ class TemperatureProgram(object):
         return self
 
     def _repeat(self, num_repeats=3):
+        log.info("Adding a repeat setting")
         new_settings = []
         for i in range(int(num_repeats)):
             for time_range, setting in sorted(self._settings.items()):
@@ -167,6 +173,7 @@ class TemperatureProgram(object):
         return self
 
     def _hold(self, temperature=25.0):
+        log.info("Adding a hold setting")
         setting = TemperatureSetting(float(temperature), float(temperature), None)
         self._settings[(self._total_duration, None)] = setting
         self._has_hold = True
