@@ -1,5 +1,4 @@
 import copy
-import json
 import logging
 import time
 
@@ -11,6 +10,7 @@ def calculate_seconds_left(data):
     assert data.current_time is not None
     assert data.start_time is not None
     seconds_left = int(max(data.program.total_duration - data.seconds_elapsed, 0))
+    log.info("seconds left: %s" % seconds_left)
     return seconds_left
 
 
@@ -21,6 +21,7 @@ def get_desired_temperature(data):
     elapsed = data.seconds_elapsed
     for (start, stop), setting in sorted(data.program.settings.items()):
         if stop is None or start <= elapsed < stop:
+            log.info("Start,Stop,Setting: %s, %s, %s" % (start, stop, setting.message))
             return float(setting.get_temperature(elapsed - start))
 
 
@@ -79,10 +80,13 @@ class TemperatureSetting(object):
     def get_temperature(self, seconds_into_setting):
         if self._duration is None:
             # Hold setting
+            log.info("We're in a hold. desired temp: %s" % self._start_temp)
             return self._start_temp
         # Set or Linear Gradient
+        log.info("We're not in a hold")
         percentage_done = float(seconds_into_setting) / self._duration
         offset = (self._final_temp - self._start_temp) * percentage_done
+        log.info("Got desired temp: %s" % self._start_temp + offset)
         return self._start_temp + offset
 
 
