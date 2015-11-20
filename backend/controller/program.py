@@ -10,7 +10,6 @@ def calculate_seconds_left(data):
     assert data.current_time is not None
     assert data.start_time is not None
     seconds_left = int(max(data.program.total_duration - data.seconds_elapsed, 0))
-    log.info("seconds left: %s" % seconds_left)
     return seconds_left
 
 
@@ -21,30 +20,29 @@ def get_desired_temperature(data):
     elapsed = data.seconds_elapsed
     for (start, stop), setting in sorted(data.program.settings.items()):
         if stop is None or start <= elapsed < stop:
-            log.info("Start,Stop,Setting: %s, %s, %s" % (start, stop, setting.message))
             return float(setting.get_temperature(elapsed - start))
 
 
 def get_next_n_settings(n, data):
-    # WELCOME TO THE SPAGHETTI FACTORY
     assert n > 0
     total = n
     next_steps = {}
     times_until = {}
     found = False
     elapsed = data.seconds_elapsed
-    log.info("Getting next N settings")
     for (start, stop), setting in sorted(data.program.settings.items()):
         if n == 0:
-            log.info("Zero settings requested, quitting...")
             break
+        if stop is None:
+            # we are in a Hold setting
+            next_steps[0] = setting.message
+            times_until[0] = "Now Running"    
         if start <= elapsed < stop or found is True:
             time_until = "Now Running" if not found else convert_seconds_to_hhmmss(start - elapsed)
             found = True
             next_steps[total - n] = setting.message
-            log.info("Yielding %s" % setting.message)
             times_until[total - n] = time_until
-            n -= 1
+        n -= 1
     return next_steps, times_until
 
 
@@ -83,13 +81,10 @@ class TemperatureSetting(object):
     def get_temperature(self, seconds_into_setting):
         if self._duration is None:
             # Hold setting
-            log.info("We're in a hold. desired temp: %s" % self._start_temp)
             return self._start_temp
         # Set or Linear Gradient
-        log.info("We're not in a hold")
         percentage_done = float(seconds_into_setting) / self._duration
         offset = (self._final_temp - self._start_temp) * percentage_done
-        log.info("Got desired temp: %s" % self._start_temp + offset)
         return self._start_temp + offset
 
 

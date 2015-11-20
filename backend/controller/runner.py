@@ -18,7 +18,6 @@ class BaseRunner(object):
     def __init__(self):
         self._api_data = APIData()
         self._thermometer = thermometer.Thermometer()
-        log.info("Started program runner")
 
     def run(self):
         while True:
@@ -80,6 +79,8 @@ class ProgramRunner(BaseRunner):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         log.debug("Exiting program runner.")
+        if exc_type:
+            log.exception("Abnormal termination!")
         self._shutdown()
 
     def _shutdown(self):
@@ -94,7 +95,7 @@ class ProgramRunner(BaseRunner):
         try:
             self._api_data.clear()
         except:
-            log.error("Failed to clear API data!")
+            log.exception("Failed to clear API data!")
         else:
             log.debug("API data cleared.")
 
@@ -106,6 +107,7 @@ class ProgramRunner(BaseRunner):
         self._pid = pid.PID(driver)
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
+        log.info("Start time: %s" % self._start_time)
         self._program = program.TemperatureProgram(self._api_data.program)
         self._heater.enable()
 
@@ -135,10 +137,9 @@ class ProgramRunner(BaseRunner):
             round_data.current_time = datetime.utcnow()
             round_data.start_time = self._start_time
             round_data.program = self._program
-
             # derive some data from the things that were just assigned
             round_data.desired_temperature = program.get_desired_temperature(round_data)
-            log.info("Desired temp: %s" % round_data.desired_temperature)
+            log.info("desired temp\t%s" % round_data.desired_temperature)
             round_data.seconds_left = program.calculate_seconds_left(round_data)
             round_data.next_steps, round_data.times_until = program.get_next_n_settings(5, round_data)
 
@@ -155,6 +156,7 @@ class ProgramRunner(BaseRunner):
             if not round_data.can_update_pid:
                 # something went wrong - maybe the thermometer returned NaN as it does sometimes,
                 # maybe something got unplugged. We'll just try again until explicitly told to stop
+                log.warn("Can't update PID!")
                 continue
 
             # make calculations based on I/O having worked
