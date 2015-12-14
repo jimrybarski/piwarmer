@@ -86,7 +86,7 @@ class TemperatureLogView(APIView):
         if 'date' in self.request.query_params.keys():
             try:
                 with open(log_dir + "temperature-%s.log" % self.request.query_params['date']) as f:
-                    return Response({n: line for n, line in enumerate(f)}, status=status.HTTP_200_OK)
+                    return Response({n: line.rstrip() for n, line in enumerate(f)}, status=status.HTTP_200_OK)
             except OSError:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
