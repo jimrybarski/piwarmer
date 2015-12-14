@@ -82,6 +82,14 @@ class CurrentView(APIView):
 
 class TemperatureLogView(APIView):
     def get(self, request, format=None):
-        logs = sorted([l for l in os.listdir("/var/log/piwarmer/") if l.startswith("temperature-") and l.endswith(".log")])
+        log_dir = "/var/log/piwarmer/"
+        if 'date' in self.request.query_params.keys():
+            try:
+                with open(log_dir + "temperature-%s.log" % self.request.query_params['date']) as f:
+                    return Response({n: line for n, line in enumerate(f)}, status=status.HTTP_200_OK)
+            except OSError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        logs = sorted([l for l in os.listdir(log_dir) if l.startswith("temperature-") and l.endswith(".log")])
         data = {n: l for n, l in enumerate(logs)}
         return Response(data, status=status.HTTP_200_OK)
