@@ -1,4 +1,3 @@
-import json
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from . import serializers, models
 from interface import APIData
 import logging
+import os
 
 log = logging.getLogger(__name__)
 
@@ -78,3 +78,10 @@ class CurrentView(APIView):
                "next_steps": next_steps,
                "times_until": times_until}
         return Response(out, status=status.HTTP_200_OK)
+
+
+class TemperatureLogView(APIView):
+    def get(self, request, format=None):
+        logs = sorted([l for l in os.listdir("/var/log/piwarmer/") if l.startswith("temperature-") and l.endswith(".log")])
+        data = {n: l for n, l in enumerate(logs)}
+        return Response(data, status=status.HTTP_200_OK)
