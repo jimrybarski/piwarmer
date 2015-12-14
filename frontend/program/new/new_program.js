@@ -65,9 +65,15 @@ $(document).ready(function(){
 
   // adds additional rows so any number of instructions can be given to the temperature controller
   $(document.body).on('click', '#add_button' ,function() {
-    var new_id = parseInt($("#temperature_settings tr:last").find('td:first').html()) + 1;
-    var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
-    $("#temperature_settings tr:last").after(new_row);
+    var last_id = parseInt($("#temperature_settings tr:last").find('td:first').html())
+    var last_item = $("#" + last_id).val()
+    if (last_item != "hold") {
+        var new_id = last_id + 1;
+        var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
+        $("#temperature_settings tr:last").after(new_row);
+    } else {
+        alert("You can't add any settings after a hold.")
+    }
   });
 
   http('driver', 'GET', null, function(d){
