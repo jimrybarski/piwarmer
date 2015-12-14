@@ -67,7 +67,6 @@ $(document).ready(function(){
   $(document.body).on('click', '#add_button' ,function() {
     var last_id = parseInt($("#temperature_settings tr:last").find('td:first').html())
     var last_item = $("#" + last_id).val()
-    alert("last thing: " + last_item)
     if (last_item != "hold") {
         var new_id = last_id + 1;
         var new_row = '<tr>' + get_new_row(new_id, "set") + '</tr>';
