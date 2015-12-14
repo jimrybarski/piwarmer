@@ -21,7 +21,7 @@ $(document).ready(function(){
         buttons = ''
         for (i=0; i<data.length; i++) {
             line = "<input type='submit' value='"
-            line += data[i]['name']
+            line += data[i]['name'].replace(/'/g, '&#39;')
             line += "'"
             line += "onclick='window.location.href=\"/program/manage/?id=" + data[i]['id'] + "\"'><br>"
             buttons += line;
