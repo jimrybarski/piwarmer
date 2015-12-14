@@ -143,7 +143,6 @@ class TemperatureProgram(object):
         setting = TemperatureSetting(temperature, temperature, duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
-        return self
 
     def _linear(self, start_temperature=60.0, end_temperature=37.0, duration=3600):
         log.info("Adding a linear gradient setting")
@@ -151,7 +150,6 @@ class TemperatureProgram(object):
         setting = TemperatureSetting(float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
-        return self
 
     def _repeat(self, num_repeats=3):
         log.info("Adding a repeat setting")
@@ -165,11 +163,9 @@ class TemperatureProgram(object):
             assert setting.duration is not None
             self._settings[(self._total_duration, self._total_duration + setting.duration)] = setting
             self._total_duration += setting.duration
-        return self
 
     def _hold(self, temperature=25.0):
         log.info("Adding a hold setting")
         setting = TemperatureSetting(float(temperature), float(temperature), None)
         self._settings[(self._total_duration, None)] = setting
         self._has_hold = True
-        return self
