@@ -20,7 +20,7 @@ $(document).ready(function(){
     http('program?user=' + get_id('user'), 'GET', null, function(data){
         buttons = ''
         for (i=0; i<data.length; i++) {
-            line = "<input type='submit' value='"
+            line = "<input type='submit' class='program_button' value='"
             line += data[i]['name']
             line += "'"
             line += "onclick='window.location.href=\"/program/manage/?id=" + data[i]['id'] + "\"'><br>"
