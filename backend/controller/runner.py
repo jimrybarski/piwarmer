@@ -34,7 +34,6 @@ class BaseRunner(object):
         self._api_data.clear()
 
     def _listen(self):
-        log.info("No programs to run right now. Waiting for a request to come in")
         while True:
             if self._api_data.active:
                 log.info("We need to run a program!")
@@ -76,6 +75,7 @@ class ProgramRunner(BaseRunner):
         self._program = None
         self._accumulated_error = None
         self._pid = None
+        self._temperature_log = None
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         log.debug("Exiting program runner.")
@@ -100,7 +100,6 @@ class ProgramRunner(BaseRunner):
             log.debug("API data cleared.")
 
     def _prerun(self):
-        # in the near future, the driver will be chosen by the user
         driver = self._api_data.driver
         driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
                             driver['max_accumulated_error'], driver['min_accumulated_error'])
@@ -108,6 +107,14 @@ class ProgramRunner(BaseRunner):
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
         log.info("Start time: %s" % self._start_time)
+
+        # Set up another logger for temperature logs
+        self._temperature_log = logging.getLogger("temperatures")
+        handler = logging.FileHandler('/var/log/piwarmer/temperature-%s.log' % self._start_time.strftime("%Y-%m-%d-%H-%M-%S"))
+        formatter = logging.Formatter('%(message)s')
+        handler.setFormatter(formatter)
+        self._temperature_log.addHandler(handler)
+        self._temperature_log.setLevel(logging.INFO)
         self._program = program.TemperatureProgram(self._api_data.program)
         self._heater.enable()
 
@@ -139,7 +146,6 @@ class ProgramRunner(BaseRunner):
             round_data.program = self._program
             # derive some data from the things that were just assigned
             round_data.desired_temperature = program.get_desired_temperature(round_data)
-            log.info("desired temp\t%s" % round_data.desired_temperature)
             round_data.seconds_left = program.calculate_seconds_left(round_data)
             round_data.next_steps, round_data.times_until = program.get_next_n_settings(5, round_data)
 
@@ -151,19 +157,18 @@ class ProgramRunner(BaseRunner):
 
             # I/O - read the temperature
             round_data.current_temperature = self._thermometer.current_temperature
-            if round_data.current_temperature:
-                log.debug("actual temp\t%s" % round_data.current_temperature)
             if not round_data.can_update_pid:
                 # something went wrong - maybe the thermometer returned NaN as it does sometimes,
                 # maybe something got unplugged. We'll just try again until explicitly told to stop
-                log.warn("Can't update PID!")
                 continue
 
             # make calculations based on I/O having worked
             round_data.duty_cycle, self._accumulated_error = self._pid.update(round_data)
 
+            self._temperature_log.info("%s\t%s\t%s" % (round_data.current_temperature,
+                                                       round_data.desired_temperature,
+                                                       round_data.duty_cycle))
             # run the heating sequence, if necessary
-            log.debug("duty cycle\t%s" % round_data.duty_cycle)
             self._heater.heat(round_data.duty_cycle)
 
             # update the API data so the frontend can know what's happening

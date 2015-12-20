@@ -1,4 +1,3 @@
-import json
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from . import serializers, models
 from interface import APIData
 import logging
+import os
 
 log = logging.getLogger(__name__)
 
@@ -78,3 +78,18 @@ class CurrentView(APIView):
                "next_steps": next_steps,
                "times_until": times_until}
         return Response(out, status=status.HTTP_200_OK)
+
+
+class TemperatureLogView(APIView):
+    def get(self, request, format=None):
+        log_dir = "/var/log/piwarmer/"
+        if 'date' in self.request.query_params.keys():
+            try:
+                with open(log_dir + "temperature-%s.log" % self.request.query_params['date']) as f:
+                    return Response({n: line.rstrip() for n, line in enumerate(f)}, status=status.HTTP_200_OK)
+            except OSError:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        logs = sorted([l for l in os.listdir(log_dir) if l.startswith("temperature-") and l.endswith(".log")])
+        data = {n: l for n, l in enumerate(logs)}
+        return Response(data, status=status.HTTP_200_OK)

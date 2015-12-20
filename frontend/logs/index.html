@@ -1,13 +1,12 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>Raspberry PID: New Program</title>
+    <title>Raspberry PID: Logs</title>
     <script type="text/javascript" src="../../jquery.min.js"></script>
     <script type="text/javascript" src="../../common.js"></script>
-    <script type="text/javascript" src="/program/new/new_program.js"></script>
+    <script type="text/javascript" src="/logs/log.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="../../rpid.css" />
   </head>
-
   <body>
   <ul>
           <li><a class="breadcrumb" href="/">Users</a></li>
@@ -17,20 +16,7 @@
           <li><a class="breadcrumb" href="/help">Help</a></li>
       </ul>
       <br>
-    <h3>Create New Program</h3>
-    <input type="text" name="name" id="name" placeholder="Program Name">
-    <select id="driver">
-        <option>Choose a Driver...</option>
-    </select>
-    <br><br>
-    <form name="settings" id="settings">
-    <table>
-      <tbody id="temperature_settings">
-        <tr></tr>
-      </tbody>
-    </table> 
-    </form>
-    <input type="submit" value="Add Step" id="add_button"><input type="submit" name="save" class="oddball" value="Save program!" id="save"><br><br>
+    <h3>Temperature Logs</h3>
+    <div id="logs"></div>
   </body>
-
 </html>
