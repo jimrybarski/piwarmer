@@ -110,7 +110,7 @@ class ProgramRunner(BaseRunner):
 
         # Set up another logger for temperature logs
         self._temperature_log = logging.getLogger("temperatures")
-        handler = logging.FileHandler('/var/log/piwarmer/temperature-%s.log' % self._start_time.strftime("%Y-%m-%d"))
+        handler = logging.FileHandler('/var/log/piwarmer/temperature-%s.log' % self._start_time.strftime("%Y-%m-%d-%H-%M-%S"))
         formatter = logging.Formatter('%(message)s')
         handler.setFormatter(formatter)
         self._temperature_log.addHandler(handler)
@@ -146,7 +146,6 @@ class ProgramRunner(BaseRunner):
             round_data.program = self._program
             # derive some data from the things that were just assigned
             round_data.desired_temperature = program.get_desired_temperature(round_data)
-            log.info("desired temp\t%s" % round_data.desired_temperature)
             round_data.seconds_left = program.calculate_seconds_left(round_data)
             round_data.next_steps, round_data.times_until = program.get_next_n_settings(5, round_data)
 
@@ -161,7 +160,6 @@ class ProgramRunner(BaseRunner):
             if not round_data.can_update_pid:
                 # something went wrong - maybe the thermometer returned NaN as it does sometimes,
                 # maybe something got unplugged. We'll just try again until explicitly told to stop
-                log.warn("Can't update PID!")
                 continue
 
             # make calculations based on I/O having worked
