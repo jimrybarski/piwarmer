@@ -15,7 +15,6 @@ except (SystemError, ImportError):
 class Heater(object):
     PWM_PIN = 16
     ENABLE_PIN = 20
-    HERTZ = 1.0  # the response is super slow so 1 Hz is fine
     DANGER = False
 
     def __init__(self):
@@ -35,8 +34,8 @@ class Heater(object):
 
     def heat(self, duty_cycle):
         assert 0.0 <= duty_cycle <= 100.0
-        on_time = (1.0 / Heater.HERTZ) * duty_cycle / 100.0
-        off_time = (1.0 / Heater.HERTZ) - on_time
+        on_time = duty_cycle / 100.0
+        off_time = 1.0 - on_time
         GPIO.output(Heater.PWM_PIN, GPIO.HIGH)
         time.sleep(on_time)
         GPIO.output(Heater.PWM_PIN, GPIO.LOW)
