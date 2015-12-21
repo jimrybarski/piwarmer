@@ -1,31 +1,11 @@
 class Driver(object):
     def __init__(self, name, kp, ki, kd, error_max, error_min):
-        self._name = name
-        self._kp = kp
-        self._ki = ki
-        self._kd = kd
-        self._error_max = error_max
-        self._error_min = error_min
-
-    @property
-    def kp(self):
-        return self._kp
-
-    @property
-    def ki(self):
-        return self._ki
-
-    @property
-    def kd(self):
-        return self._kd
-
-    @property
-    def error_max(self):
-        return self._error_max
-
-    @property
-    def error_min(self):
-        return self._error_min
+        self.name = name
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
+        self.error_max = error_max
+        self.error_min = error_min
 
 
 class PID:

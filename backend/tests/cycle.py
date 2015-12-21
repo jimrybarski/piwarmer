@@ -18,3 +18,7 @@ class CurrentCycleTests(unittest.TestCase):
         self.cycle.current_time = datetime(2015, 12, 12, 12, 12, 12)
         self.assertEqual(self.cycle.seconds_left, 120)
 
+    def test_seconds_elapsed(self):
+        self.cycle.start_time = datetime(2015, 12, 12, 12, 11, 12)
+        self.cycle.current_time = datetime(2015, 12, 12, 12, 12, 14)
+        self.assertEqual(self.cycle.seconds_elapsed, 62)
