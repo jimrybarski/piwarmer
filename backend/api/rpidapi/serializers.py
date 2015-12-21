@@ -1,3 +1,8 @@
+"""
+This just automatically builds out the serialization of each object in the database,
+so that Javascript can interact with the API using JSON.
+
+"""
 from rest_framework import serializers
 from rpidapi import models
 
