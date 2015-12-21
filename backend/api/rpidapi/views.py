@@ -1,10 +1,11 @@
+from interface.main import CurrentState
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from . import serializers, models
-from interface import APIData
+import serializers
 import logging
+import models
 import os
 
 log = logging.getLogger(__name__)
@@ -31,22 +32,22 @@ class ProgramViewset(ModelViewSet):
 
 class StartView(APIView):
     def post(self, request, format=None):
-        data = APIData()
+        current_state = CurrentState()
         try:
             log.info("Program start requested")
             log.info(str(request.data))
             driver = models.Driver.objects.get(id=request.data['driver'])
             json_driver = serializers.DriverSerializer(driver)
-            data.driver = json_driver.data
+            current_state.driver = json_driver.data
 
             program = models.Program.objects.get(id=request.data['program'])
             json_program = serializers.ProgramSerializer(program)
-            data.program = json_program.data['steps']
+            current_state.program = json_program.data['steps']
         except Exception as e:
             log.exception("Could not start program")
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
-            data.activate()
+            current_state.activate()
         log.info("Program started fine")
         return Response(status=status.HTTP_200_OK)
 
@@ -54,29 +55,19 @@ class StartView(APIView):
 class StopView(APIView):
     def post(self, request, format=None):
         log.info("Stop program requested")
-        data = APIData()
-        data.deactivate()
-        data.clear()
+        current_state = CurrentState()
+        current_state.deactivate()
+        current_state.clear()
         log.info("Program stopped OK")
         return Response(status=status.HTTP_200_OK)
 
 
 class CurrentView(APIView):
     def get(self, request, format=None):
-        data = APIData()
-        current_temp = data.current_temp
-        current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
-        next_steps = data.next_steps or ["---"]
-        times_until = data.times_until or ["---"]
-        try:
-            time_left = data.time_left
-        except TypeError:
-            time_left = None
-        out = {"setting": current_setting,
-               "temp": str(current_temp) + " &deg;C" if current_temp else "---",
-               "time_left": time_left or "---",
-               "next_steps": next_steps,
-               "times_until": times_until}
+        current_state = CurrentState()
+        out = {"step": current_state.current_step,
+               "temp": current_state.current_temp,
+               }
         return Response(out, status=status.HTTP_200_OK)
 
 
