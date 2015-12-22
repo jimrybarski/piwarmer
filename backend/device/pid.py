@@ -1,3 +1,7 @@
+import collections
+import numpy as np
+
+
 class Driver(object):
     def __init__(self, name, kp, ki, kd, error_max, error_min):
         self.name = name
@@ -8,27 +12,38 @@ class Driver(object):
         self.error_min = error_min
 
 
-class PID:
+class PID(object):
+    """
+    Calculates what duty cycle would be best to achieve a certain temperature, while attempting to prevent overshooting (and undershooting).
+
+    """
     ROOM_TEMP = 20.0
 
-    def __init__(self, driver):
+    def __init__(self, driver, memory=6):
         self._kp = driver.kp
         self._ki = driver.ki
+        self._kd = driver.kd
         self._accumulated_error_max = driver.error_max
         self._accumulated_error_min = driver.error_min
+        # generate some things needed to calculate the derivative
+        x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        self._ticks = np.vstack([x, np.ones(len(x))]).T
+        self._past_errors = collections.deque([0.0, 0.0, 0.0, 0.0, 0.0], maxlen=memory)
 
-    def update(self, data):
-        assert data.desired_temperature is not None
-        assert data.current_temperature is not None
-        assert data.accumulated_error is not None
+    def update(self, cycle_data):
+        assert cycle_data.desired_temperature is not None
+        assert cycle_data.current_temperature is not None
+        assert cycle_data.accumulated_error is not None
 
-        error = data.desired_temperature - data.current_temperature
-        new_accumulated_error = self._calculate_accumulated_error(error, data.accumulated_error)
+        error = cycle_data.desired_temperature - cycle_data.current_temperature
+        self._past_errors.append(error)
+        new_accumulated_error = self._calculate_accumulated_error(error, cycle_data.accumulated_error)
         p = self._kp * error
         i = new_accumulated_error * self._ki
+        d = self._kd * np.linalg.lstsq(self._ticks, np.array(self._past_errors))[0][0]
         # scale the result by the temperature to give it some approximation of the neighborhood it should be in
         # I don't think this is mathematically sound and might just work purely by coincidence
-        total = 100 * int(p + i) / abs(data.desired_temperature)
+        total = 100 * int(p + i + d) / abs(cycle_data.desired_temperature)
         duty_cycle = max(0, min(100, total))
         return duty_cycle, new_accumulated_error
 

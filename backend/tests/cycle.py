@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from device.cycle import CurrentCycle
+from backend.device.cycle import CurrentCycle
 
 
 class MockProgram(object):

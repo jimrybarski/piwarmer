@@ -1,14 +1,11 @@
 from device import ProgramRunner
 import logging
 from logging.handlers import RotatingFileHandler
-import heater
+from device import heater
 from interface import CurrentState
-import thermometer
-from dummy import FakeMAX31855
-try:
-    import Adafruit_MAX31855.MAX31855 as MAX31855
-except ImportError:
-    MAX31855 = FakeMAX31855
+from device import thermometer
+import Adafruit_MAX31855.MAX31855 as MAX31855
+import RPi.GPIO as GPIO
 
 # Disable the temperature probe logger because it produces annoying and useless messages
 maxlog = logging.getLogger('Adafruit_MAX31855.MAX31855')
@@ -26,6 +23,6 @@ log.setLevel(logging.DEBUG)
 if __name__ == "__main__":
     current_state = CurrentState()
     thermometer = thermometer.Thermometer(MAX31855.MAX31855(24, 23, 18))
-    heater = heater.Heater()
+    heater = heater.Heater(GPIO)
     with ProgramRunner(current_state, thermometer, heater) as program:
         program.run()

@@ -92,6 +92,7 @@ class CurrentView(APIView):
 class TemperatureLogView(APIView):
     """
     SHOULD provide links to each log, so you can see their data, however it currently just shows a list of logs available.
+    This is just not completely implemented yet.
 
     """
     def get(self, request, format=None):
