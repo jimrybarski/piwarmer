@@ -20,15 +20,20 @@ class PID(object):
     ROOM_TEMP = 20.0
 
     def __init__(self, driver, memory=6):
+        memory = int(memory)
+        assert memory > 0
         self._kp = driver.kp
         self._ki = driver.ki
         self._kd = driver.kd
         self._accumulated_error_max = driver.error_max
         self._accumulated_error_min = driver.error_min
         # generate some things needed to calculate the derivative
-        x = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        x = np.array([float(i) for i in range(memory)])
         self._ticks = np.vstack([x, np.ones(len(x))]).T
-        self._past_errors = collections.deque([0.0, 0.0, 0.0, 0.0, 0.0], maxlen=memory)
+        # seed the past errors with zeros. this will diminish the effect of the derivative for the
+        # first few (i.e. len(memory)) seconds, but after that it will be correct. It is therefore best
+        # to use a small value for memory, probably less than 10
+        self._past_errors = collections.deque([0.0 for i in range(memory)], maxlen=memory)
 
     def update(self, cycle_data):
         assert cycle_data.desired_temperature is not None
@@ -40,7 +45,7 @@ class PID(object):
         new_accumulated_error = self._calculate_accumulated_error(error, cycle_data.accumulated_error)
         p = self._kp * error
         i = new_accumulated_error * self._ki
-        d = self._kd * np.linalg.lstsq(self._ticks, np.array(self._past_errors))[0][0]
+        d = self._calculate_derivative(self._kd, self._past_errors)
         # scale the result by the temperature to give it some approximation of the neighborhood it should be in
         # I don't think this is mathematically sound and might just work purely by coincidence
         total = 100 * int(p + i + d) / abs(cycle_data.desired_temperature)
@@ -54,3 +59,6 @@ class PID(object):
         new_accumulated_error = min(new_accumulated_error, self._accumulated_error_max)
         new_accumulated_error = max(new_accumulated_error, self._accumulated_error_min)
         return new_accumulated_error
+
+    def _calculate_derivative(self, kd, past_errors):
+        return kd * np.linalg.lstsq(self._ticks, np.array(past_errors))[0][0]
