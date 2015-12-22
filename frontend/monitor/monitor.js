@@ -10,6 +10,14 @@ function mode_to_human_readable_text(program) {
     }
 }
 
+function duration_to_human_readable(program) {
+    if (program.mode == "hold") {
+        return "---"
+    }
+    return program.duration
+}
+
+
 function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
@@ -24,9 +32,18 @@ function update() {
 //            beep();
 //        }
 //        // Build up the table of each program step
-        var steps = "<table><thead class='setting'><tr><th scope='col'>Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
+        var steps = "<table><thead class='setting'><tr><th scope='col'>!!</th><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>"
             for (i=0; i<Object.keys(data.program).length; i++) {
-                line = "<tr><td>" + mode_to_human_readable_text(data.program[i]) + "</td></tr>"
+                line = "<tr>"
+                if (data.step == i) {
+                    line += "<td>**</td>"
+                }
+                else {
+                    line += "<td>&nbsp;&nbsp;</td>"
+                }
+                line += "<td>" + mode_to_human_readable_text(data.program[i]) + "</td>"
+                line += "<td>" + duration_to_human_readable(data.program[i]) + "</td>"
+                line += "</tr>"
                 steps += line
             }
         steps += "</tfoot></table>"

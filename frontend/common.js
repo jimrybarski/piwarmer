@@ -33,4 +33,7 @@ function http(endpoint, verb, d, func){
         alert("The API could not be reached.");
       },
     });
+    if (verb == "POST") {
+        return false;
+    }
 }
