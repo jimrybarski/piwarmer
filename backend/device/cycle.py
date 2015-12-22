@@ -27,6 +27,7 @@ class CurrentCycle(object):
     def current_step(self):
         try:
             start, stop, setting = self._get_current_setting()
+
             return setting.index
         except ProgramOverError:
             return None

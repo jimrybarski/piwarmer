@@ -23,7 +23,7 @@ function update() {
     http("current", 'GET', null, function(data){
         // Update the most important stats
         $("#current_temp").html("Temp: " + data.temp)
-        $("#current_step").html("Current Setting: " + data.step)
+        $("#current_step").html("Current Step: " + data.step)
 
         var show_stop_button = (Object.keys(data.program).length > 0)
 
@@ -32,14 +32,13 @@ function update() {
 //            beep();
 //        }
 //        // Build up the table of each program step
-        var steps = "<table><thead class='setting'><tr><th scope='col'>!!</th><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>"
+        var steps = "<table><thead class='setting'><tr><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>"
             for (i=0; i<Object.keys(data.program).length; i++) {
-                line = "<tr>"
                 if (data.step == i) {
-                    line += "<td>**</td>"
+                    line = "<tr class='current_step'>"
                 }
                 else {
-                    line += "<td>&nbsp;&nbsp;</td>"
+                    line = "<tr>"
                 }
                 line += "<td>" + mode_to_human_readable_text(data.program[i]) + "</td>"
                 line += "<td>" + duration_to_human_readable(data.program[i]) + "</td>"

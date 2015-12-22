@@ -10,7 +10,7 @@ class CurrentState(redis.StrictRedis):
 
         """
         labels = ["current_temp",
-                  "current_setting",
+                  "current_step",
                   "time_left",
                   "active",
                   "program",

@@ -72,6 +72,10 @@ tbody[class="setting"] td {
     background:#d7e1c5;
 }
 
+tr[class="current_step"] {
+    background:#ffa500;
+}
+
 ul {
     list-style-type:none;
     margin:0;

@@ -71,15 +71,25 @@ class TemperatureProgram(object):
             if not self._has_hold:
                 action[mode](index, **parameters)
 
+    def _hhmmss_to_seconds(self, text):
+        if type(text) == int:
+            return text
+        seconds = 0
+        multiplier = 1
+        for val in text.split(':')[::-1]:
+            seconds += int(val) * multiplier
+            multiplier *= 60
+        return seconds
+
     def _set_temperature(self, index, temperature=25.0, duration=60):
         temperature = float(temperature)
-        duration = int(duration)
+        duration = self._hhmmss_to_seconds(duration)
         setting = TemperatureSetting(index, temperature, temperature, duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
 
     def _linear(self, index, start_temperature=60.0, end_temperature=37.0, duration=3600):
-        duration = int(duration)
+        duration = self._hhmmss_to_seconds(duration)
         setting = TemperatureSetting(index, float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
