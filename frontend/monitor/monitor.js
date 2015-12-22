@@ -37,6 +37,9 @@ function update() {
                 if (data.step == i) {
                     line = "<tr class='current_step'>"
                 }
+                else if (data.step > i) {
+                    line = "<tr class='completed_step'>"
+                }
                 else {
                     line = "<tr>"
                 }

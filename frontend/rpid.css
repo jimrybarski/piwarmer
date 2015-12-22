@@ -74,6 +74,11 @@ tbody[class="setting"] td {
 
 tr[class="current_step"] {
     background:#ffa500;
+    font-weight:bold;
+}
+
+tr[class="completed_step"] {
+    color:#a8a8a8;
 }
 
 ul {
