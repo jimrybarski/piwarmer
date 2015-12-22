@@ -23,11 +23,11 @@ class TemperatureSetting(object):
 
 
 class TemperatureProgram(object):
-    def __init__(self, json_program):
+    def __init__(self, steps):
         self._settings = {}
         self._has_hold = False
         self._total_duration = 0.0
-        self._load_json(json_program)
+        self._load_program(steps)
 
     @property
     def settings(self):
@@ -37,13 +37,13 @@ class TemperatureProgram(object):
     def total_duration(self):
         return self._total_duration
 
-    def _load_json(self, steps):
+    def _load_program(self, steps):
         """
         steps will be a dict like:
         {
-          "1": {"mode": "set", "temperature": 80.0, "duration": "1:30:00"},
-          "2": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": "12:00"},
-          "3": {"mode": "hold", "temperature": 37.0}
+          "0": {"mode": "set", "temperature": 80.0, "duration": "1:30:00"},
+          "1": {"mode": "linear", "start_temperature": 80.0, "end_temperature": 37.0, "duration": "12:00"},
+          "2": {"mode": "hold", "temperature": 37.0}
         }
 
         Modes and attributes supported:
@@ -62,9 +62,10 @@ class TemperatureProgram(object):
                   "repeat": self._repeat,
                   "hold": self._hold
                   }
+        # Go through the list of steps, ordered by the integer value of the index (which is a string in the original JSON)
         for index, parameters in sorted(steps.items(), key=lambda x: int(x[0])):
             # Get the mode and remove it from the parameters
-            mode = parameters.pop("mode", None)
+            mode = parameters.pop("mode")
             # Run the desired action using the parameters given
             # Parameters of methods must match the keys exactly!
             if not self._has_hold:

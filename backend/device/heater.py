@@ -36,8 +36,10 @@ class Heater(object):
 
     def heat(self, duty_cycle):
         on_time, off_time = self._calculate_pwm(duty_cycle)
-        self._gpio.output(Heater.PWM_PIN, self._gpio.HIGH)
-        time.sleep(on_time)
+        if on_time:
+            # don't want to rapidly switch this pin on and then off unless we need to
+            self._gpio.output(Heater.PWM_PIN, self._gpio.HIGH)
+            time.sleep(on_time)
         self._gpio.output(Heater.PWM_PIN, self._gpio.LOW)
         time.sleep(off_time)
 

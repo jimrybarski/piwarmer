@@ -17,9 +17,10 @@ class BaseRunner(object):
     program. That has not yet been written though.
 
     """
-    def __init__(self, current_state, thermometer):
+    def __init__(self, current_state, thermometer, heater):
         self._current_state = current_state
         self._thermometer = thermometer
+        self._heater = heater
 
     def run(self):
         while True:
@@ -28,24 +29,56 @@ class BaseRunner(object):
             self._prerun()
             self._run()
 
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        log.debug("Exiting program runner.")
+        if exc_type:
+            log.exception("Abnormal termination!")
+        self._shutdown()
+
+    def _shutdown(self):
+        log.debug("Shutting down heater.")
+        try:
+            self._heater.disable()
+        except:
+            log.exception("DANGER! HEATER DID NOT SHUT DOWN")
+        else:
+            log.debug("Heater shutdown successful.")
+        log.debug("Clearing API data.")
+        try:
+            self._current_state.clear()
+        except:
+            log.exception("Failed to clear API data!")
+        else:
+            log.debug("API data cleared.")
+
     def __enter__(self):
         return self
 
     def _boot(self):
+        """
+        Unsets the current program. We require that this runs before every loop to prevent accidentally starting a program whose parameters were somehow left in Redis.
+
+        """
         log.info("Booting! About to clear API data")
         self._current_state.clear()
 
     def _listen(self):
+        """
+        Wait until the "active" key is on in Redis before starting a program.
+
+        """
         while True:
             if self._current_state.active:
                 log.info("We need to run a program!")
                 break
             else:
                 try:
-                    # try to display the current temperature if at all possible
+                    # update the current temperature in Redis so that we can see how hot the heater is, even if we're not running a program
                     self._current_state.current_temp = self._thermometer.current_temperature
                 except:
-                    pass
+                    # absolutely do not allow this loop to terminate. Though if it did, supervisord would restart the process, but that's annoying and
+                    # results in some downtime
+                    log.exception("Something went wrong in the _listen() loop!")
                 time.sleep(1)
 
     @abstractmethod
@@ -67,41 +100,22 @@ class BaseRunner(object):
 
 class ProgramRunner(BaseRunner):
     """
-    Runs a pre-defined program.
+    Runs a pre-defined program, and ensures that shutdown
 
     """
     def __init__(self, current_state, thermometer, heater):
-        super(ProgramRunner, self).__init__(current_state, thermometer)
-        self._heater = heater
+        super(ProgramRunner, self).__init__(current_state, thermometer, heater)
         self._start_time = None
         self._program = None
         self._accumulated_error = None
         self._pid = None
         self._temperature_log = None
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        log.debug("Exiting program runner.")
-        if exc_type:
-            log.exception("Abnormal termination!")
-        self._shutdown()
-
-    def _shutdown(self):
-        log.debug("Shutting down heater.")
-        try:
-            self._heater.disable()
-        except:
-            log.critical("DANGER! HEATER DID NOT SHUT DOWN")
-        else:
-            log.debug("Heater shutdown successful.")
-        log.debug("Clearing API data.")
-        try:
-            self._current_state.clear()
-        except:
-            log.exception("Failed to clear API data!")
-        else:
-            log.debug("API data cleared.")
-
     def _prerun(self):
+        """
+        Set up the PID for temperature control.
+
+        """
         driver = self._current_state.driver
         driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
                             driver['max_accumulated_error'], driver['min_accumulated_error'])
@@ -114,6 +128,10 @@ class ProgramRunner(BaseRunner):
         self._heater.enable()
 
     def _get_temperature_log(self):
+        """
+        Creates a machine-readable log of the temperature, the target temperature, and the duty cycle at 1-second intervals.
+
+        """
         # Set up another logger for temperature logs
         temperature_log = logging.getLogger("temperatures")
         handler = logging.FileHandler('/var/log/piwarmer/temperature-%s.log' % self._start_time.strftime("%Y-%m-%d-%H-%M-%S"))
@@ -130,6 +148,7 @@ class ProgramRunner(BaseRunner):
             assert self._thermometer is not None
             assert self._accumulated_error is not None
 
+            # check if the user pressed the stop button
             if not self._current_state.active:
                 log.info("The program has ended or been stopped")
                 self._shutdown()
@@ -154,11 +173,11 @@ class ProgramRunner(BaseRunner):
             # make calculations based on I/O having worked
             current_cycle.duty_cycle, self._accumulated_error = self._pid.update(current_cycle)
 
-            # save the temperature information to disk
+            # save the temperature information to a machine-readable log file
             self._temperature_log.info("%s\t%s\t%s" % (current_cycle.current_temperature,
                                                        current_cycle.desired_temperature,
                                                        current_cycle.duty_cycle))
-            # run the heating sequence, if necessary
+            # physically activate the heater, if necessary
             self._heater.heat(current_cycle.duty_cycle)
 
             # update the API data so the frontend can know what's happening

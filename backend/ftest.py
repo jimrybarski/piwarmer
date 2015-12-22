@@ -1,21 +1,27 @@
-from device.pid import PID, Driver
+from device import ProgramRunner
+import logging
+from logging.handlers import RotatingFileHandler
+from device import heater
+from interface import CurrentState
+from device import thermometer
+from device.dummy import MockGPIO, MockMAX31855
 
-class CycleData(object):
-    pass
+# Disable the temperature probe logger because it produces annoying and useless messages
+maxlog = logging.getLogger('Adafruit_MAX31855.MAX31855')
+maxlog.disabled = True
+
+# Set up a logger for application notifications and errors
+log = logging.getLogger()
+handler = RotatingFileHandler('/home/jim/heater.log', maxBytes=1024*1024*100, backupCount=5)
+formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t\t%(message)s')
+handler.setFormatter(formatter)
+log.addHandler(handler)
+log.setLevel(logging.DEBUG)
 
 
-cd = CycleData()
-
-cd.desired_temperature = 72
-cd.current_temperature = 25
-cd.accumulated_error = 0
-
-driver = Driver("test", 10.0, 1.0, 3.0, 10, -10)
-pid = PID(driver)
-
-temperatures = [25.0, 32.0, 37.0, 45.0, 53.0, 65.0, 68.0, 68.0, 68.0, 68.0, 68.0, 68.0, 68.0, 68.0, 71.0, 73.0, 78.0, 79.0, 83.0, 78.0, 74.0, 71.0, 70.0, 72.0, 78.0, 65.0]
-
-for temp in temperatures:
-    cd.current_temperature = temp
-    duty_cycle, cd.accumulated_error = pid.update(cd)
-    print(cd.current_temperature, duty_cycle)
+if __name__ == "__main__":
+    current_state = CurrentState()
+    thermometer = thermometer.Thermometer(MockMAX31855())
+    heater = heater.Heater(MockGPIO)
+    with ProgramRunner(current_state, thermometer, heater) as program:
+        program.run()
