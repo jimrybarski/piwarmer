@@ -42,7 +42,7 @@ class CurrentState(redis.StrictRedis):
         :rtype:     dict
 
         """
-        return json.loads(self.get("program"))
+        return json.loads(self.get("program") or "{}")
 
     @program.setter
     def program(self, value):

@@ -1,33 +1,37 @@
+function mode_to_human_readable_text(program) {
+    if (program.mode == "set") {
+        return "Set to " + program.temperature + "°C"
+    }
+    if (program.mode == "linear") {
+        return "Linear gradient from " + program.start_temperature + "°C" + " to " + program.end_temperature + "°C"
+    }
+    if (program.mode == "hold") {
+        return "Hold at " + program.temperature + "°C"
+    }
+}
+
 function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
         // Update the most important stats
         $("#current_temp").html("Temp: " + data.temp)
-        $("#current_temperature_setting").html("Current Setting: " + data.next_steps[0])
-        $("#time_left").html("Time remaining: " + data.time_left)
-        var show_stop_button = (data.time_left != '---')
-        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
-            console.log("Beeping!")
-            beep();
-        }
-        // Build up the table of next steps
-        var next_steps = "<table><thead class='setting'><tr><th scope='col'>Next Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
-            if (Object.keys(data.next_steps).length > 1) {
-                for (i=1; i<Object.keys(data.next_steps).length; i++) {
-                    line = "<tr><td>" + data.next_steps[i] + "</td><td>" + data.times_until[i] + "</td></tr>"
-                    if (data.times_until[i] == "00:00:01") {
-                        beep();
-                    }
-                    next_steps += line
-                }
-            }
-            else {
-                next_steps += "<tr><td>---</td><td>---</td></tr>"
-            }
+        $("#current_step").html("Current Setting: " + data.step)
 
-        next_steps += "</tfoot></table>"
+        var show_stop_button = (Object.keys(data.program).length > 0)
 
-        $("#next_steps").html(next_steps)
+//        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
+//            console.log("Beeping!")
+//            beep();
+//        }
+//        // Build up the table of each program step
+        var steps = "<table><thead class='setting'><tr><th scope='col'>Step</th><th>Starts In</th></tr></thead><tfoot class='setting'>"
+            for (i=0; i<Object.keys(data.program).length; i++) {
+                line = "<tr><td>" + mode_to_human_readable_text(data.program[i]) + "</td></tr>"
+                steps += line
+            }
+        steps += "</tfoot></table>"
+
+        $("#steps").html(steps)
 
         if (show_stop_button) {
             $("#stop").prop('disabled', false);
@@ -43,7 +47,6 @@ function update() {
 }
 
 $(document).ready(function(){
-
     // We want to stop the program, but keep monitoring the temperature.
     $("#stop").click(function()
         {
@@ -62,6 +65,6 @@ $(document).ready(function(){
         }
     );
 
-    // once every second, get updated information about the program and the heater from API
+    // once half second, get updated information about the program and the heater from API
     var intervalID = window.setInterval(update, 1000);
 });
