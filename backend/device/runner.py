@@ -103,12 +103,13 @@ class ProgramRunner(BaseRunner):
     Runs a pre-defined program, and ensures that shutdown
 
     """
-    def __init__(self, current_state, thermometer, heater):
+    def __init__(self, current_state, thermometer, heater, log_dir='/var/log/piwarmer'):
         super(ProgramRunner, self).__init__(current_state, thermometer, heater)
-        self._start_time = None
-        self._program = None
         self._accumulated_error = None
+        self._log_dir = log_dir.rstrip("/")
         self._pid = None
+        self._program = None
+        self._start_time = None
         self._temperature_log = None
 
     def _prerun(self):
@@ -134,7 +135,7 @@ class ProgramRunner(BaseRunner):
         """
         # Set up another logger for temperature logs
         temperature_log = logging.getLogger("temperatures")
-        handler = logging.FileHandler('/var/log/piwarmer/temperature-%s.log' % self._start_time.strftime("%Y-%m-%d-%H-%M-%S"))
+        handler = logging.FileHandler('%s/temperature-%s.log' % (self._log_dir, self._start_time.strftime("%Y-%m-%d-%H-%M-%S")))
         formatter = logging.Formatter('%(message)s')
         handler.setFormatter(formatter)
         temperature_log.addHandler(handler)
