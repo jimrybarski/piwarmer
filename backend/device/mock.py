@@ -32,8 +32,8 @@ class MockMAX31855(object):
         return MockMAX31855()
 
     def readTempC(self):
-        # You can set the temperature through an environment variable to test it live, or if you don't care about the value
-        # it will pick a random one for you
-        temp = os.getenv('MOCKTEMP', random.randint(20, 105))
+        # You can set the temperature through an environment variable to test it live,
+        # or if you don't care about the value it will pick a random one for you
+        temp = os.getenv('MOCKTEMP', random.randint(20, 155))
         log.debug("Fake temperature: %s C" % temp)
         return temp

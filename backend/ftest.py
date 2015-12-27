@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 from device import heater
 from interface import CurrentState
 from device import thermometer
-from device.dummy import MockGPIO, MockMAX31855
+from device.mock import MockGPIO, MockMAX31855
 
 # Disable the temperature probe logger because it produces annoying and useless messages
 maxlog = logging.getLogger('Adafruit_MAX31855.MAX31855')

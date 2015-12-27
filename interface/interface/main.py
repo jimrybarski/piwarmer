@@ -111,7 +111,7 @@ class CurrentState(redis.StrictRedis):
         :rtype:    int
 
         """
-        return int(self.get("current_step"))
+        return self.get("current_step")
 
     @current_step.setter
     def current_step(self, step):

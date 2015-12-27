@@ -22,45 +22,49 @@ function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
         // Update the most important stats
-        $("#current_temp").html("Temp: " + data.temp)
-        $("#current_step").html("Current Step: " + data.step)
-
-        var show_stop_button = (Object.keys(data.program).length > 0)
+        $("#current_temp").html((data.temp < 100 ? "&nbsp;" : "") + data.temp + "°C");
+        var show_stop_button = (Object.keys(data.program).length > 0);
 
 //        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
-//            console.log("Beeping!")
 //            beep();
 //        }
-//        // Build up the table of each program step
-        var steps = "<table><thead class='setting'><tr><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>"
-            for (i=0; i<Object.keys(data.program).length; i++) {
+
+        // Build up the table of each program step
+        if (data.step) {
+            var steps = "<table><thead class='setting'><tr><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>";
+            for (var i = 1; i <= Object.keys(data.program).length; i++) {
+                var line;
                 if (data.step == i) {
-                    line = "<tr class='current_step'>"
+                    line = "<tr class='current_step'>";
                 }
                 else if (data.step > i) {
-                    line = "<tr class='completed_step'>"
+                    line = "<tr class='completed_step'>";
                 }
                 else {
-                    line = "<tr>"
+                    line = "<tr>";
                 }
-                line += "<td>" + mode_to_human_readable_text(data.program[i]) + "</td>"
-                line += "<td>" + duration_to_human_readable(data.program[i]) + "</td>"
-                line += "</tr>"
-                steps += line
+                line += "<td>" + mode_to_human_readable_text(data.program[i]) + "</td>";
+                line += "<td>" + duration_to_human_readable(data.program[i]) + "</td>";
+                line += "</tr>";
+                steps += line;
             }
-        steps += "</tfoot></table>"
+            steps += "</tfoot></table>";
 
-        $("#steps").html(steps)
+            $("#steps").html(steps);
+        }
 
         if (show_stop_button) {
-            $("#stop").prop('disabled', false);
-            $("#stop").val("STOP");
-            $("#stop").attr('style', 'background-color: #FF2020; color: #FFFFFF;')
+            $("#stop")
+                .prop('disabled', false)
+                .val("STOP")
+                .attr('style', 'background-color: #FF2020; color: #FFFFFF;');
         }
         else {
-            $("#stop").prop('disabled', true);
-            $("#stop").val("No program running");
-            $("#stop").attr('style', 'background-color: #806666; color: #FFFFFF;')
+            $("#steps").html('');
+            $("#stop")
+                .prop('disabled', true)
+                .val("No program running")
+                .attr('style', 'background-color: #806666; color: #FFFFFF;');
         }
     });
 }
@@ -70,7 +74,7 @@ $(document).ready(function(){
     $("#stop").click(function()
         {
             http("stop", 'POST', null, function(data){
-                alert("Program has stopped and the heater is shut down.")
+                alert("Program has stopped and the heater is shut down.");
             });
         }
     );

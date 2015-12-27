@@ -16,6 +16,10 @@ input[class="program_button"] {
    width: 500px;
 }
 
+.data {
+    font:60px "Courier New";
+}
+
 .program_setting {
     height: 70px;
     font-size: 24px;

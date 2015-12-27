@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 
+# Django
+*migrations/
 # C extensions
 *.so
 .idea/*
