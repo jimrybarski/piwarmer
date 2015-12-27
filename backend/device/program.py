@@ -1,10 +1,13 @@
-import copy
 import logging
 
 log = logging.getLogger(__name__)
 
 
 class TemperatureSetting(object):
+    """
+    The instructions for a single step in a program. Something like "Set to 37C for 30 seconds"
+
+    """
     def __init__(self, index, start_temp, final_temp, duration):
         assert duration is None or duration > 0.0
         self.index = index
@@ -13,6 +16,11 @@ class TemperatureSetting(object):
         self.duration = duration
 
     def get_temperature(self, seconds_into_setting):
+        """
+        Figure out what temperature we're supposed to have at a given time. Linear gradients will change with each
+        invocation, everything else will give a constant value.
+
+        """
         if self.duration is None:
             # Hold setting
             return self._start_temp
@@ -23,6 +31,10 @@ class TemperatureSetting(object):
 
 
 class TemperatureProgram(object):
+    """
+    Converts user-supplied JSON, representing a set of temperatures, to a list of TemperatureSetting objects.
+
+    """
     def __init__(self, steps):
         self._settings = {}
         self._has_hold = False
@@ -31,10 +43,18 @@ class TemperatureProgram(object):
 
     @property
     def settings(self):
+        """
+        An ordered list of TemperatureSetting objects.
+
+        """
         return self._settings
 
     @property
     def total_duration(self):
+        """
+        The total number of seconds it will take to run the program.
+
+        """
         return self._total_duration
 
     def _load_program(self, steps):
@@ -48,7 +68,6 @@ class TemperatureProgram(object):
         Note that indexes are 1-based!
 
         Modes and attributes supported:
-
         set: temperature, duration
         repeat: num_repeats
         hold: temperature
@@ -74,6 +93,10 @@ class TemperatureProgram(object):
                 action[mode](int(index), **parameters)
 
     def _hhmmss_to_seconds(self, text):
+        """
+        Converts human-readable times to seconds.
+
+        """
         if type(text) == int:
             return text
         seconds = 0
@@ -84,6 +107,10 @@ class TemperatureProgram(object):
         return seconds
 
     def _set_temperature(self, index, temperature=25.0, duration=60):
+        """
+        Keep the temperature constant.
+
+        """
         temperature = float(temperature)
         duration = self._hhmmss_to_seconds(duration)
         setting = TemperatureSetting(index, temperature, temperature, duration)
@@ -91,27 +118,20 @@ class TemperatureProgram(object):
         self._total_duration += duration
 
     def _linear(self, index, start_temperature=60.0, end_temperature=37.0, duration=3600):
+        """
+        Change the temperature evenly over a period of time.
+
+        """
         duration = self._hhmmss_to_seconds(duration)
         setting = TemperatureSetting(index, float(start_temperature), float(end_temperature), duration)
         self._settings[(self._total_duration, self._total_duration + duration)] = setting
         self._total_duration += duration
 
-    def _repeat(self, index, num_repeats=3):
-        new_settings = []
-        offset = 0
-        for i in range(int(num_repeats)):
-            for time_range, setting in sorted(self._settings.items()):
-                new_setting = copy.copy(setting)
-                new_setting.index = index + offset
-                new_settings.append(new_setting)
-                offset += 1
-        for setting in new_settings:
-            # The duration must be defined because otherwise it means there's a repeat after a hold - nonsensical
-            assert setting.duration is not None
-            self._settings[(self._total_duration, self._total_duration + setting.duration)] = setting
-            self._total_duration += setting.duration
-
     def _hold(self, index, temperature=25.0):
+        """
+        Keep the temperature constant indefinitely and do not allow any more settings to be added to the program.
+
+        """
         setting = TemperatureSetting(index, float(temperature), float(temperature), None)
         self._settings[(self._total_duration, None)] = setting
         self._has_hold = True

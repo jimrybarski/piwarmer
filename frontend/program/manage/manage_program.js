@@ -23,9 +23,6 @@ function display_step(data) {
     if (data['mode'] == 'hold') {
         return 'Hold at ' + data['temperature'] + '&deg;C'
     }
-    if (data['mode'] == 'repeat') {
-        return 'Repeat ' + data['num_repeats'] + ' times'
-    }
 }
 
 $(document).ready(function(){

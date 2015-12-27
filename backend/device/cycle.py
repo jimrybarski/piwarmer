@@ -1,9 +1,17 @@
 class ProgramOverError(Exception):
-    # No more steps left to run
+    """
+    Signals that we have no more steps to run.
+
+    """
     pass
 
 
 class CurrentCycle(object):
+    """
+    A container for data about the current state of the program and the sensor data. A new one is created each second
+    in the main loop and it is repopulated with fresh data each time.
+
+    """
     def __init__(self):
         self.accumulated_error = None
         self.active = None
@@ -36,7 +44,7 @@ class CurrentCycle(object):
     def desired_temperature(self):
         try:
             start, stop, setting = self._get_current_setting()
-            return float(setting.get_temperature(self.seconds_elapsed - start))
+            return setting.get_temperature(self.seconds_elapsed - start)
         except ProgramOverError:
             return None
 

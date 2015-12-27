@@ -14,6 +14,7 @@ function duration_to_human_readable(program) {
     if (program.mode == "hold") {
         return "---"
     }
+    // TODO: Convert seconds to HH:MM:SS
     return program.duration
 }
 
@@ -28,11 +29,12 @@ function update() {
         // Build up the table of each program step
         if (data.step) {
             // see if we have changed steps since the last check. If so, we should beep.
-            var previous_step = parseInt($("#current_step").val());
+            var current_step = $("#current_step");
+            var previous_step = parseInt(current_step.val());
             if (previous_step != data.step) {
                 beep();
             }
-            $("#current_step").val(data.step);
+            current_step.val(data.step);
             var steps = "<table><thead class='setting'><tr><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>";
             for (var i = 1; i <= Object.keys(data.program).length; i++) {
                 var line;
@@ -91,5 +93,5 @@ $(document).ready(function(){
     );
 
     // once half second, get updated information about the program and the heater from API
-    var intervalID = window.setInterval(update, 1000);
+    window.setInterval(update, 1000);
 });

@@ -42,10 +42,6 @@ function get_new_row(id, mode) {
     back = '<td class="program_step"><input type="text" name="temperature" placeholder="Temperature (&deg;C)"></td><td class="program_step"></td><td class="program_step"></td>';
   }
 
-  if (mode == "repeat") {
-    back = '<td class="program_step"><input type="text" name="num_repeats" placeholder="Number of repeats"></td><td class="program_step"></td><td class="program_step"></td>';
-  }
-
   return front + back;
 }
 
@@ -54,7 +50,7 @@ function get_id_td(id) {
 }
 
 function get_mode_td(id, mode) {
-  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">Set</option><option value="hold">Hold</option><option value="linear">Linear Gradient</option><option value="repeat">Repeat</option></select></td>';
+  return '<td><select id="' + id + '" class="mode" name="mode"><option value="set">Set</option><option value="hold">Hold</option><option value="linear">Linear Gradient</option></select></td>';
 }
 
 $(document).ready(function(){
