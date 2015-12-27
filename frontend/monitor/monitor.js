@@ -25,12 +25,14 @@ function update() {
         $("#current_temp").html((data.temp < 100 ? "&nbsp;" : "") + data.temp + "°C");
         var show_stop_button = (Object.keys(data.program).length > 0);
 
-//        if (data.time_left == "00:00:01" || data.time_left == "00:00:02") {
-//            beep();
-//        }
-
         // Build up the table of each program step
         if (data.step) {
+            // see if we have changed steps since the last check. If so, we should beep.
+            var previous_step = parseInt($("#current_step").val());
+            if (previous_step != data.step) {
+                beep();
+            }
+            $("#current_step").val(data.step);
             var steps = "<table><thead class='setting'><tr><th>Step</th><th>Duration</th></tr></thead><tfoot class='setting'>";
             for (var i = 1; i <= Object.keys(data.program).length; i++) {
                 var line;
