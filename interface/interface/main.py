@@ -2,7 +2,7 @@ import redis
 import json
 
 
-class CurrentState(redis.StrictRedis):
+class APIInterface(redis.StrictRedis):
     def clear(self):
         """
         Resets all data, essentially stopping the current program and going back into a state where we're waiting

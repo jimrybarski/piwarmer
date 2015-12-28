@@ -2,7 +2,7 @@ from device import ProgramRunner
 import logging
 from logging.handlers import RotatingFileHandler
 from device import heater
-from interface import CurrentState
+from interface import APIInterface
 from device import thermometer
 from device.mock import MockGPIO, MockMAX31855
 
@@ -20,8 +20,8 @@ log.setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":
-    current_state = CurrentState()
+    api_interface = APIInterface()
     thermometer = thermometer.Thermometer(MockMAX31855())
     heater = heater.Heater(MockGPIO)
-    with ProgramRunner(current_state, thermometer, heater) as program:
+    with ProgramRunner(api_interface, thermometer, heater) as program:
         program.run()

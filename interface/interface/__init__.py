@@ -1,1 +1,1 @@
-from main import CurrentState
+from main import APIInterface

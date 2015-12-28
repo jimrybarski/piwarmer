@@ -1,4 +1,4 @@
-from interface import CurrentState
+from interface import APIInterface
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,7 +38,7 @@ class StartView(APIView):
 
     """
     def post(self, request, format=None):
-        current_state = CurrentState()
+        api_interface = APIInterface()
         try:
             log.info("Program start requested")
             # look up the driver and program in the database
@@ -48,14 +48,14 @@ class StartView(APIView):
             json_driver = serializers.DriverSerializer(driver)
             json_program = serializers.ProgramSerializer(program)
             # update the selected driver and program in Redis, so that our backend can know which ones to use
-            current_state.driver = json_driver.data
-            current_state.program = json_program.data['steps']
+            api_interface.driver = json_driver.data
+            api_interface.program = json_program.data['steps']
         except Exception as e:
             log.exception("Could not start program")
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
             # Flip the switch and the backend will start running the program once it detects the change (usually within a second)
-            current_state.activate()
+            api_interface.activate()
         log.info("Program started fine")
         return Response(status=status.HTTP_200_OK)
 
@@ -67,11 +67,11 @@ class StopView(APIView):
     """
     def post(self, request, format=None):
         log.info("Stop program requested")
-        current_state = CurrentState()
+        api_interface = APIInterface()
         # Turn off the heater
-        current_state.deactivate()
+        api_interface.deactivate()
         # Delete the program and driver from Redis so that the backend realizes we're done
-        current_state.clear()
+        api_interface.clear()
         log.info("Program stopped OK")
         return Response(status=status.HTTP_200_OK)
 
@@ -82,10 +82,10 @@ class CurrentView(APIView):
 
     """
     def get(self, request, format=None):
-        current_state = CurrentState()
-        out = {"step": current_state.current_step,
-               "temp": current_state.current_temp,
-               "program": current_state.program
+        api_interface = APIInterface()
+        out = {"step": api_interface.current_step,
+               "temp": api_interface.current_temp,
+               "program": api_interface.program
                }
         return Response(out, status=status.HTTP_200_OK)
 

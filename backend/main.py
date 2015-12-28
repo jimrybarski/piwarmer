@@ -2,7 +2,7 @@ from device import ProgramRunner
 import logging
 from logging.handlers import RotatingFileHandler
 from device import heater
-from interface import CurrentState
+from interface import APIInterface
 from device import thermometer
 import Adafruit_MAX31855.MAX31855 as MAX31855
 import RPi.GPIO as GPIO
@@ -21,8 +21,8 @@ log.setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":
-    current_state = CurrentState()
+    api_interface = APIInterface()
     thermometer = thermometer.Thermometer(MAX31855.MAX31855(24, 23, 18))
     heater = heater.Heater(GPIO)
-    with ProgramRunner(current_state, thermometer, heater) as program:
+    with ProgramRunner(api_interface, thermometer, heater) as program:
         program.run()

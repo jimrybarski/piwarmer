@@ -1,4 +1,4 @@
-class ProgramOverError(Exception):
+class ProgramOver(Exception):
     """
     Signals that we have no more steps to run.
 
@@ -22,6 +22,14 @@ class CurrentCycle(object):
         self.start_time = None
 
     def _get_current_setting(self):
+        """
+        Finds the setting that we should currently be using to calculate the target temperature.
+
+        :return:    start time (in seconds), stop time (in seconds), the program setting
+        :rtype:     int, int, ProgramSetting
+        :raises:    ProgramOver
+
+        """
         assert self.program is not None
         assert self.current_time is not None
         assert self.start_time is not None
@@ -29,27 +37,44 @@ class CurrentCycle(object):
             if stop is None or start <= self.seconds_elapsed < stop:
                 # we're either at a Hold setting (stop is None) or we've found the current setting
                 return start, stop, setting
-        raise ProgramOverError
+        raise ProgramOver
 
     @property
     def current_step(self):
+        """
+        Gets the index of the current program setting.
+
+        :rtype:     int
+
+        """
         try:
             start, stop, setting = self._get_current_setting()
-
             return setting.index
-        except ProgramOverError:
+        except ProgramOver:
             return None
 
     @property
     def desired_temperature(self):
+        """
+        Gets the target temperature for the current setting.
+
+        :rtype:     float
+
+        """
         try:
             start, stop, setting = self._get_current_setting()
             return setting.get_temperature(self.seconds_elapsed - start)
-        except ProgramOverError:
+        except ProgramOver:
             return None
 
     @property
     def seconds_left(self):
+        """
+        The number of seconds until the program is over.
+
+        :rtype:     int
+
+        """
         assert self.program is not None
         assert self.current_time is not None
         assert self.start_time is not None
@@ -57,12 +82,12 @@ class CurrentCycle(object):
 
     @property
     def steps(self):
+        """
+        Yields program settings in order along with their start and stop times (in seconds from the start of the program).
+
+        """
         for (start, stop), setting in sorted(self.program.settings.items()):
             yield start, stop, setting
-
-    @property
-    def can_update_pid(self):
-        return self.desired_temperature is not None
 
     @property
     def seconds_elapsed(self):

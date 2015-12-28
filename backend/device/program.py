@@ -69,7 +69,6 @@ class TemperatureProgram(object):
 
         Modes and attributes supported:
         set: temperature, duration
-        repeat: num_repeats
         hold: temperature
         linear: temperature, duration
 
@@ -79,7 +78,6 @@ class TemperatureProgram(object):
         """
         action = {"set": self._set_temperature,
                   "linear": self._linear,
-                  "repeat": self._repeat,
                   "hold": self._hold
                   }
         # Go through the list of steps, ordered by the integer value of the index

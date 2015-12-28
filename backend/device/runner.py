@@ -17,12 +17,17 @@ class BaseRunner(object):
     program. That has not yet been written though.
 
     """
-    def __init__(self, current_state, thermometer, heater):
-        self._current_state = current_state
+    def __init__(self, api_interface, thermometer, heater):
+        self._api_interface = api_interface
         self._thermometer = thermometer
         self._heater = heater
 
     def run(self):
+        """
+        The main loop basically just waits for a program to show up in Redis, and runs it until it's told to stop,
+        then it resets all values and starts all over again.
+
+        """
         while True:
             self._boot()
             self._listen()
@@ -36,7 +41,11 @@ class BaseRunner(object):
         self._shutdown()
 
     def _shutdown(self):
-        log.debug("Shutting down heater.")
+        """
+        Physically turns off the heater and clears the program from memory.
+
+        """
+        log.debug("Shutting down heater...")
         try:
             self._heater.disable()
         except:
@@ -45,7 +54,7 @@ class BaseRunner(object):
             log.debug("Heater shutdown successful.")
         log.debug("Clearing API data.")
         try:
-            self._current_state.clear()
+            self._api_interface.clear()
         except:
             log.exception("Failed to clear API data!")
         else:
@@ -57,10 +66,11 @@ class BaseRunner(object):
     def _boot(self):
         """
         Unsets the current program. We require that this runs before every loop to prevent accidentally starting a program whose parameters were somehow left in Redis.
+        This was a problem even after the Raspberry Pi was physically disconnected from the power supply.
 
         """
         log.info("Booting! About to clear API data")
-        self._current_state.clear()
+        self._api_interface.clear()
 
     def _listen(self):
         """
@@ -68,13 +78,13 @@ class BaseRunner(object):
 
         """
         while True:
-            if self._current_state.active:
+            if self._api_interface.active:
                 log.info("We need to run a program!")
                 break
             else:
                 try:
                     # update the current temperature in Redis so that we can see how hot the heater is, even if we're not running a program
-                    self._current_state.current_temp = self._thermometer.current_temperature
+                    self._api_interface.current_temp = self._thermometer.current_temperature
                 except:
                     # absolutely do not allow this loop to terminate. Though if it did, supervisord would restart the process, but that's annoying and
                     # results in some downtime
@@ -100,7 +110,7 @@ class BaseRunner(object):
 
 class ProgramRunner(BaseRunner):
     """
-    Runs a pre-defined program, and ensures that shutdown
+    Runs a pre-defined program, and ensures that shutdown.
 
     """
     def __init__(self, current_state, thermometer, heater, log_dir='/var/log/piwarmer'):
@@ -117,7 +127,7 @@ class ProgramRunner(BaseRunner):
         Set up the PID for temperature control.
 
         """
-        driver = self._current_state.driver
+        driver = self._api_interface.driver
         driver = pid.Driver(driver['name'], driver['kp'], driver['ki'], driver['kd'],
                             driver['max_accumulated_error'], driver['min_accumulated_error'])
         self._pid = pid.PID(driver)
@@ -125,7 +135,7 @@ class ProgramRunner(BaseRunner):
         self._start_time = datetime.utcnow()
         log.info("Start time: %s" % self._start_time)
         self._temperature_log = self._get_temperature_log()
-        self._program = program.TemperatureProgram(self._current_state.program)
+        self._program = program.TemperatureProgram(self._api_interface.program)
         self._heater.enable()
 
     def _get_temperature_log(self):
@@ -143,18 +153,16 @@ class ProgramRunner(BaseRunner):
         return temperature_log
 
     def _run(self):
-        while True:
-            assert self._start_time is not None
-            assert self._current_state is not None
-            assert self._thermometer is not None
-            assert self._accumulated_error is not None
+        """
+        The main program loop. We figure out what step we're on, whether the heater needs to be turned on, and whether it's time to shutdown.
 
-            # check if the user pressed the stop button
-            if not self._current_state.active:
-                log.info("The program has ended or been stopped")
-                self._shutdown()
-                break
+        """
+        assert self._api_interface is not None
+        assert self._start_time is not None
+        assert self._thermometer is not None
+        assert self._accumulated_error is not None
 
+        while self._api_interface.active:
             # make some safe assignments that should never fail
             current_cycle = cycle.CurrentCycle()
             current_cycle.accumulated_error = self._accumulated_error
@@ -182,5 +190,9 @@ class ProgramRunner(BaseRunner):
             self._heater.heat(current_cycle.duty_cycle)
 
             # update the API data so the frontend can know what's happening
-            self._current_state.current_temp = current_cycle.current_temperature
-            self._current_state.current_step = current_cycle.current_step
+            self._api_interface.current_temp = current_cycle.current_temperature
+            self._api_interface.current_step = current_cycle.current_step
+
+        # The user pressed the stop button
+        log.info("The program was manually stopped")
+        self._shutdown()
