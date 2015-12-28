@@ -1,10 +1,11 @@
+from interface import APIInterface
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from . import serializers, models
-from interface import APIData
+import serializers
 import logging
+import models
 import os
 
 log = logging.getLogger(__name__)
@@ -24,63 +25,81 @@ class ProgramViewset(ModelViewSet):
     serializer_class = serializers.ProgramSerializer
 
     def get_queryset(self):
+        # We implement get_queryset so that a user will only see their own programs.
+        # Not a security thing, just a convenience.
         if 'user' in self.request.query_params.keys():
             return models.Program.objects.filter(scientist=self.request.query_params['user'])
         return models.Program.objects.all()
 
 
 class StartView(APIView):
+    """
+    The endpoint that will start a program.
+
+    """
     def post(self, request, format=None):
-        data = APIData()
+        api_interface = APIInterface()
         try:
             log.info("Program start requested")
-            log.info(str(request.data))
+            # look up the driver and program in the database
             driver = models.Driver.objects.get(id=request.data['driver'])
-            json_driver = serializers.DriverSerializer(driver)
-            data.driver = json_driver.data
-
             program = models.Program.objects.get(id=request.data['program'])
+            # convert to JSON, which our Python backend is expecting
+            json_driver = serializers.DriverSerializer(driver)
             json_program = serializers.ProgramSerializer(program)
-            data.program = json_program.data['steps']
+            # update the selected driver and program in Redis, so that our backend can know which ones to use
+            api_interface.driver = json_driver.data
+            api_interface.program = json_program.data['steps']
         except Exception as e:
             log.exception("Could not start program")
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
-            data.activate()
+            # Flip the switch and the backend will start running the program once it detects the change (usually within a second)
+            api_interface.activate()
         log.info("Program started fine")
         return Response(status=status.HTTP_200_OK)
 
 
 class StopView(APIView):
+    """
+    The endpoint that will reset everything and shut off the heater.
+
+    """
     def post(self, request, format=None):
         log.info("Stop program requested")
-        data = APIData()
-        data.deactivate()
-        data.clear()
+        api_interface = APIInterface()
+        # Turn off the heater
+        api_interface.deactivate()
+        # Delete the program and driver from Redis so that the backend realizes we're done
+        api_interface.clear()
         log.info("Program stopped OK")
         return Response(status=status.HTTP_200_OK)
 
 
 class CurrentView(APIView):
+    """
+    The endpoint that provides the current temperature and the action that the controller is performing.
+
+    """
     def get(self, request, format=None):
-        data = APIData()
-        current_temp = data.current_temp
-        current_setting = "%0.2f&deg;C" % float(data.current_setting) if data.current_setting is not None else "off"
-        next_steps = data.next_steps or ["---"]
-        times_until = data.times_until or ["---"]
-        try:
-            time_left = data.time_left
-        except TypeError:
-            time_left = None
-        out = {"setting": current_setting,
-               "temp": str(current_temp) + " &deg;C" if current_temp else "---",
-               "time_left": time_left or "---",
-               "next_steps": next_steps,
-               "times_until": times_until}
+        api_interface = APIInterface()
+        print()
+        out = {"step": api_interface.current_step,
+               "temp": api_interface.current_temp,
+               "target": api_interface.target_temp,
+               "step_time_remaining": api_interface.step_time_remaining,
+               "program_time_remaining": api_interface.program_time_remaining,
+               "program": api_interface.program
+               }
         return Response(out, status=status.HTTP_200_OK)
 
 
 class TemperatureLogView(APIView):
+    """
+    SHOULD provide links to each log, so you can see their data, however it currently just shows a list of logs available.
+    This is just not completely implemented yet.
+
+    """
     def get(self, request, format=None):
         log_dir = "/var/log/piwarmer/"
         if 'date' in self.request.query_params.keys():

@@ -17,11 +17,30 @@
           <li><a class="breadcrumb" href="/help">Help</a></li>
       </ul>
       <br><br>
-    <div><h3 id="current_temp">Fetching live data...</h3></div>
-    <div><h3 id="current_temperature_setting">&nbsp;</h3></div>
-    <div><h3 id="time_left">&nbsp;</h3></div>
-    <div id="next_steps"></div><br>
-    <input type="submit" name="stop" value="No program running" id="stop" disabled="disabled" >
 
+      <table>
+          <tr style="text-align:left;">
+              <th>Current Temperature</th>
+              <th>Target Temperature</th>
+          </tr>
+          <tr>
+              <td id="current_temp" class="data">Loading...</td>
+              <td id="target_temp" class="data">---</td>
+          </tr>
+          <tr style="text-align:left;">
+              <th>Current Step Time Remaining</th>
+              <th>Program Time Remaining</th>
+          </tr>
+          <tr>
+              <td id="step_time_remaining" class="data">---</td>
+              <td id="program_time_remaining" class="data">---</td>
+          </tr>
+      </table>
+      <br>
+
+
+    <div id="steps"></div><br>
+    <input type="submit" name="stop" value="No program running" id="stop" disabled="disabled" >
+    <input type="hidden" id="current_step" value="">
   </body>
 </html>

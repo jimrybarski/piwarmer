@@ -16,6 +16,10 @@ input[class="program_button"] {
    width: 500px;
 }
 
+.data {
+    font:60px "Courier New";
+}
+
 .program_setting {
     height: 70px;
     font-size: 24px;
@@ -45,8 +49,12 @@ td[class="program_step"] {
     width: 25%;
 }
 
+td[class="data"] {
+    width: 5%;
+}
+
 table {
-    width: 95%;
+    width: 50%;
 }
 
 thead {
@@ -70,6 +78,15 @@ tbody[class="setting"] th {
 
 tbody[class="setting"] td {
     background:#d7e1c5;
+}
+
+tr[class="current_step"] {
+    background:#ffa500;
+    font-weight:bold;
+}
+
+tr[class="completed_step"] {
+    color:#a8a8a8;
 }
 
 ul {

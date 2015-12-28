@@ -1,8 +1,5 @@
-var API_URL = '192.168.10.3/backend'
-
-if (API_URL == '192.168.10.N/backend') {
-    alert("Your Pi Warmer is not properly configured. Change the API_URL variable in common.js")
-}
+var API_URL = '127.0.0.1:8000/backend'
+//var API_URL = '192.168.10.1'
 
 function get_id(search_term) {
     var regex = new RegExp('\\?' + search_term + '=');
@@ -14,13 +11,34 @@ function get_id(search_term) {
 }
 
 function beep(){
+    // lets the user know that a step finished or the program is over
     var audio = new Audio('../smb_coin.wav');
     audio.play();
 }
 
+function to_hhmmss(seconds) {
+    if (seconds === null || seconds === undefined) {
+        return "---";
+    }
+    seconds = parseInt(seconds, 10);
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds - (hours * 3600)) / 60);
+    var seconds = seconds - (hours * 3600) - (minutes * 60);
+    var result = "";
+    // only use HH:MM:SS if total time is less than 60 minutes
+    if (hours) {
+        result += hours + ":"
+    }
+    // only show leading zero in minute column if we have an hour preceding it
+    result += ((minutes < 10 && hours) ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+    return result;
+}
+
 function http(endpoint, verb, d, func){
-    console.log("http(" + endpoint + ", " + verb + ") called with data:")
-    console.log(d)
+    // verb is an HTTP verb.
+    // d is the data, which may be null.
+    // func is a function to execute using the *return* data as an argument. usually this is an anonymous function.
+
     $.ajax({
       type: verb,
       crossDomain: true,
@@ -35,4 +53,8 @@ function http(endpoint, verb, d, func){
         alert("The API could not be reached.");
       },
     });
+    if (verb == "POST") {
+        // necessary for some stupid reason I forget. Don't remove this.
+        return false;
+    }
 }
