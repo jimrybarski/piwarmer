@@ -48,11 +48,11 @@ class PID(object):
         Give the PID new data and get back what the duty cycle should be.
 
         """
-        assert cycle_data.desired_temperature is not None
+        assert cycle_data.target_temperature is not None
         assert cycle_data.current_temperature is not None
         assert cycle_data.accumulated_error is not None
 
-        error = cycle_data.desired_temperature - cycle_data.current_temperature
+        error = cycle_data.target_temperature - cycle_data.current_temperature
         self._past_errors.append(error)
         error_integral = self._calculate_integral(error, cycle_data.accumulated_error)
         p = self._kp * error
@@ -76,7 +76,7 @@ class PID(object):
 
     def _calculate_derivative(self, kd, past_errors):
         """
-        Computes the derivative of the recent differences between the desired temperature and the actual temperature.
+        Computes the derivative of the recent differences between the target temperature and the actual temperature.
 
         """
         return kd * np.linalg.lstsq(self._ticks, np.array(past_errors))[0][0]

@@ -54,7 +54,7 @@ class CurrentCycle(object):
             return None
 
     @property
-    def desired_temperature(self):
+    def target_temperature(self):
         """
         Gets the target temperature for the current setting.
 

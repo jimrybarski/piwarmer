@@ -19,11 +19,21 @@ function duration_to_human_readable(program) {
 }
 
 
+function display_temperature(temperature) {
+    // returns a space if we have no data, otherwise returns the formatted temperature
+    if (temperature === undefined || temperature === null) {
+        return "&nbsp;";
+    }
+    // add a space when we have two-digit temperatures, to keep spacing the same as when it's 100°C or higher
+    return (temperature < 100 ? "&nbsp;" : "") + temperature + "°C"
+}
+
 function update() {
     // Get the latest temperature and data about the program that's running
     http("current", 'GET', null, function(data){
         // Update the most important stats
-        $("#current_temp").html((data.temp < 100 ? "&nbsp;" : "") + data.temp + "°C");
+        $("#current_temp").html(display_temperature(data.temp));
+        $("#target_temp").html(display_temperature(data.target));
         var show_stop_button = (Object.keys(data.program).length > 0);
 
         // Build up the table of each program step

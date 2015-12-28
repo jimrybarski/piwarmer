@@ -10,6 +10,7 @@ class APIInterface(redis.StrictRedis):
 
         """
         labels = ["current_temp",
+                  "target_temp",
                   "current_step",
                   "time_left",
                   "active",
@@ -102,6 +103,25 @@ class APIInterface(redis.StrictRedis):
         :type temp:     float
         """
         self.set("current_temp", temp)
+
+    @property
+    def target_temp(self):
+        """
+        The temperature we want the heater to be at, in Celsius.
+
+        :rtype:     float
+
+        """
+        return self.get("target_temp")
+
+    @target_temp.setter
+    def target_temp(self, temp):
+        """
+        Update the temperature we're trying to achieve.
+
+        :type temp:     float
+        """
+        self.set("target_temp", temp)
 
     @property
     def current_step(self):

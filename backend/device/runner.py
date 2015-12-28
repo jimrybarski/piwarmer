@@ -184,13 +184,14 @@ class ProgramRunner(BaseRunner):
 
             # save the temperature information to a machine-readable log file
             self._temperature_log.info("%s\t%s\t%s" % (current_cycle.current_temperature,
-                                                       current_cycle.desired_temperature,
+                                                       current_cycle.target_temperature,
                                                        current_cycle.duty_cycle))
             # physically activate the heater, if necessary
             self._heater.heat(current_cycle.duty_cycle)
 
             # update the API data so the frontend can know what's happening
             self._api_interface.current_temp = current_cycle.current_temperature
+            self._api_interface.target_temp = current_cycle.target_temperature
             self._api_interface.current_step = current_cycle.current_step
 
         # The user pressed the stop button
