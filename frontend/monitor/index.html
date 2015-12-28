@@ -18,10 +18,19 @@
       </ul>
       <br><br>
 
-    <div>
-        <h3 id="current_temp" class="data">Fetching live data...</h3>
-        <h3 id="target_temp" class="data">&nbsp;</h3>
-    </div>
+      <table style="width: 50%;">
+          <tr style="text-align:left;">
+              <th>Current Temperature</th>
+              <th>Target Temperature</th>
+          </tr>
+          <tr>
+              <td id="current_temp" class="data">Loading...</td>
+              <td id="target_temp" class="data">---</td>
+          </tr>
+      </table>
+      <br>
+
+
     <div id="steps"></div><br>
     <input type="submit" name="stop" value="No program running" id="stop" disabled="disabled" >
     <input type="hidden" id="current_step" value="">

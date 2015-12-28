@@ -22,10 +22,11 @@ function duration_to_human_readable(program) {
 function display_temperature(temperature) {
     // returns a space if we have no data, otherwise returns the formatted temperature
     if (temperature === undefined || temperature === null) {
-        return "&nbsp;";
+        return "---";
     }
+    rounded_temp = parseFloat(temperature).toFixed(2);
     // add a space when we have two-digit temperatures, to keep spacing the same as when it's 100°C or higher
-    return (temperature < 100 ? "&nbsp;" : "") + temperature + "°C"
+    return (rounded_temp < 100 ? "&nbsp;" : "") + rounded_temp + "°C"
 }
 
 function update() {

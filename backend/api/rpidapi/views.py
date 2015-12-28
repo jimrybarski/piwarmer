@@ -85,6 +85,7 @@ class CurrentView(APIView):
         api_interface = APIInterface()
         out = {"step": api_interface.current_step,
                "temp": api_interface.current_temp,
+               "target": api_interface.target_temp,
                "program": api_interface.program
                }
         return Response(out, status=status.HTTP_200_OK)

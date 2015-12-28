@@ -49,6 +49,10 @@ td[class="program_step"] {
     width: 25%;
 }
 
+td[class="data"] {
+    width: 5%;
+}
+
 table {
     width: 95%;
 }
