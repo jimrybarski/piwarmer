@@ -35,6 +35,10 @@ function to_hhmmss(seconds) {
 }
 
 function http(endpoint, verb, d, func){
+    // verb is an HTTP verb.
+    // d is the data, which may be null.
+    // func is a function to execute using the *return* data as an argument. usually this is an anonymous function.
+
     $.ajax({
       type: verb,
       crossDomain: true,
@@ -50,6 +54,7 @@ function http(endpoint, verb, d, func){
       },
     });
     if (verb == "POST") {
+        // necessary for some stupid reason I forget. Don't remove this.
         return false;
     }
 }
