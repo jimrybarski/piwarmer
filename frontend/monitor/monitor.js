@@ -14,8 +14,7 @@ function duration_to_human_readable(program) {
     if (program.mode == "hold") {
         return "---"
     }
-    // TODO: Convert seconds to HH:MM:SS
-    return program.duration
+    return to_hhmmss(program.duration)
 }
 
 

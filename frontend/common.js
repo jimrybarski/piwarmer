@@ -16,6 +16,21 @@ function beep(){
     audio.play();
 }
 
+function to_hhmmss(seconds) {
+    seconds = parseInt(seconds, 10);
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds - (hours * 3600)) / 60);
+    var seconds = seconds - (hours * 3600) - (minutes * 60);
+    var result = "";
+    // only use HH:MM:SS if total time is less than 60 minutes
+    if (hours) {
+        result += hours + ":"
+    }
+    // only show leading zero in minute column if we have an hour preceding it
+    result += ((minutes < 10 && hours) ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+    return result;
+}
+
 function http(endpoint, verb, d, func){
     console.log("http(" + endpoint + ", " + verb + ") called with data:")
     console.log(d)
