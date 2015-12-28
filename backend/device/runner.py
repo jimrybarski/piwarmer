@@ -193,6 +193,8 @@ class ProgramRunner(BaseRunner):
             self._api_interface.current_temp = current_cycle.current_temperature
             self._api_interface.target_temp = current_cycle.target_temperature
             self._api_interface.current_step = current_cycle.current_step
+            self._api_interface.program_time_remaining = current_cycle.seconds_left
+            self._api_interface.step_time_remaining = current_cycle.step_time_remaining
 
         # The user pressed the stop button
         log.info("The program was manually stopped")

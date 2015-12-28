@@ -25,7 +25,7 @@ function display_temperature(temperature) {
     }
     rounded_temp = parseFloat(temperature).toFixed(2);
     // add a space when we have two-digit temperatures, to keep spacing the same as when it's 100°C or higher
-    return (rounded_temp < 100 ? "&nbsp;" : "") + rounded_temp + "°C"
+    return rounded_temp + "°C"
 }
 
 function update() {
@@ -34,6 +34,14 @@ function update() {
         // Update the most important stats
         $("#current_temp").html(display_temperature(data.temp));
         $("#target_temp").html(display_temperature(data.target));
+        if (data.program_time_remaining == 0) {
+            $("#step_time_remaining").html('---');
+            $("#program_time_remaining").html('---');
+        }
+        else {
+            $("#step_time_remaining").html(to_hhmmss(data.step_time_remaining));
+            $("#program_time_remaining").html(to_hhmmss(data.program_time_remaining));
+        }
         var show_stop_button = (Object.keys(data.program).length > 0);
 
         // Build up the table of each program step

@@ -20,8 +20,10 @@ class CurrentCycle(object):
         self.duty_cycle = None
         self.program = None
         self.start_time = None
+        self._current_setting = None
 
-    def _get_current_setting(self):
+    @property
+    def current_setting(self):
         """
         Finds the setting that we should currently be using to calculate the target temperature.
 
@@ -40,6 +42,21 @@ class CurrentCycle(object):
         raise ProgramOver
 
     @property
+    def step_time_remaining(self):
+        """
+        The number of seconds left in the currently-running step.
+
+        :rtype:     int
+
+        """
+        try:
+            start, stop, setting = self.current_setting
+            remaining = int(stop - self.seconds_elapsed)
+            return 0 if remaining is None else remaining
+        except (ProgramOver, TypeError):
+            return 0
+
+    @property
     def current_step(self):
         """
         Gets the index of the current program setting.
@@ -48,7 +65,7 @@ class CurrentCycle(object):
 
         """
         try:
-            start, stop, setting = self._get_current_setting()
+            start, stop, setting = self.current_setting
             return setting.index
         except ProgramOver:
             return None
@@ -62,7 +79,7 @@ class CurrentCycle(object):
 
         """
         try:
-            start, stop, setting = self._get_current_setting()
+            start, stop, setting = self.current_setting
             return setting.get_temperature(self.seconds_elapsed - start)
         except ProgramOver:
             return None
@@ -78,7 +95,10 @@ class CurrentCycle(object):
         assert self.program is not None
         assert self.current_time is not None
         assert self.start_time is not None
-        return int(max(self.program.total_duration - self.seconds_elapsed, 0))
+        try:
+            return int(max(self.program.total_duration - self.seconds_elapsed, 0))
+        except TypeError:
+            return None
 
     @property
     def steps(self):

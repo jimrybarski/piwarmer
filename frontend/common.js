@@ -17,6 +17,9 @@ function beep(){
 }
 
 function to_hhmmss(seconds) {
+    if (seconds === null || seconds === undefined) {
+        return "---";
+    }
     seconds = parseInt(seconds, 10);
     var hours = Math.floor(seconds / 3600);
     var minutes = Math.floor((seconds - (hours * 3600)) / 60);
@@ -32,8 +35,6 @@ function to_hhmmss(seconds) {
 }
 
 function http(endpoint, verb, d, func){
-    console.log("http(" + endpoint + ", " + verb + ") called with data:")
-    console.log(d)
     $.ajax({
       type: verb,
       crossDomain: true,

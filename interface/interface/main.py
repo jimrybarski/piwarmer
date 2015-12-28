@@ -12,12 +12,11 @@ class APIInterface(redis.StrictRedis):
         labels = ["current_temp",
                   "target_temp",
                   "current_step",
-                  "time_left",
+                  "step_time_remaining",
+                  "program_time_remaining",
                   "active",
                   "program",
-                  "mode",
-                  "next_steps",
-                  "times_until"]
+                  "mode"]
         for label in labels:
             self.delete(label)
 
@@ -34,6 +33,34 @@ class APIInterface(redis.StrictRedis):
 
         """
         self.set("active", 1)
+
+    @property
+    def step_time_remaining(self):
+        """
+        The time in seconds until the next step.
+
+        :rtype:     int
+
+        """
+        return self.get("step_time_remaining")
+
+    @step_time_remaining.setter
+    def step_time_remaining(self, value):
+        self.set("step_time_remaining", value)
+
+    @property
+    def program_time_remaining(self):
+        """
+        The time in seconds until the program is over.
+
+        :rtype:     int
+
+        """
+        return self.get("program_time_remaining")
+
+    @program_time_remaining.setter
+    def program_time_remaining(self, value):
+        self.set("program_time_remaining", value)
 
     @property
     def program(self):
