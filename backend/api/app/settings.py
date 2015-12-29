@@ -80,6 +80,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/var/log/piwarmer/api.log',
+            'formatter': 'verbose',
         },
     },
     'loggers': {
