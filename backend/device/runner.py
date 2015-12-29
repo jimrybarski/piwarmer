@@ -79,7 +79,7 @@ class BaseRunner(object):
         """
         while True:
             if self._api_interface.active:
-                log.info("We need to run a program!")
+                log.info("The system has been activated")
                 break
             else:
                 try:
@@ -133,7 +133,7 @@ class ProgramRunner(BaseRunner):
         self._pid = pid.PID(driver)
         self._accumulated_error = 0.0
         self._start_time = datetime.utcnow()
-        log.info("Start time: %s" % self._start_time)
+        log.info("Program start time: %s" % self._start_time)
         self._temperature_log = self._get_temperature_log()
         self._program = program.TemperatureProgram(self._api_interface.program)
         self._heater.enable()
@@ -146,7 +146,7 @@ class ProgramRunner(BaseRunner):
         # Set up another logger for temperature logs
         temperature_log = logging.getLogger("temperatures")
         handler = logging.FileHandler('%s/temperature-%s.log' % (self._log_dir, self._start_time.strftime("%Y-%m-%d-%H-%M-%S")))
-        formatter = logging.Formatter('%(message)s')
+        formatter = logging.Formatter('%(asctime)s\t%(message)s')
         handler.setFormatter(formatter)
         temperature_log.addHandler(handler)
         temperature_log.setLevel(logging.INFO)
@@ -173,8 +173,7 @@ class ProgramRunner(BaseRunner):
 
             if current_cycle.current_step is None:
                 # the program is over and we're not using a Hold setting
-                log.info("We're out of steps to run, so we should shut down now.")
-                self._shutdown()
+                log.info("There are no more steps to run in the current program. Shutting down...")
                 break
 
             # I/O - read the temperature. This operation is blocking!
@@ -197,6 +196,4 @@ class ProgramRunner(BaseRunner):
             self._api_interface.program_time_remaining = current_cycle.seconds_left
             self._api_interface.step_time_remaining = current_cycle.step_time_remaining
 
-        # The user pressed the stop button
-        log.info("The program was manually stopped")
         self._shutdown()

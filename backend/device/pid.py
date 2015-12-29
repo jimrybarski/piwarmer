@@ -29,7 +29,7 @@ class PID(object):
 
         """
         memory = int(memory)
-        assert memory > 0
+        assert memory > 2
         self._kp = driver.kp
         self._ki = driver.ki
         self._kd = driver.kd
