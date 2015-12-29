@@ -21,6 +21,7 @@ class CurrentCycle(object):
         self.program = None
         self.start_time = None
         self._current_setting = None
+        self.skip_time = 0
 
     @property
     def current_setting(self):
@@ -111,4 +112,4 @@ class CurrentCycle(object):
 
     @property
     def seconds_elapsed(self):
-        return (self.current_time - self.start_time).total_seconds()
+        return (self.current_time - self.start_time).total_seconds() + self.skip_time

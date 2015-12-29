@@ -17,13 +17,12 @@ function duration_to_human_readable(program) {
     return to_hhmmss(program.duration)
 }
 
-
 function display_temperature(temperature) {
     // returns a space if we have no data, otherwise returns the formatted temperature
     if (temperature === undefined || temperature === null) {
         return "---";
     }
-    rounded_temp = parseFloat(temperature).toFixed(2);
+    var rounded_temp = parseFloat(temperature).toFixed(2);
     // add a space when we have two-digit temperatures, to keep spacing the same as when it's 100°C or higher
     return rounded_temp + "°C"
 }
@@ -42,6 +41,8 @@ function update() {
             $("#step_time_remaining").html(to_hhmmss(data.step_time_remaining));
             $("#program_time_remaining").html(to_hhmmss(data.program_time_remaining));
         }
+
+        // we're running a program if there are any steps
         var show_stop_button = (Object.keys(data.program).length > 0);
 
         // Build up the table of each program step
@@ -71,27 +72,40 @@ function update() {
                 steps += line;
             }
             steps += "</tfoot></table>";
-
             $("#steps").html(steps);
         }
 
+        // enable the Stop and Skip buttons only if a program is running
         if (show_stop_button) {
             $("#stop")
                 .prop('disabled', false)
-                .val("STOP")
                 .attr('style', 'background-color: #FF2020; color: #FFFFFF;');
+            $("#skip")
+                .prop('disabled', false)
+                .attr('style', 'background-color: #FFC200; color: #000000;');
         }
         else {
             $("#steps").html('');
             $("#stop")
                 .prop('disabled', true)
-                .val("No program running")
+                .attr('style', 'background-color: #806666; color: #FFFFFF;');
+            $("#skip")
+                .prop('disabled', true)
                 .attr('style', 'background-color: #806666; color: #FFFFFF;');
         }
     });
 }
 
 $(document).ready(function(){
+    $("#skip").click(function()
+        {
+            console.log("trying to skip a step");
+            http("skip", 'POST', null, function(data){
+                console.log("skipped a step!");
+               // we skipped a step, not sure if there's anything to do
+            });
+        }
+    );
     // We want to stop the program, but keep monitoring the temperature.
     $("#stop").click(function()
         {

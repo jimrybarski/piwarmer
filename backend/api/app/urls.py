@@ -16,8 +16,10 @@ stop = url(r'stop', views.StopView.as_view())
 start = url(r'start', views.StartView.as_view())
 # Find out the current state of things (e.g. temperature, duty cycle, etc)
 current = url(r'current', views.CurrentView.as_view())
+# Skip a step
+skip = url(r'skip', views.SkipView.as_view())
 # See a list of previous runs and their temperatures over time
 temperature_logs = url(r'logs', views.TemperatureLogView.as_view())
 
 
-urlpatterns = [url(r'^backend/', include(router.urls)), stop, start, current, temperature_logs]
+urlpatterns = [url(r'^backend/', include(router.urls)), stop, start, current, skip, temperature_logs]
