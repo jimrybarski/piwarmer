@@ -2,7 +2,7 @@ import logging
 import random
 import os
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("heater." + __name__)
 
 
 class MockGPIO(object):

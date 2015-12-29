@@ -7,7 +7,7 @@ import program
 import time
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("heater." + __name__)
 
 
 class BaseRunner(object):

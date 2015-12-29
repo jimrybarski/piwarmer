@@ -1,4 +1,4 @@
-var API_URL = '192.168.10.1'
+var API_URL = '192.168.10.1/backend';
 //var API_URL = '127.0.0.1:8000/backend';
 
 

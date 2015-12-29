@@ -1,7 +1,7 @@
 import time
 import logging
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("heater." + __name__)
 
 
 class Heater(object):

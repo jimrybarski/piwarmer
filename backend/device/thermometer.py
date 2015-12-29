@@ -1,7 +1,7 @@
 import logging
 import math
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("heater." + __name__)
 
 
 class Thermometer(object):
