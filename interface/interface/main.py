@@ -189,4 +189,4 @@ class APIInterface(redis.StrictRedis):
         :return:
         """
         if self.step_time_remaining is not None:
-            self.set("skip_time", self.skip_time + self.step_time_remaining)
+            self.set("skip_time", self.skip_time + int(self.step_time_remaining))
