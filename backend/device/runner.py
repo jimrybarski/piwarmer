@@ -169,6 +169,7 @@ class ProgramRunner(BaseRunner):
             current_cycle.current_time = datetime.utcnow()
             current_cycle.start_time = self._start_time
             current_cycle.program = self._program
+            current_cycle.skip_time = self._api_interface.skip_time
 
             if current_cycle.current_step is None:
                 # the program is over and we're not using a Hold setting

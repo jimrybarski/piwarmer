@@ -76,6 +76,18 @@ class StopView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class SkipView(APIView):
+    """
+    Skips the current step.
+
+    """
+    def post(self, request, format=None):
+        api_interface = APIInterface()
+        api_interface.skip_step()
+        log.info("Skipped a step.")
+        return Response(status=status.HTTP_200_OK)
+
+
 class CurrentView(APIView):
     """
     The endpoint that provides the current temperature and the action that the controller is performing.

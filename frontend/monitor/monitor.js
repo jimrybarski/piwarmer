@@ -78,20 +78,33 @@ function update() {
         if (show_stop_button) {
             $("#stop")
                 .prop('disabled', false)
-                .val("STOP")
                 .attr('style', 'background-color: #FF2020; color: #FFFFFF;');
+            $("#skip")
+                .prop('disabled', false)
+                .attr('style', 'background-color: #FFC200; color: #000000;');
         }
         else {
             $("#steps").html('');
             $("#stop")
                 .prop('disabled', true)
-                .val("No program running")
+                .attr('style', 'background-color: #806666; color: #FFFFFF;');
+            $("#skip")
+                .prop('disabled', true)
                 .attr('style', 'background-color: #806666; color: #FFFFFF;');
         }
     });
 }
 
 $(document).ready(function(){
+    $("#skip").click(function()
+        {
+            console.log("trying to skip a step");
+            http("skip", 'POST', null, function(data){
+                console.log("skipped a step!");
+               // we skipped a step, not sure if there's anything to do
+            });
+        }
+    );
     // We want to stop the program, but keep monitoring the temperature.
     $("#stop").click(function()
         {

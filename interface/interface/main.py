@@ -16,7 +16,8 @@ class APIInterface(redis.StrictRedis):
                   "program_time_remaining",
                   "active",
                   "program",
-                  "mode"]
+                  "mode",
+                  "skip_time"]
         for label in labels:
             self.delete(label)
 
@@ -169,3 +170,23 @@ class APIInterface(redis.StrictRedis):
 
         """
         self.set("current_step", step)
+
+    @property
+    def skip_time(self):
+        """
+        The number of seconds ahead we should skip.
+
+        :return:
+
+        """
+        skip_time = self.get("skip_time")
+        return int(skip_time) if skip_time is not None else 0
+
+    def skip_step(self):
+        """
+        Doesn't skip a step directly, but advances the start time by the number of seconds left in the current step.
+
+        :return:
+        """
+        if self.step_time_remaining is not None:
+            self.set("skip_time", self.skip_time + self.step_time_remaining)
