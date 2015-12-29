@@ -40,23 +40,24 @@ class StartView(APIView):
     def post(self, request, format=None):
         api_interface = APIInterface()
         try:
-            log.info("Program start requested")
             # look up the driver and program in the database
             driver = models.Driver.objects.get(id=request.data['driver'])
             program = models.Program.objects.get(id=request.data['program'])
+            log.info("Received request to start program: ID: {id}, NAME: {name}".format(id=program.id, name=program.name))
             # convert to JSON, which our Python backend is expecting
             json_driver = serializers.DriverSerializer(driver)
             json_program = serializers.ProgramSerializer(program)
             # update the selected driver and program in Redis, so that our backend can know which ones to use
             api_interface.driver = json_driver.data
             api_interface.program = json_program.data['steps']
+            log.info("Program steps: {steps}".format(steps=str(json_program.data['steps'])))
         except Exception as e:
             log.exception("Could not start program")
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": e.message})
         else:
             # Flip the switch and the backend will start running the program once it detects the change (usually within a second)
             api_interface.activate()
-        log.info("Program started fine")
+        log.info("Program started.")
         return Response(status=status.HTTP_200_OK)
 
 
@@ -66,13 +67,13 @@ class StopView(APIView):
 
     """
     def post(self, request, format=None):
-        log.info("Stop program requested")
+        log.info("User requested that we stop the current program")
         api_interface = APIInterface()
         # Turn off the heater
         api_interface.deactivate()
         # Delete the program and driver from Redis so that the backend realizes we're done
         api_interface.clear()
-        log.info("Program stopped OK")
+        log.info("Program stopped successfully")
         return Response(status=status.HTTP_200_OK)
 
 
@@ -84,7 +85,7 @@ class SkipView(APIView):
     def post(self, request, format=None):
         api_interface = APIInterface()
         api_interface.skip_step()
-        log.info("Skipped a step.")
+        log.info("User skipped a step")
         return Response(status=status.HTTP_200_OK)
 
 
@@ -95,7 +96,6 @@ class CurrentView(APIView):
     """
     def get(self, request, format=None):
         api_interface = APIInterface()
-        print()
         out = {"step": api_interface.current_step,
                "temp": api_interface.current_temp,
                "target": api_interface.target_temp,

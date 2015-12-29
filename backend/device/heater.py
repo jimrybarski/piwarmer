@@ -36,7 +36,6 @@ class Heater(object):
         try:
             self._gpio.output(Heater.ENABLE_PIN, self._gpio.LOW)
         except Exception:
-            log.critical("DANGER! COULD NOT DEACTIVATE HEATER! UNPLUG IT IMMEDIATELY!")
             log.exception("Could not deactivate heater!")
             Heater.DANGER = True
         # This next step may fail, but we've already turned off the heater so there's no danger worth reporting.

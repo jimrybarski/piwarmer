@@ -1,8 +1,3 @@
-import logging
-
-log = logging.getLogger(__name__)
-
-
 class TemperatureSetting(object):
     """
     The instructions for a single step in a program. Something like "Set to 37C for 30 seconds"
