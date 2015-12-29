@@ -4,7 +4,7 @@
         <title>Raspberry PID: Manage Driver</title>
         <script type="text/javascript" src="../../jquery.min.js"></script>
         <script type="text/javascript" src="../../common.js"></script>
-        <script type="text/javascript" src="/driver/new/new_driver.js"></script>
+        <script type="text/javascript" src="/driver/manage/manage_driver.js"></script>
         <link rel="stylesheet" type="text/css" media="screen" href="../../rpid.css" />
     </head>
 
@@ -15,9 +15,10 @@
           <li><a class="breadcrumb" href="/driver">Drivers</a></li>
           <li><a class="breadcrumb" href="/logs">Logs</a></li>
           <li><a class="breadcrumb" href="/help">Help</a></li>
-        </ul><br>
+      </ul>
+      <br>
+        <h3 id="driver_name"></h3>
 
-        <h2>Create New Driver</h2>
         <input id="name" type="text"> Name<br>
         <input id="kp" type="text"> Kp<br>
         <input id="ki" type="text"> Ki<br>
@@ -26,6 +27,7 @@
         <input id="min_accumulated_error" type="text"> Integral Error Min<br>
         <input id="max_power" type="text"> Max Power<br><br><br>
 
-        <input id="save" type="submit" class="oddball" value="Save">
+        <input id="update" type="submit" class="oddball" value="Update">
+        <input id="delete" type="submit" value="Delete">
     </body>
 </html>

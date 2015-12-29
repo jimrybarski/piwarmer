@@ -77,7 +77,6 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/var/log/piwarmer/api.log',
             'formatter': 'verbose',
@@ -86,7 +85,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
