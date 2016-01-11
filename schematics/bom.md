@@ -1,4 +1,5 @@
 |Item|Manufacturer|Part Number|Link|Price|Quantity|Total
+|---|---|---|---|---|---|---|
 |Illuminated Pushbutton|E-Switch|RP3508BBLKGRNGRNNS|http://www.mouser.com/ProductDetail/E-Switch/RP3508BBLKGRNGRNNS/?qs=QtyuwXswaQiX%252bd395cLv4Q%3D%3D|5.43|1|5.43
 |Enclosure|Hammond Manufacturing|1598CSGYPBK|http://www.mouser.com/ProductDetail/Hammond/1598CSGYPBK/?qs=%2fha2pyFaduhcl8o0RDq%252bRo%252bYpB8JxZRz23RRUafTWBvVz5DNez3v3g%3d%3d|9.14|1|9.14
 |AC Power Adapter|Mean Well|GST60A24-P1J|http://www.mouser.com/ProductDetail/Mean-Well/GST60A24-P1J/?qs=%2fha2pyFadui3kbIPD59xs9qh1hhbffoeYF3QlwoAcmQvpDcakgizcg%3d%3d|20.66|1|20.66
