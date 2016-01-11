@@ -1,6 +1,6 @@
 import unittest
 from backend.device.thermometer import Thermometer
-from backend.device.dummy import MockMAX31855
+from backend.device.mock import MockMAX31855
 import math
 
 

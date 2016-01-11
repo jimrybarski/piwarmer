@@ -1,6 +1,6 @@
 import unittest
 from backend.device.heater import Heater
-from backend.device.dummy import MockGPIO
+from backend.device.mock import MockGPIO
 
 
 class HeaterTests(unittest.TestCase):

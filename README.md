@@ -8,6 +8,10 @@ This repo contains everything you need to make and configure your own. We can't 
 
 The PiWarmer is controlled over wifi from any nearby computer through a simple web interface. It works just like most thermocyclers, where you create users and programs. Unlike thermal cyclers, you also have to define the [PID](https://en.wikipedia.org/wiki/PID_controller) values for whatever it is you're heating, since the size, shape and heat capacity of each heating block is unique.
 
-## Development
+## How to Build
 
-The backend is written in Python, and the frontend is in Javascript/jQuery. We do not intend on adding any more features ourselves, though we will fix serious bugs if time permits. That said, we will accept pull requests if you've written some code you think others might benefit from.
+You'll need basic electronics skills. Schematics are provided [here](https://github.com/jimrybarski/piwarmer/schematics) along with the list of materials and some photos of a completed device.
+
+## How to Configure
+
+There are instructions on the wiki for this repo, but we'll add an image that you can just write to the SD drive.
