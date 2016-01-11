@@ -12,7 +12,7 @@ The PiWarmer is controlled over wifi from any nearby computer through a simple w
 
 ## How to Build
 
-You'll need basic electronics skills. Schematics are provided [here](https://github.com/jimrybarski/piwarmer/schematics) along with the list of materials and some photos of a completed device.
+You'll need basic electronics skills. Schematics are provided [here](https://github.com/jimrybarski/piwarmer/blob/master/schematics/README.md) along with the [bill of materials](https://github.com/jimrybarski/piwarmer/blob/master/schematics/bom.md) and some photos of a completed device.
 
 ## How to Configure
 
