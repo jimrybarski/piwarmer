@@ -4,6 +4,8 @@ Keep in mind that this was designed by some random biologist with no background 
 doing and see obvious room for improvement, please don't feel constrained by this design.
 
 A mostly-complete bill of materials is [here](https://github.com/jimrybarski/piwarmer/blob/master/schematics/bom.md).
+
+
 [Click for high resolution version](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/images/wiring.png)
 ![alt tag](https://github.com/jimrybarski/piwarmer/blob/master/schematics/images/wiring.png)
 
