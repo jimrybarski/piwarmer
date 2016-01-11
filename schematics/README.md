@@ -3,8 +3,8 @@
 [View the bill of materials](https://github.com/jimrybarski/piwarmer/blob/master/schematics/bom.md).
 
 
-[Click for high resolution version](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/images/wiring.png)
 ![alt tag](https://github.com/jimrybarski/piwarmer/blob/master/schematics/images/wiring.png)
+[Click for high resolution schematic](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/images/wiring.png)
 
 Everything is mounted on an aluminum plate, which serves as a ground. Offsets or plastic enclosures separate the
 components from the plate. Alternative approaches could easily be conceived.
