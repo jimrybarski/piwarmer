@@ -15,12 +15,12 @@
 |MicroSD card|SanDisk||8.99|1|8.99|http://www.amazon.com/SanDisk-16GB-microSD-Card/dp/B004KSMXVM
 |MicroUSB connector|Motorola|SKN6238|3.96|1|3.96|http://www.amazon.com/Motorola-SKN6238-MicroUSB-Data-Cable/dp/B000X96G1K
 |K-Type Thermocouple Female Adapter|Digikey|290-1986-ND|7.1|1|7.1|http://www.digikey.com/product-detail/en/A346/290-1986-ND/4312200
-|Barrel connector|||||1
-|1 amp fuse|||||1
-|2.5 amp fuse|||||1
-|Crimp connector housing (male)|||||2
-|Crimp connector housing (female)|||||2
-|Female spade connector|||||4
-|Ring terminals|||||3
-|Assorted screws|||||12
-|M2.5 standoff screws|||||4
+|Barrel connector||||1|
+|1 amp fuse||||1|
+|2.5 amp fuse||||1|
+|Crimp connector housing (male)||||2|
+|Crimp connector housing (female)||||2|
+|Female spade connector||||4|
+|Ring terminals||||3|
+|Assorted screws||||12|
+|M2.5 standoff screws||||4|
