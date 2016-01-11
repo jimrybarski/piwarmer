@@ -1,5 +1,6 @@
 # Schematics for the PiWarmer
 
+[Click for high resolution version](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/wiring.png)
 ![alt tag](https://github.com/jimrybarski/piwarmer/blob/master/schematics/wiring.png)
 
 Everything is mounted on an aluminum plate, which serves as a ground. Offsets or plastic enclosures separate the
