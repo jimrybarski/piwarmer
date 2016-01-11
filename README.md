@@ -1,6 +1,8 @@
 # PiWarmer
 
-The PiWarmer is a book-sized device that controls the temperature of a heating element accoring to an arbitrary, user-defined program. It was developed in the [Finkelstein Lab](http://finkelsteinlab.org/) to regulate the temperature of several on-microscope experiments that required complex and precise changes in temperature. This repo contains everything you need to make and configure your own. We can't build one for you, but you should be able to build your own with a cursory knowledge of electronics.
+The PiWarmer is a book-sized device that controls the temperature of a heating element accoring to an arbitrary, user-defined program. It was developed in the [Finkelstein Lab](http://finkelsteinlab.org/) to regulate the temperature of several on-microscope experiments that required complex and precise changes in temperature.
+
+This repo contains everything you need to make and configure your own. We can't build one for you, but you should be able to build your own with a cursory knowledge of electronics.
 
 ![alt tag](https://github.com/jimrybarski/piwarmer/blob/master/schematics/images/exterior_pi.jpg)
 
