@@ -1,13 +1,10 @@
 # Schematics for the PiWarmer
 
-Keep in mind that this was designed by some random biologist with no background in electronics. If you know what you're
-doing and see obvious room for improvement, please don't feel constrained by this design.
-
-A mostly-complete bill of materials is [here](https://github.com/jimrybarski/piwarmer/blob/master/schematics/bom.md).
+[View the bill of materials](https://github.com/jimrybarski/piwarmer/blob/master/schematics/bom.md).
 
 
-[Click for high resolution version](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/images/wiring.png)
 ![alt tag](https://github.com/jimrybarski/piwarmer/blob/master/schematics/images/wiring.png)
+[Click for high resolution schematic](https://raw.githubusercontent.com/jimrybarski/piwarmer/master/schematics/images/wiring.png)
 
 Everything is mounted on an aluminum plate, which serves as a ground. Offsets or plastic enclosures separate the
 components from the plate. Alternative approaches could easily be conceived.
