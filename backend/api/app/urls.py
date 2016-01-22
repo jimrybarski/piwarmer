@@ -22,4 +22,4 @@ skip = url(r'skip', views.SkipView.as_view())
 temperature_logs = url(r'logs', views.TemperatureLogView.as_view())
 
 
-urlpatterns = [url(r'^backend/', include(router.urls)), stop, start, current, skip, temperature_logs]
+urlpatterns = [url(r'', include(router.urls)), stop, start, current, skip, temperature_logs]
