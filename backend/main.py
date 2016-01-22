@@ -13,7 +13,10 @@ maxlog.disabled = True
 
 # Set up a logger for application notifications and errors
 log = logging.getLogger("heater")
-handler = RotatingFileHandler('/var/log/piwarmer/heater.log', maxBytes=1024, backupCount=5000)
+
+# We use rotating log files so that if there is a crash mid-run, we will lose the least amount possible.
+# 5120 bytes is around 50 lines of log messages
+handler = RotatingFileHandler('/var/log/piwarmer/heater.log', maxBytes=5120, backupCount=10000)
 formatter = logging.Formatter('%(asctime)s\t%(name)s\t%(levelname)s\t\t%(message)s')
 handler.setFormatter(formatter)
 log.addHandler(handler)
