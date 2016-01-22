@@ -26,7 +26,7 @@ SECRET_KEY = 'yc$@k)$$*#f9bn770zo6ksl$^j*&!1r8^-if3eu_5jb$n!by-s'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+FORCE_SCRIPT_NAME = '/backend'
 
 # Application definition
 
