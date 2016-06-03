@@ -1,6 +1,11 @@
 import logging
 import math
+import os
 
+# The temperature sensor sometimes erroneously reports temperatures between -100 and -200 degrees
+# To be safe, we ignore any results that are less than 10 degrees since the room will never get that
+# cold. You can override this limit by setting the environment variable MINIMUM_BELIEVABLE_TEMPERATURE.
+MINIMUM_BELIEVABLE_TEMPERATURE = float(os.getenv('MINIMUM_BELIEVABLE_TEMPERATURE', 10.0))
 log = logging.getLogger("heater." + __name__)
 
 
@@ -28,6 +33,6 @@ class Thermometer(object):
 
         """
         temperature = float('NaN')
-        while math.isnan(temperature):
+        while math.isnan(temperature) or temperature < MINIMUM_BELIEVABLE_TEMPERATURE:
             temperature = float(self._sensor.readTempC())
         return temperature
