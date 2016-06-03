@@ -3,6 +3,8 @@ body {
 	padding:20px; 
 	font:30px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
     width:95%;
+    background-color: black;
+    color: gray;
 }
 
 input, select {
@@ -28,22 +30,22 @@ input[class="program_button"] {
 
 input[name="stop"] {
    background-color: #806666;
-   color: #FFFFFF;
+   color: lightgray;
 }
 
 input[name="skip"] {
    background-color: #806666;
-   color: #FFFFFF;
+   color: lightgray;
 }
 
 input[id="delete"] {
    background-color: #FF2020;
-   color: #FFFFFF;
+   color: lightgray;
 }
 
 input[class="oddball"] {
     background-color: #6699FF;
-    color: #FFFFFF;
+    color: lightgray;
 }
 
 td[class="step_id"] {
@@ -68,7 +70,7 @@ thead {
 
 thead th[colspan],
 thead th[rowspan] {
-	background:#66a9bd;
+	background:#084B8A;
 }
 
 tbody[class="setting"],
@@ -86,7 +88,7 @@ tbody[class="setting"] td {
 }
 
 tr[class="current_step"] {
-    background:#ffa500;
+    background:#7f5200;
     font-weight:bold;
 }
 
@@ -111,15 +113,15 @@ a[class="breadcrumb"]{
 
 a[class="breadcrumb"]:link, a[class="breadcrumb"]:visited {
     font-weight:bold;
-    color:#FFFFFF;
-    background-color:#91c5d4;
+    color: gray;
+    background-color:#084B8A;
     text-align:center;
     padding:4px;
     text-decoration:none;
 }
 
 a[class="breadcrumb"]:hover, a[class="breadcrumb"]:active {
-    background-color:#66a9bd;
+    background-color: #084B8A;
 }
 
 #left {
